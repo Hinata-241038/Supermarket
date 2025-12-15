@@ -46,7 +46,16 @@ h1 {
     margin-top: 40px;
 }
 
-.back-btn, .hacchu-btn {
+.back-btn  {
+    width: 100px;
+    height: 50px;
+    background: #dcdcdc;
+    font-size: 20px;
+    border-radius: 6px;
+    border: none;
+}
+
+.hacchu-btn {
     width: 100px;
     height: 50px;
     background: #dcdcdc;
