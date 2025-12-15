@@ -73,3 +73,22 @@ h1 {
     font-size: 20px;
     border-radius: 6px;
 }
+
+.tabs {
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.tabs label {
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+.tabs input[type="radio"] {
+    margin-right: 5px;
+}
+
+.dot {
+    color: #333;
+    margin-right: 4px;
+}
