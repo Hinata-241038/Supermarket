@@ -1,5 +1,5 @@
 <?php
-$host = "localhost";
+$host = "172.16.1.38";
 $user = "user";
 $pass = "user";        // XAMPP はパスワード空欄
 $dbname = "supermarketmanager";
