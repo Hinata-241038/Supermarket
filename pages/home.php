@@ -12,6 +12,6 @@
     <a href="hacchu_form.php" id="hacchuBtn" class="menu-button">発注</a>
     <a href="zaiko.php" id="zaikoBtn" class="menu-button">在庫情報</a>
     <a href="haiki.php" id="haikiBtn" class="menu-button">廃棄</a>
-    <a href="logu.php" class="logout">ログアウト</a>
+    <a href="logu.php" class="logout">ログアウトa</a>
 </body>
 </html> 
