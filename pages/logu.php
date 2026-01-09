@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>ログイン画面</title>
-  <link rel="stylesheet" href="../assets/css/logu.css">
+  <link rel="stylesheet" href="../assts/css/logu.css">
 </head>
 <body>
   <div class="container">
