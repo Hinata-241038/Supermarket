@@ -1,3 +1,44 @@
+<?php
+// DB接続
+$dsn = 'mysql:host=localhost;dbname=supermarket;charset=utf8';
+$user = 'root';
+$pass = '';
+
+try {
+    $pdo = new PDO($dsn, $user, $pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+    ]);
+} catch (PDOException $e) {
+    exit('DB接続失敗: ' . $e->getMessage());
+}
+
+// 登録処理
+$message = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $user_id = $_POST['user_id'] ?? '';
+    $password = $_POST['password'] ?? '';
+
+    if ($user_id === '' || $password === '') {
+        $message = 'IDとパスワードを入力してください';
+    } else {
+        // パスワードをハッシュ化
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+
+        try {
+            $sql = "INSERT INTO users (user_id, password) VALUES (:user_id, :password)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                ':user_id' => $user_id,
+                ':password' => $hash
+            ]);
+            $message = '登録が完了しました';
+        } catch (PDOException $e) {
+            $message = 'このIDは既に使われています';
+        }
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
