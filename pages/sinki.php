@@ -1,6 +1,6 @@
 <?php
 // DB接続
-$dsn = 'mysql:host=localhost;dbname=supermarket;charset=utf8';
+$dsn = 'mysql:host=localhost;dbname=supermarketmanager;charset=utf8';
 $user = 'root';
 $pass = '';
 
