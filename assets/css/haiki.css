@@ -10,15 +10,21 @@ body {
     max-width: 900px;
     margin: 0 auto;
     text-align: center;
+    padding-top: 20px;
 }
 
+/* 戻る（左下固定） */
 .back-btn {
-    margin: 20px;
+    position: fixed;
+    left: 20px;
+    top: 20px;
     padding: 10px 20px;
     background: #dcdcdc;
     border: none;
     font-size: 20px;
     border-radius: 6px;
+    cursor: pointer;
+    z-index: 10;
 }
 
 h1 {
@@ -26,19 +32,17 @@ h1 {
     margin: 10px 0;
 }
 
-.tabs {
+.switch-area {
     font-size: 22px;
     margin: 20px 0;
 }
 
-.dot {
-    margin: 0 20px;
-}
-
+/* テーブル */
 .item-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
+    text-align: left; /* ここ重要：表は左寄せ */
 }
 
 .item-table th {
@@ -53,10 +57,22 @@ h1 {
     font-size: 18px;
 }
 
+/* 廃棄リンクをボタン見た目に */
 .discard-btn {
+    display: inline-block;
     background: #dcdcdc;
     padding: 8px 16px;
-    border: none;
     border-radius: 4px;
     font-size: 18px;
+    text-decoration: none;
+    color: #000;
+}
+
+/* 期限色分け（行の背景） */
+tr.expired {
+    background: #ffd6d6; /* 赤系 */
+}
+
+tr.warning {
+    background: #fff1b8; /* 黄系 */
 }

@@ -7,7 +7,12 @@ require_once __DIR__ . '/../dbconnect.php';
 /* 表示タイプ（デフォルト：消費期限） */
 $type = $_GET['type'] ?? 'use';
 
-/* SQL（今回は stock.expire_date を共通で使用） */
+/*
+  期限は一旦 stock.expire_date を使用。
+  JOIN列が環境で違う場合：
+    - itemsの主キーが item_id なら  ON s.item_id = i.item_id
+    - stock側が items_id なら      ON s.items_id = i.id
+*/
 $sql = "
 SELECT
     i.item_name,
@@ -21,7 +26,7 @@ ORDER BY s.expire_date
 $stmt = $pdo->query($sql);
 $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$today = date('Y-m-d');
+$today = new DateTime('today');
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -56,7 +61,7 @@ $today = date('Y-m-d');
     </form>
 
     <!-- 一覧テーブル -->
-    <table>
+    <table class="item-table">
         <tr>
             <th>商品名</th>
             <th>数量</th>
@@ -65,20 +70,44 @@ $today = date('Y-m-d');
             <th>操作</th>
         </tr>
 
-        <?php foreach ($list as $row): ?>
-            <?php
-                $expired = ($row['expire_date'] < $today);
-            ?>
-            <tr class="<?= $expired ? 'expired' : '' ?>">
-                <td><?= htmlspecialchars($row['item_name']) ?></td>
-                <td><?= htmlspecialchars($row['quantity']) ?></td>
-                <td><?= htmlspecialchars($row['expire_date']) ?></td>
-                <td><?= $expired ? '期限切れ' : 'OK' ?></td>
-                <td>
-                    <a href="disposal_form.php">廃棄</a>
-                </td>
+        <?php if (empty($list)): ?>
+            <tr>
+                <td colspan="5">表示するデータがありません（在庫未登録 or JOIN不一致の可能性）</td>
             </tr>
-        <?php endforeach; ?>
+        <?php else: ?>
+            <?php foreach ($list as $row): ?>
+                <?php
+                    $expireStr = $row['expire_date'] ?? '';
+                    $rowClass  = '';
+                    $judgeText = '不明';
+
+                    if ($expireStr !== '') {
+                        $expire = new DateTime($expireStr);
+                        if ($expire < $today) {
+                            $rowClass = 'expired';
+                            $judgeText = '期限切れ';
+                        } else {
+                            $diffDays = (int)$today->diff($expire)->days;
+                            if ($diffDays <= 3) {
+                                $rowClass = 'warning';
+                                $judgeText = '期限間近';
+                            } else {
+                                $judgeText = 'OK';
+                            }
+                        }
+                    }
+                ?>
+                <tr class="<?= htmlspecialchars($rowClass) ?>">
+                    <td><?= htmlspecialchars($row['item_name'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($row['quantity'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($row['expire_date'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($judgeText) ?></td>
+                    <td>
+                        <a class="discard-btn" href="disposal_form.php">廃棄</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </table>
 </div>
 
