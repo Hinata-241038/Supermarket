@@ -16,12 +16,12 @@ $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $login_id = $_POST['login_id'] ?? '';
-    $password = $_POST['password'] ?? '';
+    $password_hash = $_POST['password_hash'] ?? '';
 
-    if ($login_id === '' || $password === '') {
+    if ($login_id === '' || $password_hash === '') {
         $message = 'IDとパスワードを入力してください';
     } else {
-        $password_hash = password_hash($password, PASSWORD_DEFAULT);
+        $password_hash = password_hash($password_hash, PASSWORD_DEFAULT);
 
         try {
             $sql = "
@@ -69,10 +69,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <div>
-        <a href = "logu.php">
-            <button class="back-btn">戻る</button>
-        </a>
-        <button class="submit-btn">登録</button>
+        <a href="logu.php" class="back-btn">戻る</a>
+        <button type="submit" class="submit-btn">登録</button>
     </div>
 </body>
 </html>

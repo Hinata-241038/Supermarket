@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     /* 入力値 */
     $login_id = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
+    $password_hash = $_POST['password_hash'] ?? '';
 
     /* ユーザー取得 */
     $sql = "SELECT * FROM users WHERE login_id = :login_id";
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     /* ログイン判定 */
-    if ($user && password_verify($password, $user['password_hash'])) {
+    if ($user && password_verify($password_hash, $user['password_hash'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['login_id'] = $user['login_id'];
 
