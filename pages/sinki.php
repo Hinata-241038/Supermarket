@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="form-countainer">
         <div class="form-row">
             <label for="user_id">ID</label>
-            <input type="text" id="user_id" name="user_id">
+            <input type="text" id="user_id" name="login_id">
         </div>
 
         <div class="form-row">
