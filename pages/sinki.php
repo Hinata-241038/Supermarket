@@ -18,10 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $login_id = $_POST['login_id'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    if ($login_id === '' || $password_hash === '') {
+    if ($login_id === '' || $password === '') {
         $message = 'IDとパスワードを入力してください';
     } else {
-        $password_hash = password_hash($password_hash, PASSWORD_DEFAULT);
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
         try {
             $sql = "
