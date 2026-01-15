@@ -16,7 +16,7 @@ $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $login_id = $_POST['login_id'] ?? '';
-    $password_hash = $_POST['password_hash'] ?? '';
+    $password = $_POST['password'] ?? '';
 
     if ($login_id === '' || $password_hash === '') {
         $message = 'IDとパスワードを入力してください';
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <h1 class="title">新規登録</h1>
     <form method="post">
-    <div class="form-countainer">
+    <div class="form-container">
         <div class="form-row">
             <label for="user_id">ID</label>
             <input type="text" id="user_id" name="login_id">
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="form-row">
             <label for="password">パスワード</label>
-            <input type="password" id="password" name="password_hash">            
+            <input type="password" id="password" name="password">            
         </div>
     </div>
 
