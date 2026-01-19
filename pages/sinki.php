@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 <?php
 // DB接続
 $dsn = 'mysql:host=localhost;dbname=supermarketmanager;charset=utf8';
@@ -45,27 +47,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
+>>>>>>> origin/main
 
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SuperMarketManager</title>
+    <title>SuperMarketManagement</title>
     <link rel="stylesheet" href="../assets/css/sinki.css">
 </head>
 <body>
+<<<<<<< HEAD
+
+<h1 class="title">新規登録</h1>
+
+<?php if (isset($_GET['error'])): ?>
+<p class="error">未入力の項目があります</p>
+<?php endif; ?>
+
+
+<!-- ★ form を必ず追加 -->
+<form action="../php/users/add.php" method="post">
+
+    <div class="form-container">
+        <div class="form-row">
+            <label for="login_id">ID</label>
+            <input type="text" id="login_id" name="login_id" required>
+=======
     <h1 class="title">新規登録</h1>
     <form method="post">
     <div class="form-container">
         <div class="form-row">
             <label for="user_id">ID</label>
             <input type="text" id="user_id" name="login_id">
+<<<<<<< HEAD
+>>>>>>> origin/main
+=======
+>>>>>>> 274123b5cb286705a7445188a0a85c1c859b43fa
         </div>
 
         <div class="form-row">
             <label for="password">パスワード</label>
+<<<<<<< HEAD
+<<<<<<< HEAD
+            <input type="password" id="password" name="password" required>
+=======
             <input type="password" id="password" name="password">            
+>>>>>>> origin/main
+=======
+            <input type="password" id="password" name="password">            
+>>>>>>> 274123b5cb286705a7445188a0a85c1c859b43fa
         </div>
     </div>
 
@@ -73,5 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <a href="logu.php" class="back-btn">戻る</a>
         <button type="submit" class="submit-btn">登録</button>
     </div>
+
+</form>
+
+
 </body>
 </html>
