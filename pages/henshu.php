@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="hacchu.css">
-    <title>発注</title>
+    <link rel="stylesheet" href="../assets/css/henshu.css">
+    <title>編集</title>
 </head>
 <body>
     <div class="container">
-        <h1>発注</h1>
+        <header>
+            <div class="home-icon">&#8962;</div>
+            <h1>編集</h1>
+        </header>
 
-        <form class="order-form">
-            <label>発注先</label>
-            <input type="text">
-
+        <form class="edit-form">
             <label>JAN</label>
             <input type="text">
 
@@ -26,17 +26,18 @@
             <label>個数（点）</label>
             <input type="number">
 
-            <label>単価（円）</label>
+            <label>単価</label>
             <input type="number">
+
+            <label>期限</label>
+            <input type="date">
         </form>
 
         <div class="buttons">
-            <a href="home.html">
-            <button class="back-btn">戻る</button>
+            <a href="zaiko.php">
+                <button type="button" class="back-btn">戻る</button>
             </a>
-            <a href="#">
-            <button class="hacchu-btn">発注</button>
-            </a>
+            <button class="submit-btn">登録</button>
         </div>
     </div>
 </body>

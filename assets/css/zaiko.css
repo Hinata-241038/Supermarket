@@ -1,0 +1,105 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+}
+
+/* 戻る */
+.back-btn {
+    position: fixed;
+    left: 20px;
+    top: 20px;
+    padding: 10px 20px;
+    font-size: 20px;
+    background-color: #d9d9d9;
+    border: none;
+    cursor: pointer;
+}
+
+/* タイトル */
+.title {
+    font-size: 48px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* 検索エリア */
+.search-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.search-box {
+    width: 60%;
+    padding: 10px;
+    font-size: 20px;
+    background-color: #d9d9d9;
+    border: none;
+}
+
+.search-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    border: none;
+    background-color: #d9d9d9;
+    cursor: pointer;
+}
+
+.order-btn {
+    font-size: 32px;
+    padding: 10px 25px;
+    background-color: #d9d9d9;
+    border: none;
+    cursor: pointer;
+}
+
+/* 表 */
+.item-table {
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
+}
+
+.item-table th {
+    background-color: #d9d9d9;
+    padding: 10px;
+    font-size: 18px;
+}
+
+.item-table td {
+    padding: 8px;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+}
+
+/* =========================
+   追加：在庫0を赤表示
+   ========================= */
+.stock-zero {
+    color: #d10000;
+    font-weight: bold;
+}
+
+/* =========================
+   追加：期限警告表示
+   ========================= */
+.expire-over {
+    color: #d10000;
+    font-weight: bold;
+}
+
+.expire-soon {
+    color: #cc6a00;
+    font-weight: bold;
+}
+
+/* 行全体を薄く強調（見落とし防止） */
+.row-expire-over {
+    background: rgba(209, 0, 0, 0.08);
+}
+
+.row-expire-soon {
+    background: rgba(204, 106, 0, 0.10);
+}

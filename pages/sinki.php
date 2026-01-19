@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SuperMarketMagament</title>
-    <link rel="stylesheet" href="sinki.css">
+    <link rel="stylesheet" href="../assets/css/sinki.css">
 </head>
 <body>
     <h1 class="title">新規登録</h1>
@@ -21,8 +21,8 @@
     </div>
 
     <div>
-        <a href = "logu.html">
-        <button class="back-btn">戻る</button>
+        <a href = "logu.php">
+            <button class="back-btn">戻る</button>
         </a>
         <button class="submit-btn">登録</button>
     </div>

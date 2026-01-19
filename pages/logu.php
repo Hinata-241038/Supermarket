@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>ログイン画面</title>
-  <link rel="stylesheet" href="logu.css">
+  <link rel="stylesheet" href="../assets/css/logu.css">
 </head>
 <body>
   <div class="container">
@@ -12,8 +12,8 @@
       <label>ユーザー名: <input type="text" name="username" required></label><br>
       <label>パスワード: <input type="password" name="password" required></label><br>
       <div class="button-group">
-        <a href="sinki.html">新規登録</a>
-        <a href="home.html">ログイン</a>
+        <a href="sinki.php">新規登録</a>
+        <a href="home.php">ログイン</a>
       </div>
     </form>
   </div>
