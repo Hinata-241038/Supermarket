@@ -3,23 +3,23 @@ body {
     margin: 0;
 }
 
-/* ホームアイコン */
-.home-btn {
-    font-size: 36px;
-    border: 2px solid #000;
-    width: 60px;
-    height: 60px;
-    text-align: center;
-    line-height: 55px;
-    margin: 20px;
+/* 戻る */
+.back-btn {
+    position: fixed;
+    left: 20px;
+    top: 20px;
+    padding: 10px 20px;
+    font-size: 20px;
+    background-color: #d9d9d9;
+    border: none;
+    cursor: pointer;
 }
 
 /* タイトル */
 .title {
     font-size: 48px;
     text-align: center;
-    margin-top: -60px;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 /* 検索エリア */
@@ -47,7 +47,6 @@ body {
     cursor: pointer;
 }
 
-/* 発注ボタン */
 .order-btn {
     font-size: 32px;
     padding: 10px 25px;
@@ -56,24 +55,9 @@ body {
     cursor: pointer;
 }
 
-/* カテゴリーボタン */
-.category-area {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.category-btn {
-    margin: 0 20px;
-    padding: 8px 25px;
-    background-color: #d9d9d9;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-}
-
-/* 表ヘッダー */
+/* 表 */
 .item-table {
-    width: 80%;
+    width: 90%;
     margin: 20px auto;
     border-collapse: collapse;
 }
@@ -81,18 +65,41 @@ body {
 .item-table th {
     background-color: #d9d9d9;
     padding: 10px;
-    font-size: 20px;
-    text-align: center;
+    font-size: 18px;
 }
 
-/* 戻るボタン */
-.back-btn {
-    position: fixed;
-    left: 20px;
-    bottom: 20px;
-    padding: 15px 25px;
-    font-size: 22px;
-    background-color: #d9d9d9;
-    border: none;
-    cursor: pointer;
+.item-table td {
+    padding: 8px;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+}
+
+/* =========================
+   追加：在庫0を赤表示
+   ========================= */
+.stock-zero {
+    color: #d10000;
+    font-weight: bold;
+}
+
+/* =========================
+   追加：期限警告表示
+   ========================= */
+.expire-over {
+    color: #d10000;
+    font-weight: bold;
+}
+
+.expire-soon {
+    color: #cc6a00;
+    font-weight: bold;
+}
+
+/* 行全体を薄く強調（見落とし防止） */
+.row-expire-over {
+    background: rgba(209, 0, 0, 0.08);
+}
+
+.row-expire-soon {
+    background: rgba(204, 106, 0, 0.10);
 }
