@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="haiki.css">
+    <title>廃棄</title>
+</head>
+<body>
+    <div class="container">
+
+        <h1>廃棄</h1>
+
+        <div class="tabs">
+            <label>
+        <input type="radio" name="limitType" value="best" checked>
+        <span class="dot"></span> 賞味
+    </label>
+
+    <label>
+        <input type="radio" name="limitType" value="use">
+        <span class="dot"></span> 消費
+    </label>
+        </div>
+
+        <table class="item-table">
+            <thead>
+                <tr>
+                    <th>JAN</th>
+                    <th>商品名</th>
+                    <th>期限</th>
+                    <th>個数</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>0000000000000</td>
+                    <td>サンプル商品</td>
+                    <td>2025-12-31</td>
+                    <td>5</td>
+                    <td><button class="discard-btn">廃棄</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+<a href = "home.html">
+    <button class="back-btn">戻る</button>
+    </a>
+</html>
