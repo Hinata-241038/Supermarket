@@ -1,3 +1,4 @@
+<?php
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -14,7 +15,6 @@
             <label for="user_id">ID</label>
             <input type="text" id="user_id" name="login_id">
         </div>
-
         <div class="form-row">
             <label for="password">パスワード</label>
             <input type="password" id="password" name="password">            
@@ -33,3 +33,5 @@
 
 </body>
 </html>
+//コメント
+?>
