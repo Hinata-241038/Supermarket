@@ -3,16 +3,16 @@ require_once __DIR__ . '/../dbconnect.php';
 
 $sql = "
 SELECT
-  i.jan_code,
+  s.id AS stock_id,
   i.item_name,
+  i.jan_code,
   c.category_label_ja,
   s.quantity,
   s.expire_date
 FROM stock s
 JOIN items i ON s.item_id = i.id
 LEFT JOIN categories c ON i.category_id = c.id
-WHERE
-  s.expire_date < CURDATE()
+WHERE s.expire_date < CURDATE()
 ORDER BY s.expire_date
 ";
 $stmt = $pdo->query($sql);
@@ -50,15 +50,21 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <td><?= (int)$item['quantity'] ?></td>
   <td><?= htmlspecialchars($item['expire_date']) ?></td>
   <td>
-    <a href="dispose.php?jan=<?= urlencode($item['jan_code']) ?>"
-       class="discard-btn">
-       廃棄
-    </a>
+    <form method="post"
+          action="haiki_execute.php"
+          onsubmit="return confirm('この在庫を廃棄しますか？');">
+      <input type="hidden" name="stock_id" value="<?= $item['stock_id'] ?>">
+      <button type="submit" class="discard-btn">廃棄確定</button>
+    </form>
   </td>
 </tr>
 <?php endforeach; ?>
+
+<?php if (empty($items)): ?>
+<tr><td colspan="6">廃棄対象はありません</td></tr>
+<?php endif; ?>
+
 </table>
 </div>
-
 </body>
 </html>
