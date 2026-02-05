@@ -28,10 +28,12 @@ body {
     justify-content: center;
     align-items: center;
     gap: 15px;
+    flex-wrap: wrap;
 }
 
 .search-box {
-    width: 60%;
+    width: 55%;
+    min-width: 320px;
     padding: 10px;
     font-size: 20px;
     background-color: #d9d9d9;
@@ -47,12 +49,63 @@ body {
     cursor: pointer;
 }
 
-.order-btn {
-    font-size: 32px;
-    padding: 10px 25px;
-    background-color: #d9d9d9;
+/* AND/OR ラジオ */
+.search-mode {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    background: #f2f2f2;
+    border-radius: 6px;
+    font-size: 16px;
+}
+.search-mode label {
+    cursor: pointer;
+}
+
+/* エラー表示 */
+.error-msg {
+    width: 90%;
+    margin: 10px auto 0;
+    padding: 10px 12px;
+    background: rgba(209, 0, 0, 0.08);
+    color: #d10000;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+/* 期限切替ボタン領域 */
+.toggle-area {
+    width: 90%;
+    margin: 10px auto 0;
+    display: flex;
+    justify-content: flex-end;
+}
+.toggle-expire-btn {
+    display: inline-block;
+    padding: 8px 12px;
+    background: #d9d9d9;
+    text-decoration: none;
+    border-radius: 6px;
+    color: #000;
+    font-weight: bold;
+}
+
+/* 廃棄処理ボタン領域 */
+.dispose-area {
+    width: 90%;
+    margin: 10px auto 0;
+    display: flex;
+    justify-content: flex-end;
+}
+.dispose-btn {
+    padding: 8px 14px;
     border: none;
     cursor: pointer;
+    background: #d9d9d9;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
 }
 
 /* 表 */
@@ -74,17 +127,13 @@ body {
     border-bottom: 1px solid #ccc;
 }
 
-/* =========================
-   追加：在庫0を赤表示
-   ========================= */
+/* 在庫0を赤表示 */
 .stock-zero {
     color: #d10000;
     font-weight: bold;
 }
 
-/* =========================
-   追加：期限警告表示
-   ========================= */
+/* 期限警告表示 */
 .expire-over {
     color: #d10000;
     font-weight: bold;
@@ -104,24 +153,7 @@ body {
     background: rgba(204, 106, 0, 0.10);
 }
 
-.low-stock {
-  color: #c62828;
-  font-weight: bold;
-}
-
-.low-stock-label {
-  margin-left: 6px;
-  padding: 2px 6px;
-  font-size: 12px;
-  background: #c62828;
-  color: #fff;
-  border-radius: 4px;
-}
-
-.row-low-stock {
-  background: rgba(198, 40, 40, 0.08);
-}
-
+/* 表の発注ボタン */
 .order-suggest-btn {
   padding: 6px 10px;
   background: #1976d2;
