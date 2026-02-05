@@ -38,12 +38,13 @@ $consumeExpr = $hasConsume ? "s.consume_date" : "NULL";
 $dateExprForView = ($expiryMode === 'consume') ? $consumeExpr : $bestExpr;
 
 // 期限切れ判定：消費/賞味のどちらかが切れていたら「期限切れ扱い」(安全運用)
-$expiredParts = [];
-if ($hasConsume) $expiredParts[] = "(s.consume_date IS NOT NULL AND s.consume_date < CURDATE())";
-if ($hasBest || $hasLegacy) {
-  $expiredParts[] = "({$bestExpr} IS NOT NULL AND {$bestExpr} < CURDATE())";
-}
-$expiredExpr = empty($expiredParts) ? "0" : "(" . implode(" OR ", $expiredParts) . ")";
+// ★ 期限切れ判定（安全版：consume_date を一切使わない）
+$expiredExpr = "
+(
+  ({$bestExpr} IS NOT NULL AND {$bestExpr} < CURDATE())
+)
+";
+
 
 /* =========================================================
   2) 検索入力の許可文字（サーバ側）
