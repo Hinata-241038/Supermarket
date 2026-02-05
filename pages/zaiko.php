@@ -5,33 +5,50 @@ ini_set('display_errors', 1);
 require_once __DIR__ . '/../dbconnect.php';
 
 /* =========================================================
-   1) GETパラメータ（検索 / AND-OR / 期限モード）
-   ========================================================= */
-$keyword = trim($_GET['keyword'] ?? '');
-$searchMode = ($_GET['mode'] ?? 'or') === 'and' ? 'and' : 'or';       // and / or
-$expiryMode = ($_GET['expiry'] ?? 'best') === 'consume' ? 'consume' : 'best'; // consume / best
+  共通：カラム存在チェック（列が無くても落ちないようにする）
+========================================================= */
+function hasColumn(PDO $pdo, string $table, string $column): bool
+{
+  $sql = "SHOW COLUMNS FROM {$table} LIKE :col";
+  $st = $pdo->prepare($sql);
+  $st->execute([':col' => $column]);
+  return (bool)$st->fetch(PDO::FETCH_ASSOC);
+}
 
-// 表示用：期限モードごとに参照する日付列
-// best: best_before_date があればそれ、なければ expire_date（互換）
-// consume: consume_date
-$dateExprForView = ($expiryMode === 'consume')
-  ? "s.consume_date"
-  : "COALESCE(s.best_before_date, s.expire_date)";
-
-// 「期限切れ判定」はモードに依存させず、どちらかが切れてたら切れ扱いにする（実務で安全）
-$dateExprExpired = "
-  (
-    (s.consume_date IS NOT NULL AND s.consume_date < CURDATE())
-    OR
-    (COALESCE(s.best_before_date, s.expire_date) IS NOT NULL
-     AND COALESCE(s.best_before_date, s.expire_date) < CURDATE())
-  )
-";
+$hasConsume = hasColumn($pdo, 'stock', 'consume_date');
+$hasBest    = hasColumn($pdo, 'stock', 'best_before_date');
+$hasLegacy  = hasColumn($pdo, 'stock', 'expire_date'); // 互換
 
 /* =========================================================
-   2) 検索欄の入力制限（サーバ側）
-   ひらがな/カタカナ/漢字/英数字/空白のみ許可
-   ========================================================= */
+  1) GET（検索 / AND-OR / 期限モード）
+========================================================= */
+$keyword    = trim($_GET['keyword'] ?? '');
+$searchMode = ($_GET['mode'] ?? 'or') === 'and' ? 'and' : 'or';         // and / or
+$expiryMode = ($_GET['expiry'] ?? 'best') === 'consume' ? 'consume' : 'best'; // consume / best
+
+// 賞味期限モード：best_before_date があればそれ、なければ expire_date
+$bestExpr = $hasBest
+  ? ($hasLegacy ? "COALESCE(s.best_before_date, s.expire_date)" : "s.best_before_date")
+  : ($hasLegacy ? "s.expire_date" : "NULL");
+
+// 消費期限モード：consume_date（無ければNULL）
+$consumeExpr = $hasConsume ? "s.consume_date" : "NULL";
+
+// 表示用の期限（モードで切替）
+$dateExprForView = ($expiryMode === 'consume') ? $consumeExpr : $bestExpr;
+
+// 期限切れ判定：消費/賞味のどちらかが切れていたら「期限切れ扱い」(安全運用)
+$expiredParts = [];
+if ($hasConsume) $expiredParts[] = "(s.consume_date IS NOT NULL AND s.consume_date < CURDATE())";
+if ($hasBest || $hasLegacy) {
+  $expiredParts[] = "({$bestExpr} IS NOT NULL AND {$bestExpr} < CURDATE())";
+}
+$expiredExpr = empty($expiredParts) ? "0" : "(" . implode(" OR ", $expiredParts) . ")";
+
+/* =========================================================
+  2) 検索入力の許可文字（サーバ側）
+  ひらがな/カタカナ/漢字/英数字/空白のみ許可
+========================================================= */
 $allowPattern = '/^[0-9A-Za-zぁ-ゖァ-ヶー一-龯々\s]*$/u';
 $inputError = '';
 if ($keyword !== '' && !preg_match($allowPattern, $keyword)) {
@@ -39,12 +56,11 @@ if ($keyword !== '' && !preg_match($allowPattern, $keyword)) {
 }
 
 /* =========================================================
-   3) 廃棄処理（ボタンを押したときだけ）
-   - 期限切れ：quantity>0 を disposal に移す（同日同理由の二重登録防止）
-   - 在庫切れ：quantity<=0 を disposal に移す（同日同理由の二重登録防止）
-   - その後 stock から該当行を削除
-   ※ stock は1商品1行運用でも、複数行でも壊れないように "集計してINSERT" する
-   ========================================================= */
+  3) 廃棄処理（ボタン押下時だけ）
+  - 期限切れ：在庫>0 を disposalへ（同日同理由の二重登録防止）
+  - 在庫切れ：在庫<=0 を disposalへ（同日同理由の二重登録防止）
+  - 最後に stock から削除
+========================================================= */
 $errorMsg = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_disposal'])) {
@@ -61,15 +77,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_disposal'])) {
         CURDATE() AS disposal_date,
         CURDATE() AS created_at
       FROM stock s
-      WHERE {$dateExprExpired}
+      WHERE {$expiredExpr}
       GROUP BY s.item_id
       HAVING disposal_quantity > 0
-      AND NOT EXISTS (
-        SELECT 1 FROM disposal d
-        WHERE d.item_id = s.item_id
-          AND d.reason = '期限切れ'
-          AND d.disposal_date = CURDATE()
-      )
+         AND NOT EXISTS (
+           SELECT 1 FROM disposal d
+           WHERE d.item_id = s.item_id
+             AND d.reason = '期限切れ'
+             AND d.disposal_date = CURDATE()
+         )
     ";
     $pdo->exec($sqlExpire);
 
@@ -94,17 +110,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_disposal'])) {
     ";
     $pdo->exec($sqlZero);
 
-    // stock から削除（期限切れ OR 在庫切れ）
+    // stock から削除（期限切れ or 在庫切れ）
     $sqlDelete = "
       DELETE FROM stock
       WHERE quantity <= 0
-         OR {$dateExprExpired}
+         OR {$expiredExpr}
     ";
     $pdo->exec($sqlDelete);
 
     $pdo->commit();
 
-    // 二重送信防止
+    // 二重送信防止：GETに戻す
     header('Location: zaiko.php?keyword=' . urlencode($keyword) . '&mode=' . urlencode($searchMode) . '&expiry=' . urlencode($expiryMode));
     exit;
   } catch (Throwable $e) {
@@ -114,15 +130,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_disposal'])) {
 }
 
 /* =========================================================
-   4) 検索条件（空白区切りトークン + AND/OR 切替）
-   対象：商品名 / カテゴリ / JAN / 発注先
-   ========================================================= */
+  4) AND/OR検索（空白区切り）
+  対象：商品名/カテゴリ/JAN/発注先
+========================================================= */
 $params = [];
 $whereSql = '1=1';
 
 if ($inputError !== '') {
-  // 入力が不正なら “検索結果なし” にする（意図せず全件表示しない）
-  $whereSql = '0=1';
+  $whereSql = '0=1'; // 不正入力なら全件表示しない
 } else {
   $tokens = [];
   if ($keyword !== '') {
@@ -148,11 +163,11 @@ if ($inputError !== '') {
 }
 
 /* =========================================================
-   5) 表示データ（重複防止：1商品=1行）
-   - stock は SUM(quantity) で合算
-   - 期限は MIN(期限) で最も近い日付を表示
-   - 発注ボタンは stock_quantity>0 の時のみ
-   ========================================================= */
+  5) 表示データ（重複防止：1商品=1行）
+  - stock 合計 SUM(quantity)
+  - 表示期限は MIN(期限)
+  - 期限切れフラグは MAX(期限切れ判定)
+========================================================= */
 $sql = "
   SELECT
     i.id AS item_id,
@@ -161,27 +176,28 @@ $sql = "
     i.unit,
     i.supplier,
     c.category_label_ja,
+    i.price,
     IFNULL(SUM(s.quantity), 0) AS stock_quantity,
-    MIN({$dateExprForView}) AS nearest_expire
+    MIN({$dateExprForView}) AS nearest_expire,
+    MAX(CASE WHEN {$expiredExpr} THEN 1 ELSE 0 END) AS is_expired
   FROM items i
   LEFT JOIN categories c ON i.category_id = c.id
   LEFT JOIN stock s ON i.id = s.item_id
   WHERE {$whereSql}
-  GROUP BY
-    i.id, i.jan_code, i.item_name, i.unit, i.supplier, c.category_label_ja
+  GROUP BY i.id, i.jan_code, i.item_name, i.unit, i.supplier, c.category_label_ja, i.price
   ORDER BY i.item_name
 ";
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-/* 表示用：期限モードの見出し＆切替リンク */
-$expireTitle = ($expiryMode === 'consume') ? '消費期限' : '賞味期限';
-$nextExpiryMode = ($expiryMode === 'consume') ? 'best' : 'consume';
+/* 期限切替ボタン */
+$expireTitle     = ($expiryMode === 'consume') ? '消費期限' : '賞味期限';
+$nextExpiryMode  = ($expiryMode === 'consume') ? 'best' : 'consume';
 $nextExpiryLabel = ($expiryMode === 'consume') ? '賞味期限に切替' : '消費期限に切替';
 
 $today = new DateTime('today');
-$soon = (new DateTime('today'))->modify('+7 days');
+$soon  = (new DateTime('today'))->modify('+7 days');
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -195,8 +211,8 @@ $soon = (new DateTime('today'))->modify('+7 days');
 <button class="back-btn" onclick="location.href='home.php'">戻る</button>
 <h1 class="title">在庫</h1>
 
-<!-- 検索（入力制限 + AND/OR + 期限モード維持） -->
-<form method="get" class="search-area" id="searchForm">
+<!-- 検索 -->
+<form method="get" class="search-area">
   <input
     type="text"
     name="keyword"
@@ -212,38 +228,35 @@ $soon = (new DateTime('today'))->modify('+7 days');
   </div>
 
   <input type="hidden" name="expiry" value="<?= htmlspecialchars($expiryMode, ENT_QUOTES, 'UTF-8') ?>">
-
   <button class="search-btn" type="submit">🔍</button>
 </form>
 
 <?php if ($inputError !== ''): ?>
   <p class="error-msg"><?= htmlspecialchars($inputError, ENT_QUOTES, 'UTF-8') ?></p>
 <?php endif; ?>
-
 <?php if ($errorMsg !== ''): ?>
   <p class="error-msg"><?= htmlspecialchars($errorMsg, ENT_QUOTES, 'UTF-8') ?></p>
 <?php endif; ?>
 
-<!-- 期限モード切替（完全別モード） -->
-<div class="toggle-area">
+<!-- 右側ボタン群 -->
+<div class="right-actions">
   <a class="toggle-expire-btn"
      href="?keyword=<?= urlencode($keyword) ?>&mode=<?= urlencode($searchMode) ?>&expiry=<?= urlencode($nextExpiryMode) ?>">
      <?= htmlspecialchars($nextExpiryLabel, ENT_QUOTES, 'UTF-8') ?>
   </a>
-</div>
 
-<!-- 廃棄処理（押した時だけ移動） -->
-<form method="post" class="dispose-area">
-  <button
-    type="submit"
-    name="do_disposal"
-    value="1"
-    class="dispose-btn"
-    onclick="return confirm('期限切れ・在庫切れ商品を廃棄処理します。よろしいですか？')"
-  >
-    廃棄処理
-  </button>
-</form>
+  <form method="post" class="dispose-form">
+    <button
+      type="submit"
+      name="do_disposal"
+      value="1"
+      class="dispose-btn"
+      onclick="return confirm('期限切れ・在庫切れ商品を廃棄処理します。よろしいですか？')"
+    >
+      廃棄処理
+    </button>
+  </form>
+</div>
 
 <table class="item-table">
 <tr>
@@ -260,8 +273,9 @@ $soon = (new DateTime('today'))->modify('+7 days');
 <?php foreach ($items as $item): ?>
 <?php
   $qty = (int)$item['stock_quantity'];
+  $isExpired = ((int)$item['is_expired'] === 1);
 
-  // 期限表示（モードで nearest_expire が変わる）
+  // 期限表示（モードの列で表示）
   $expireLabel = '-';
   $expireClass = '';
   $rowClass = '';
@@ -280,6 +294,9 @@ $soon = (new DateTime('today'))->modify('+7 days');
       $expireLabel = $exp->format('Y-m-d');
     }
   }
+
+  // 発注ボタン表示条件（要件優先：0のとき空白）
+  $showOrder = ($qty > 0); // 期限切れでも在庫>0なら表示される
 ?>
 <tr class="<?= $rowClass ?>">
   <td><?= htmlspecialchars($item['jan_code'], ENT_QUOTES, 'UTF-8') ?></td>
@@ -293,25 +310,24 @@ $soon = (new DateTime('today'))->modify('+7 days');
   <td class="<?= $qty <= 0 ? 'stock-zero' : '' ?>"><?= $qty ?></td>
 
   <td>
-    <?php if ($qty > 0): ?>
-      <!-- 在庫が0より大きい時だけ表示 -->
-      <a class="order-suggest-btn"
-         href="hacchu_form.php?jan=<?= urlencode($item['jan_code']) ?>">
-         発注
-      </a>
-    <?php else: ?>
-      &nbsp;
-    <?php endif; ?>
+    <div class="op-buttons">
+      <?php if ($showOrder): ?>
+        <!-- 発注：発注画面へ（JAN渡す → 発注画面で item_id/単価/カテゴリ/単位/商品名/発注先 を自動反映） -->
+        <a class="btn-order" href="hacchu_form.php?jan=<?= urlencode($item['jan_code']) ?>">発注</a>
+      <?php else: ?>
+        <span class="btn-blank">&nbsp;</span>
+      <?php endif; ?>
+
+      <!-- 編集：在庫・商品情報を編集 -->
+      <a class="btn-edit" href="zaiko_edit.php?item_id=<?= (int)$item['item_id'] ?>">編集</a>
+    </div>
   </td>
 </tr>
 <?php endforeach; ?>
 </table>
 
 <script>
-/* =========================================================
-   検索入力の禁止文字をリアルタイム除去（クライアント側）
-   - ひらがな/カタカナ/漢字/英数字/空白のみ許可
-   ========================================================= */
+/* 検索欄：許可文字以外をリアルタイム除去 */
 (function(){
   const input = document.getElementById('keywordInput');
   if (!input) return;
