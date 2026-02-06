@@ -87,7 +87,7 @@ $sql = "
     i.item_name,
     c.category_label_ja,
     i.unit,
-    i.vendor,
+    i.supplier,
     s.quantity,
     {$bestExpr} AS best_date
   FROM stock s
@@ -157,7 +157,7 @@ $stocks = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <td><?= htmlspecialchars($row['item_name']) ?></td>
       <td><?= htmlspecialchars($row['category_label_ja']) ?></td>
       <td><?= htmlspecialchars($row['unit']) ?></td>
-      <td><?= htmlspecialchars($row['vendor']) ?></td>
+      <td><?= htmlspecialchars($row['supplier']) ?></td>
       <td><?= $row['best_date'] ? htmlspecialchars($row['best_date']) : '-' ?></td>
       <td><?= (int)$row['quantity'] ?></td>
       <td>
