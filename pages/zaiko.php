@@ -43,24 +43,49 @@ $expiredExpr = $expiryMode === 'consume'
   廃棄処理（POST）
 ========================================================= */
 $disposeError = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dispose'])) {
   try {
     $pdo->beginTransaction();
 
-    $sqlDelete = "
-      DELETE s
-      FROM stock AS s
-      WHERE s.quantity <= 0
-         OR ({$expiredExpr})
-    ";
-    $pdo->exec($sqlDelete);
+    // 賞味期限式（best_before_date 優先、なければ expire_date）
+    if ($hasBest && $hasLegacy) {
+      $bestExpr = "COALESCE(best_before_date, expire_date)";
+    } elseif ($hasBest) {
+      $bestExpr = "best_before_date";
+    } elseif ($hasLegacy) {
+      $bestExpr = "expire_date";
+    } else {
+      $bestExpr = "NULL";
+    }
 
+    // 消費期限
+    $consumeExpr = $hasConsume ? "consume_date" : "NULL";
+
+    // 期限切れ判定
+    $expiredExpr = ($expiryMode === 'consume')
+      ? "({$consumeExpr} IS NOT NULL AND {$consumeExpr} < CURDATE())"
+      : "({$bestExpr} IS NOT NULL AND {$bestExpr} < CURDATE())";
+
+    // DELETE（エイリアスを使わない安全版）
+    $sql = "
+      DELETE FROM stock
+      WHERE quantity <= 0
+         OR {$expiredExpr}
+    ";
+
+    $pdo->exec($sql);
     $pdo->commit();
+
+    header('Location: zaiko.php');
+    exit;
+
   } catch (PDOException $e) {
     $pdo->rollBack();
     $disposeError = '廃棄処理でエラー: ' . $e->getMessage();
   }
 }
+
 
 /* =========================================================
   在庫一覧取得
