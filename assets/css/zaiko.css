@@ -13,22 +13,23 @@ body { font-family: sans-serif; margin: 0; }
   gap: 14px; flex-wrap: wrap;
 }
 
-.search-box {
-  width: 55%; min-width: 320px;
-  padding: 10px; font-size: 18px;
-  background: #d9d9d9; border: none;
+.search-form{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.search-box{
+  width: 420px;   /* 好みで調整 */
+}
+.search-btn{
+  cursor:pointer;
+}
+.search-mode{
+  display:flex;
+  align-items:center;
+  gap:12px;
 }
 
-.search-btn {
-  width: 40px; height: 40px; font-size: 18px;
-  border: none; background: #d9d9d9; cursor: pointer;
-}
-
-.search-mode {
-  display: flex; align-items: center; gap: 10px;
-  padding: 8px 12px; background: #f2f2f2; border-radius: 8px;
-  font-size: 14px;
-}
 
 .error-msg {
   width: 90%; margin: 10px auto 0;
