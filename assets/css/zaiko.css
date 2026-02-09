@@ -8,29 +8,56 @@ body { font-family: sans-serif; margin: 0; }
 
 .title { font-size: 48px; text-align: center; margin: 30px 0 20px; }
 
-.search-area {
-  display: flex; justify-content: center; align-items: center;
-  gap: 14px; flex-wrap: wrap;
+/* =========================
+   検索エリア（並び：検索欄 → 🔍 → AND/OR）
+========================= */
+.search-area{
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
 }
 
 .search-form{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
+
 .search-box{
-  width: 420px;   /* 好みで調整 */
+  width: 520px;
+  max-width: 70vw;
+  padding: 10px 12px;
+  font-size: 16px;
 }
+
 .search-btn{
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 6px;
+  background: #d9d9d9;
   cursor:pointer;
+  font-size: 18px;
 }
+
 .search-mode{
   display:flex;
   align-items:center;
-  gap:12px;
+  gap: 12px;
+  background: #f3f3f3;
+  padding: 10px 12px;
+  border-radius: 8px;
 }
 
+.search-mode .radio{
+  display:flex;
+  align-items:center;
+  gap: 6px;
+  font-weight: bold;
+}
 
+/* エラー */
 .error-msg {
   width: 90%; margin: 10px auto 0;
   padding: 10px 12px;
@@ -60,6 +87,7 @@ body { font-family: sans-serif; margin: 0; }
 }
 .dispose-form{ margin:0; }
 
+/* テーブル */
 .item-table {
   width: 90%;
   margin: 22px auto;
@@ -79,21 +107,18 @@ body { font-family: sans-serif; margin: 0; }
 }
 
 .stock-zero { color: #d10000; font-weight: bold; }
-
 .expire-over { color: #d10000; font-weight: bold; }
-.expire-soon { color: #cc6a00; font-weight: bold; }
 
 .row-expire-over { background: rgba(209,0,0,0.08); }
-.row-expire-soon { background: rgba(204,106,0,0.10); }
 
-/* 操作ボタン（発注・編集） */
+/* 操作ボタン（編集） */
 .op-buttons{
   display: flex;
   justify-content: center;
   gap: 8px;
 }
 
-.btn-order, .btn-edit{
+.btn-edit{
   display: inline-block;
   padding: 7px 10px;
   border-radius: 6px;
@@ -101,9 +126,5 @@ body { font-family: sans-serif; margin: 0; }
   color: #fff;
   font-weight: bold;
   min-width: 56px;
+  background: #6b7280;
 }
-
-.btn-order { background: #1976d2; }
-.btn-edit  { background: #6b7280; }
-
-.btn-blank{ display:inline-block; min-width:56px; }

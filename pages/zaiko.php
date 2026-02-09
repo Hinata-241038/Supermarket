@@ -9,7 +9,7 @@ require_once __DIR__ . '/../dbconnect.php';
 ========================================================= */
 function hasColumn(PDO $pdo, string $table, string $column): bool
 {
-  $sql = "SHOW COLUMNS FROM {$table} LIKE :col";
+  $sql = "SHOW COLUMNS FROM `{$table}` LIKE :col";
   $st = $pdo->prepare($sql);
   $st->execute([':col' => $column]);
   return (bool)$st->fetch(PDO::FETCH_ASSOC);
@@ -43,41 +43,21 @@ $expiredExpr = $expiryMode === 'consume'
   廃棄処理（POST）
 ========================================================= */
 $disposeError = '';
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dispose'])) {
   try {
     $pdo->beginTransaction();
 
-    // 賞味期限式（best_before_date 優先、なければ expire_date）
-    if ($hasBest && $hasLegacy) {
-      $bestExpr = "COALESCE(best_before_date, expire_date)";
-    } elseif ($hasBest) {
-      $bestExpr = "best_before_date";
-    } elseif ($hasLegacy) {
-      $bestExpr = "expire_date";
-    } else {
-      $bestExpr = "NULL";
-    }
-
-    // 消費期限
-    $consumeExpr = $hasConsume ? "consume_date" : "NULL";
-
-    // 期限切れ判定
-    $expiredExpr = ($expiryMode === 'consume')
-      ? "({$consumeExpr} IS NOT NULL AND {$consumeExpr} < CURDATE())"
-      : "({$bestExpr} IS NOT NULL AND {$bestExpr} < CURDATE())";
-
-    // DELETE（エイリアスを使わない安全版）
-    $sql = "
+    $sqlDelete = "
       DELETE FROM stock
       WHERE quantity <= 0
-         OR {$expiredExpr}
+         OR ({$expiredExpr})
     ";
+    $pdo->exec($sqlDelete);
 
-    $pdo->exec($sql);
     $pdo->commit();
 
-    header('Location: zaiko.php');
+    // POST→GET（連打で同じ処理しない）
+    header('Location: zaiko.php?keyword=' . urlencode($keyword) . '&mode=' . urlencode($searchMode) . '&expiry=' . urlencode($expiryMode));
     exit;
 
   } catch (PDOException $e) {
@@ -86,7 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dispose'])) {
   }
 }
 
-
 /* =========================================================
   在庫一覧取得
 ========================================================= */
@@ -94,12 +73,13 @@ $where = [];
 $params = [];
 
 if ($keyword !== '') {
-  $terms = preg_split('/\s+/', $keyword);
+  $terms = preg_split('/\s+/', $keyword, -1, PREG_SPLIT_NO_EMPTY);
   $conds = [];
   foreach ($terms as $i => $t) {
     $conds[] = "(i.item_name LIKE :kw{$i}
               OR c.category_label_ja LIKE :kw{$i}
-              OR i.jan_code LIKE :kw{$i})";
+              OR i.jan_code LIKE :kw{$i}
+              OR i.supplier LIKE :kw{$i})";
     $params[":kw{$i}"] = "%{$t}%";
   }
   $glue = $searchMode === 'and' ? ' AND ' : ' OR ';
@@ -115,7 +95,8 @@ $sql = "
     i.unit,
     i.supplier,
     s.quantity,
-    {$bestExpr} AS best_date
+    {$bestExpr} AS best_date,
+    {$consumeExpr} AS consume_date
   FROM stock s
   LEFT JOIN items i ON i.id = s.item_id
   LEFT JOIN categories c ON c.id = i.category_id
@@ -130,6 +111,9 @@ $sql .= ' ORDER BY i.item_name';
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $stocks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// 表示する期限名
+$expiryLabel = ($expiryMode === 'consume') ? '消費期限' : '賞味期限';
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -144,36 +128,51 @@ $stocks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <h1 class="title">在庫</h1>
 
+<!-- =======================================================
+  検索エリア（並び：検索欄 → 🔍 → AND/OR）
+  - 既存機能を壊さないため、expiryはhiddenで維持
+======================================================= -->
 <div class="search-area">
-  <form method="get">
+  <form method="get" class="search-form">
     <input
       type="text"
       name="keyword"
       class="search-box"
-      value="<?= htmlspecialchars($keyword) ?>"
+      value="<?= htmlspecialchars($keyword, ENT_QUOTES, 'UTF-8') ?>"
       placeholder="商品名 / カテゴリ / JAN / 発注先（空白区切り可）"
     >
 
+    <!-- 期限モードを検索時も維持する -->
+    <input type="hidden" name="expiry" value="<?= htmlspecialchars($expiryMode, ENT_QUOTES, 'UTF-8') ?>">
+
+    <!-- 🔍（検索実行） -->
+    <button type="submit" class="search-btn" aria-label="検索">🔍</button>
+
+    <!-- AND/OR -->
     <div class="search-mode">
-      <label>
+      <label class="radio">
         <input type="radio" name="mode" value="and" <?= $searchMode === 'and' ? 'checked' : '' ?>>
         AND
       </label>
-      <label>
+      <label class="radio">
         <input type="radio" name="mode" value="or" <?= $searchMode === 'or' ? 'checked' : '' ?>>
         OR
       </label>
     </div>
-
-    <button type="submit" class="search-btn">🔍</button>
   </form>
 </div>
 
 <?php if ($disposeError): ?>
-  <div class="error-msg"><?= htmlspecialchars($disposeError) ?></div>
+  <div class="error-msg"><?= htmlspecialchars($disposeError, ENT_QUOTES, 'UTF-8') ?></div>
 <?php endif; ?>
 
+<!-- 右側の操作（期限切替・廃棄処理）は維持 -->
 <div class="right-actions">
+  <a class="toggle-expire-btn"
+     href="zaiko.php?keyword=<?= urlencode($keyword) ?>&mode=<?= urlencode($searchMode) ?>&expiry=<?= ($expiryMode === 'best') ? 'consume' : 'best' ?>">
+    <?= ($expiryMode === 'best') ? '消費期限に切替' : '賞味期限に切替' ?>
+  </a>
+
   <form method="post" class="dispose-form">
     <button type="submit" name="dispose" class="dispose-btn">廃棄処理</button>
   </form>
@@ -187,7 +186,7 @@ $stocks = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <th>カテゴリ</th>
       <th>単位</th>
       <th>発注先</th>
-      <th>賞味期限</th>
+      <th><?= htmlspecialchars($expiryLabel, ENT_QUOTES, 'UTF-8') ?></th>
       <th>在庫</th>
       <th>操作</th>
     </tr>
@@ -195,24 +194,27 @@ $stocks = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <tbody>
   <?php foreach ($stocks as $row): ?>
     <?php
-      $expired = $row['best_date'] && $row['best_date'] < date('Y-m-d');
+      $today = date('Y-m-d');
+      $dateToShow = ($expiryMode === 'consume') ? ($row['consume_date'] ?? null) : ($row['best_date'] ?? null);
+      $expired = ($dateToShow && $dateToShow < $today);
     ?>
     <tr class="<?= $expired ? 'row-expire-over' : '' ?>">
-      <td><?= htmlspecialchars($row['jan_code']) ?></td>
-      <td><?= htmlspecialchars($row['item_name']) ?></td>
-      <td><?= htmlspecialchars($row['category_label_ja']) ?></td>
-      <td><?= htmlspecialchars($row['unit']) ?></td>
-      <td><?= htmlspecialchars($row['supplier']) ?></td>
+      <td><?= htmlspecialchars($row['jan_code'], ENT_QUOTES, 'UTF-8') ?></td>
+      <td><?= htmlspecialchars($row['item_name'], ENT_QUOTES, 'UTF-8') ?></td>
+      <td><?= htmlspecialchars($row['category_label_ja'], ENT_QUOTES, 'UTF-8') ?></td>
+      <td><?= htmlspecialchars($row['unit'], ENT_QUOTES, 'UTF-8') ?></td>
+      <td><?= htmlspecialchars($row['supplier'], ENT_QUOTES, 'UTF-8') ?></td>
       <td>
         <span class="<?= $expired ? 'expire-over' : '' ?>">
-          <?= $row['best_date'] ? htmlspecialchars($row['best_date']) : '-' ?>
+          <?= $dateToShow ? htmlspecialchars($dateToShow, ENT_QUOTES, 'UTF-8') : '-' ?>
+          <?= $expired ? '（期限切れ）' : '' ?>
         </span>
       </td>
-      <td class="<?= $row['quantity'] <= 0 ? 'stock-zero' : '' ?>">
+      <td class="<?= ((int)$row['quantity'] <= 0) ? 'stock-zero' : '' ?>">
         <?= (int)$row['quantity'] ?>
       </td>
       <td class="op-buttons">
-        <a href="zaiko_edit.php?id=<?= $row['id'] ?>" class="btn-edit">編集</a>
+        <a href="zaiko_edit.php?item_id=<?= (int)$row['id'] ?>" class="btn-edit">編集</a>
       </td>
     </tr>
   <?php endforeach; ?>
@@ -221,4 +223,3 @@ $stocks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 </body>
 </html>
-
