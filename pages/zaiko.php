@@ -134,6 +134,8 @@ $expiryLabel = ($expiryMode === 'consume') ? '消費期限' : '賞味期限';
 ======================================================= -->
 <div class="search-area">
   <form method="get" class="search-form">
+
+    <!-- 検索欄（横長） -->
     <input
       type="text"
       name="keyword"
@@ -142,25 +144,27 @@ $expiryLabel = ($expiryMode === 'consume') ? '消費期限' : '賞味期限';
       placeholder="商品名 / カテゴリ / JAN / 発注先（空白区切り可）"
     >
 
-    <!-- 期限モードを検索時も維持する -->
+    <!-- 期限モード維持 -->
     <input type="hidden" name="expiry" value="<?= htmlspecialchars($expiryMode, ENT_QUOTES, 'UTF-8') ?>">
 
-    <!-- 🔍（検索実行） -->
+    <!-- 🔍 -->
     <button type="submit" class="search-btn" aria-label="検索">🔍</button>
 
-    <!-- AND/OR -->
+    <!-- AND / OR（🔍の右隣） -->
     <div class="search-mode">
-      <label class="radio">
+      <label>
         <input type="radio" name="mode" value="and" <?= $searchMode === 'and' ? 'checked' : '' ?>>
         AND
       </label>
-      <label class="radio">
+      <label>
         <input type="radio" name="mode" value="or" <?= $searchMode === 'or' ? 'checked' : '' ?>>
         OR
       </label>
     </div>
+
   </form>
 </div>
+
 
 <?php if ($disposeError): ?>
   <div class="error-msg"><?= htmlspecialchars($disposeError, ENT_QUOTES, 'UTF-8') ?></div>
