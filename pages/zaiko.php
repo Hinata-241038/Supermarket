@@ -140,30 +140,32 @@ $expiryLabel = ($expiryMode === 'consume') ? '消費期限' : '賞味期限';
       type="text"
       name="keyword"
       class="search-box"
-      value="<?= htmlspecialchars($keyword, ENT_QUOTES, 'UTF-8') ?>"
-      placeholder="商品名 / カテゴリ / JAN / 発注先（空白区切り可）"
+      placeholder="商品名 / カテゴリ / JAN / 発注先（空白区切り）"
+      value="<?= htmlspecialchars($keyword ?? '', ENT_QUOTES) ?>"
     >
 
-    <!-- 期限モード維持 -->
-    <input type="hidden" name="expiry" value="<?= htmlspecialchars($expiryMode, ENT_QUOTES, 'UTF-8') ?>">
+    <!-- 🔍（検索実行） -->
+    <button type="submit" class="search-btn">🔍</button>
 
-    <!-- 🔍 -->
-    <button type="submit" class="search-btn" aria-label="検索">🔍</button>
-
-    <!-- AND / OR（🔍の右隣） -->
+    <!-- AND / OR（🔍の右側） -->
     <div class="search-mode">
       <label>
-        <input type="radio" name="mode" value="and" <?= $searchMode === 'and' ? 'checked' : '' ?>>
+        <input type="radio" name="mode" value="and"
+          <?= ($searchMode === 'and') ? 'checked' : '' ?>>
         AND
       </label>
+
       <label>
-        <input type="radio" name="mode" value="or" <?= $searchMode === 'or' ? 'checked' : '' ?>>
+        <input type="radio" name="mode" value="or"
+          <?= ($searchMode === 'or') ? 'checked' : '' ?>>
         OR
       </label>
     </div>
 
   </form>
 </div>
+
+
 
 
 <?php if ($disposeError): ?>
