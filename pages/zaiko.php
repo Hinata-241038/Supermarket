@@ -48,7 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dispose'])) {
     $pdo->beginTransaction();
 
     $sqlDelete = "
-      DELETE FROM stock s
+      DELETE s
+      FROM stock AS s
       WHERE s.quantity <= 0
          OR ({$expiredExpr})
     ";
