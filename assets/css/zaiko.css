@@ -1,39 +1,49 @@
 body { font-family: sans-serif; margin: 0; }
 
+/* 戻る */
 .back-btn {
-  position: fixed; left: 20px; top: 20px;
-  padding: 10px 20px; font-size: 18px;
-  background: #d9d9d9; border: none; cursor: pointer;
+  position: fixed;
+  left: 20px;
+  top: 20px;
+  padding: 10px 20px;
+  font-size: 18px;
+  background: #d9d9d9;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  color: #000;
+  border-radius: 8px;
+  font-weight: bold;
 }
 
-.title { font-size: 48px; text-align: center; margin: 30px 0 20px; }
+.title {
+  font-size: 48px;
+  text-align: center;
+  margin: 30px 0 20px;
+}
 
-/* =========================
-   検索エリア（横一列）
-========================= */
-.search-area{
+/* 検索 */
+.search-area {
   display: flex;
   justify-content: center;
   margin-top: 10px;
 }
 
-.search-form{
+.search-form {
   display: flex;
   align-items: center;
   gap: 14px;
   flex-wrap: nowrap;
 }
 
-/* 検索欄をもっと横長に */
-.search-box{
-  width: 780px;      /* ← ここが肝 */
+.search-box {
+  width: 780px;
   max-width: 70vw;
   padding: 10px 14px;
   font-size: 16px;
 }
 
-/* 🔍 */
-.search-btn{
+.search-btn {
   width: 46px;
   height: 46px;
   border: none;
@@ -43,8 +53,7 @@ body { font-family: sans-serif; margin: 0; }
   font-size: 18px;
 }
 
-/* AND / OR（🔍の右） */
-.search-mode{
+.search-mode {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -54,45 +63,18 @@ body { font-family: sans-serif; margin: 0; }
   font-weight: bold;
 }
 
-.search-mode label{
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
-
-
-/* エラー */
-.error-msg {
-  width: 90%; margin: 10px auto 0;
-  padding: 10px 12px;
-  background: rgba(209,0,0,0.08); color: #d10000;
-  border-radius: 8px; font-weight: bold;
-}
-
-/* 右側の操作ボタン（切替・廃棄） */
-.right-actions{
+/* 右側ボタン */
+.right-actions {
   width: 90%;
   margin: 12px auto 0;
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  align-items: center;
 }
 
-.toggle-expire-btn, .dispose-btn{
-  padding: 10px 14px;
-  background: #d9d9d9;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-  text-decoration: none;
-  color: #000;
-}
-.dispose-form{ margin:0; }
-
-/* テーブル */
+/* =========================
+   テーブル（★変更なし）
+========================= */
 .item-table {
   width: 90%;
   margin: 22px auto;
@@ -111,25 +93,49 @@ body { font-family: sans-serif; margin: 0; }
   border-bottom: 1px solid #ccc;
 }
 
-.stock-zero { color: #d10000; font-weight: bold; }
-.expire-over { color: #d10000; font-weight: bold; }
+/* =========================
+   ★ 追記：横スクロール対応
+========================= */
+.table-wrap {
+  width: 90%;
+  margin: 22px auto;
+  overflow-x: auto;
+}
 
-.row-expire-over { background: rgba(209,0,0,0.08); }
+/* 操作列固定 */
+.item-table th.op-col,
+.item-table td.op-col {
+  position: sticky;
+  right: 0;
+  background: #fff;
+  z-index: 2;
+}
 
-/* 操作ボタン（編集） */
-.op-buttons{
+.item-table th.op-col {
+  z-index: 3;
+}
+
+/* 操作ボタン */
+.op-buttons {
   display: flex;
   justify-content: center;
   gap: 8px;
 }
 
-.btn-edit{
-  display: inline-block;
+.btn-edit {
   padding: 7px 10px;
   border-radius: 6px;
-  text-decoration: none;
-  color: #fff;
-  font-weight: bold;
-  min-width: 56px;
   background: #6b7280;
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.btn-order {
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
 }
