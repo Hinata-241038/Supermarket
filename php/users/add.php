@@ -14,13 +14,7 @@ $password = $_POST['password'];
 $role     = $_POST['role'];
 
 /* DB接続 */
-$dsn = 'mysql:host=localhost;dbname=supermarketmanager;charset=utf8'; 
-$user = 'root'; 
-$pass = '';
-
-$pdo = new PDO($dsn, $user, $pass, [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-]);
+require_once __DIR__ . '/../db/dbconnect.php';
 
 /* 重複チェック */
 $stmt = $pdo->prepare('SELECT COUNT(*) FROM users WHERE login_id = ?');
