@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once __DIR__ . '/../dbconnect.php';
+require_once 'C:/Users/241048/OneDrive/ドキュメント/Supermarket/dbcnect.php';
 
 $pdo = new PDO($dsn, $user, $pass, [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
