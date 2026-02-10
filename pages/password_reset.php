@@ -1,5 +1,9 @@
 <?php
+<<<<<<< HEAD
 require_once __DIR__ . '/../php/db/dbconnect.php';
+=======
+require_once __DIR__ . '/../dbcnect.php';
+>>>>>>> add-password-reset
 
 /* IDを受け取る */
 $login_id = $_POST['login_id'] ?? '';

@@ -1,6 +1,10 @@
 <?php
 session_start();
+<<<<<<< HEAD
 require_once __DIR__ . '/../dbconnect.php';
+=======
+require_once __DIR__ . '/../dbcnect.php';
+>>>>>>> add-password-reset
 
 
 /* POST以外拒否 */
