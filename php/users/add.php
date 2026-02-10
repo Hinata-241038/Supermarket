@@ -10,13 +10,11 @@ if (empty($_POST['login_id']) || empty($_POST['password']) || empty($_POST['role
 }
 
 $login_id = trim($_POST['login_id']);
-$password = $_POST['password'];
+$password = $_POST['password'];           
 $role     = $_POST['role'];
 
 /* DB接続 */
-$dsn  = 'mysql:host=localhost;dbname=supermarketmanager;charset=utf8';
-$user = 'root';
-$pass = '';
+require_once __DIR__ . '/../dbconnect.php';
 
 $pdo = new PDO($dsn, $user, $pass, [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION

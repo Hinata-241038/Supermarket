@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once __DIR__ . '/../dbcnect.php';
+require_once __DIR__ . '/../dbconnect.php';
 
 $pdo = new PDO($dsn, $user, $pass, [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
