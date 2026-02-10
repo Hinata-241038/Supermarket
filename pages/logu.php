@@ -1,9 +1,7 @@
 <?php
 session_start();
 
-$dsn  = 'mysql:host=localhost;dbname=supermarketmanager;charset=utf8';
-$user = 'root';
-$pass = '';
+require_once __DIR__ . '/../dbcnect.php';
 
 $pdo = new PDO($dsn, $user, $pass, [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
