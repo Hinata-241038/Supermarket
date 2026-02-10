@@ -25,25 +25,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['login_id'] = $user['login_id'];
         $_SESSION['role']     = $user['role'];
         
-              switch ($user['role']) {
+        switch ($user['role']) {
             case 'mng':
-                header('Location: manager/home.php');
-                break;
-
             case 'fte':
-                header('Location: employee/home.php');
-                break;
-
             case 'ptj':
-                header('Location: parttime/home.php');
-                break;
+                header('Location: home.php');
+                exit;
 
             default:
-                echo '権限が不正です';
+                echo "<script>
+                        alert('権限が不正です');
+                        window.location.href = 'logu.php';
+                      </script>";
+                exit;
         }
-        exit;
+
     } else {
-        echo 'IDまたはパスワードが違います';
+        echo "<script>
+                alert('IDまたはパスワードが違います');
+                window.location.href = 'logu.php';
+              </script>";
+        exit;
     }
 }
 ?>
@@ -74,6 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div class="button-group">
         <a href="sinki.php">新規登録</a>
+        <a href="password_reset.php">再設定</a>
         <button type="submit">ログイン</button>
       </div>
     </form>
