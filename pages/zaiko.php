@@ -3,9 +3,9 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require_once __DIR__ . '/../dbconnect.php';
 
-/* =============================
-   カラム存在チェック
-============================= */
+/* =========================================================
+   1) カラム存在チェック
+========================================================= */
 function hasColumn(PDO $pdo, string $table, string $column): bool {
   $st = $pdo->prepare("SHOW COLUMNS FROM {$table} LIKE :c");
   $st->execute([':c'=>$column]);
@@ -16,9 +16,9 @@ $hasConsume = hasColumn($pdo,'stock','consume_date');
 $hasBest    = hasColumn($pdo,'stock','best_before_date');
 $hasLegacy  = hasColumn($pdo,'stock','expire_date');
 
-/* =============================
-   検索（既存維持）
-============================= */
+/* =========================================================
+   2) 検索処理（既存機能維持）
+========================================================= */
 $keyword    = trim($_GET['keyword'] ?? '');
 $searchMode = ($_GET['mode'] ?? 'or') === 'and' ? 'and' : 'or';
 
@@ -30,44 +30,58 @@ if ($keyword !== '') {
   $conds = [];
 
   foreach ($words as $i => $w) {
-    $conds[] = "(i.item_name LIKE :w{$i}
-              OR i.jan_code LIKE :w{$i}
-              OR c.category_label_ja LIKE :w{$i}
-              OR i.supplier LIKE :w{$i})";
+    $conds[] = "(
+      COALESCE(i.item_name,'') LIKE :w{$i}
+      OR COALESCE(i.jan_code,'') LIKE :w{$i}
+      OR COALESCE(c.category_label_ja,'') LIKE :w{$i}
+      OR COALESCE(i.supplier,'') LIKE :w{$i}
+    )";
     $params[":w{$i}"] = "%{$w}%";
   }
+
   $where[] = '(' . implode($searchMode === 'and' ? ' AND ' : ' OR ', $conds) . ')';
 }
 
 $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
+/* =========================================================
+   3) 期限列決定
+========================================================= */
 $expireCol = $hasConsume ? 's.consume_date'
            : ($hasBest  ? 's.best_before_date'
            : 's.expire_date');
 
-/* =============================
-   データ取得
-============================= */
+/* =========================================================
+   4) データ取得（NULL完全対策版）
+========================================================= */
 $sql = "
 SELECT
   s.id,
   s.item_id,
-  i.jan_code,
-  i.item_name,
-  c.category_label_ja,
-  i.unit,
-  i.supplier,
-  {$expireCol} AS expire_date,
-  s.quantity
+  COALESCE(i.jan_code,'') AS jan_code,
+  COALESCE(i.item_name,'') AS item_name,
+  COALESCE(c.category_label_ja,'') AS category_label_ja,
+  COALESCE(i.unit,'') AS unit,
+  COALESCE(i.supplier,'') AS supplier,
+  COALESCE({$expireCol}, '') AS expire_date,
+  COALESCE(s.quantity, 0) AS quantity
 FROM stock s
 LEFT JOIN items i ON i.id = s.item_id
 LEFT JOIN categories c ON c.id = i.category_id
 {$whereSql}
 ORDER BY i.item_name
 ";
+
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+/* =========================================================
+   5) 表示用安全関数（完全string保証）
+========================================================= */
+function h($v): string {
+  return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
+}
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -82,10 +96,11 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <h1 class="title">在庫</h1>
 
+<!-- 検索 -->
 <div class="search-area">
   <form method="get" class="search-form">
     <input type="text" name="keyword" class="search-box"
-      value="<?= htmlspecialchars($keyword,ENT_QUOTES) ?>">
+      value="<?= h($keyword) ?>">
     <button type="submit" class="search-btn">🔍</button>
 
     <div class="search-mode">
@@ -106,7 +121,7 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <a href="dispose.php" class="dispose-btn">廃棄処理</a>
 </div>
 
-<!-- ★ 横スクロール対応 -->
+<!-- 横スクロール -->
 <div class="table-wrap">
 <table class="item-table">
 <thead>
@@ -124,25 +139,24 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <tbody>
 <?php foreach ($rows as $r): ?>
 <tr>
-  <td><?= htmlspecialchars($r['jan_code']) ?></td>
-  <td><?= htmlspecialchars($r['item_name']) ?></td>
-  <td><?= htmlspecialchars($r['category_label_ja']) ?></td>
-  <td><?= htmlspecialchars($r['unit']) ?></td>
-  <td><?= htmlspecialchars($r['supplier']) ?></td>
-  <td><?= htmlspecialchars($r['expire_date']) ?></td>
+  <td><?= h($r['jan_code']) ?></td>
+  <td><?= h($r['item_name']) ?></td>
+  <td><?= h($r['category_label_ja']) ?></td>
+  <td><?= h($r['unit']) ?></td>
+  <td><?= h($r['supplier']) ?></td>
+  <td><?= h($r['expire_date']) ?></td>
 
-  <!-- 在庫0強調 -->
-  <td class="<?= ($r['quantity'] <= 0) ? 'stock-zero' : '' ?>">
+  <td class="<?= ((int)$r['quantity'] <= 0) ? 'stock-zero' : '' ?>">
     <?= (int)$r['quantity'] ?>
   </td>
 
   <td class="op-col">
     <div class="op-buttons">
-      <a href="zaiko_edit.php?id=<?= $r['id'] ?>"
+      <a href="zaiko_edit.php?id=<?= (int)$r['id'] ?>"
          class="btn-edit">編集</a>
 
-      <a href="hacchu_form.php?jan=<?= urlencode($r['jan_code']) ?>"
-         class="btn-order <?= ($r['quantity'] <= 0) ? 'btn-order-alert' : '' ?>">
+      <a href="hacchu_form.php?jan=<?= urlencode((string)$r['jan_code']) ?>"
+         class="btn-order <?= ((int)$r['quantity'] <= 0) ? 'btn-order-alert' : '' ?>">
          発注
       </a>
     </div>
