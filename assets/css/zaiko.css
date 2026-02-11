@@ -139,3 +139,38 @@ body { font-family: sans-serif; margin: 0; }
   text-decoration: none;
   font-weight: bold;
 }
+
+/* 横スクロール */
+.table-wrap{
+  width: 90%;
+  margin: 22px auto;
+  overflow-x: auto;
+}
+
+/* 操作列固定 */
+.item-table th.op-col,
+.item-table td.op-col{
+  position: sticky;
+  right: 0;
+  background: #fff;
+  z-index: 2;
+}
+
+.item-table th.op-col{
+  z-index: 3;
+}
+
+/* 発注ボタン */
+.btn-order{
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* 在庫0時強調 */
+.btn-order-alert{
+  background: #d10000;
+}

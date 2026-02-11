@@ -1,12 +1,11 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
 require_once __DIR__ . '/../dbconnect.php';
 
-/* =========================================================
-  カラム存在チェック（既存）
-========================================================= */
+/* =============================
+   カラム存在チェック
+============================= */
 function hasColumn(PDO $pdo, string $table, string $column): bool {
   $st = $pdo->prepare("SHOW COLUMNS FROM {$table} LIKE :c");
   $st->execute([':c'=>$column]);
@@ -17,9 +16,9 @@ $hasConsume = hasColumn($pdo,'stock','consume_date');
 $hasBest    = hasColumn($pdo,'stock','best_before_date');
 $hasLegacy  = hasColumn($pdo,'stock','expire_date');
 
-/* =========================================================
-  検索（既存）
-========================================================= */
+/* =============================
+   検索（既存維持）
+============================= */
 $keyword    = trim($_GET['keyword'] ?? '');
 $searchMode = ($_GET['mode'] ?? 'or') === 'and' ? 'and' : 'or';
 
@@ -46,9 +45,9 @@ $expireCol = $hasConsume ? 's.consume_date'
            : ($hasBest  ? 's.best_before_date'
            : 's.expire_date');
 
-/* =========================================================
-  データ取得（既存）
-========================================================= */
+/* =============================
+   データ取得
+============================= */
 $sql = "
 SELECT
   s.id,
@@ -83,7 +82,6 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <h1 class="title">在庫</h1>
 
-<!-- 検索（既存そのまま） -->
 <div class="search-area">
   <form method="get" class="search-form">
     <input type="text" name="keyword" class="search-box"
@@ -108,7 +106,7 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <a href="dispose.php" class="dispose-btn">廃棄処理</a>
 </div>
 
-<!-- ★ 横スクロール対応ラッパー（追加） -->
+<!-- ★ 横スクロール対応 -->
 <div class="table-wrap">
 <table class="item-table">
 <thead>
@@ -132,14 +130,21 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <td><?= htmlspecialchars($r['unit']) ?></td>
   <td><?= htmlspecialchars($r['supplier']) ?></td>
   <td><?= htmlspecialchars($r['expire_date']) ?></td>
-  <td><?= (int)$r['quantity'] ?></td>
 
-  <!-- ★ 操作列（固定） -->
+  <!-- 在庫0強調 -->
+  <td class="<?= ($r['quantity'] <= 0) ? 'stock-zero' : '' ?>">
+    <?= (int)$r['quantity'] ?>
+  </td>
+
   <td class="op-col">
     <div class="op-buttons">
-      <a href="zaiko_edit.php?id=<?= $r['id'] ?>" class="btn-edit">編集</a>
+      <a href="zaiko_edit.php?id=<?= $r['id'] ?>"
+         class="btn-edit">編集</a>
+
       <a href="hacchu_form.php?jan=<?= urlencode($r['jan_code']) ?>"
-         class="btn-order">発注</a>
+         class="btn-order <?= ($r['quantity'] <= 0) ? 'btn-order-alert' : '' ?>">
+         発注
+      </a>
     </div>
   </td>
 </tr>
