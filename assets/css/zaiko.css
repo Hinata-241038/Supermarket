@@ -1,176 +1,203 @@
-body { font-family: sans-serif; margin: 0; }
-
-/* 戻る */
-.back-btn {
-  position: fixed;
-  left: 20px;
-  top: 20px;
-  padding: 10px 20px;
-  font-size: 18px;
-  background: #d9d9d9;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-  color: #000;
-  border-radius: 8px;
-  font-weight: bold;
+/* =========================
+   全体
+========================= */
+body{
+  margin:0;
+  font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif;
+  background:#F3F4F6;
+  color:#1F2937;
 }
 
-.title {
-  font-size: 48px;
-  text-align: center;
-  margin: 30px 0 20px;
+/* 戻るボタン */
+.back-btn{
+  position:fixed;
+  top:20px;
+  left:20px;
+  padding:10px 18px;
+  background:#E5E7EB;
+  border-radius:8px;
+  text-decoration:none;
+  font-weight:bold;
+  color:#111;
+  transition:.2s;
+}
+.back-btn:hover{
+  background:#D1D5DB;
 }
 
-/* 検索 */
-.search-area {
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.search-form {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: nowrap;
-}
-
-.search-box {
-  width: 780px;
-  max-width: 70vw;
-  padding: 10px 14px;
-  font-size: 16px;
-}
-
-.search-btn {
-  width: 46px;
-  height: 46px;
-  border: none;
-  border-radius: 6px;
-  background: #d9d9d9;
-  cursor: pointer;
-  font-size: 18px;
-}
-
-.search-mode {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: #f3f3f3;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-weight: bold;
-}
-
-/* 右側ボタン */
-.right-actions {
-  width: 90%;
-  margin: 12px auto 0;
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+/* タイトル */
+.title{
+  text-align:center;
+  font-size:42px;
+  font-weight:700;
+  margin:40px 0 30px;
+  color:#1F2937;
 }
 
 /* =========================
-   テーブル（★変更なし）
+   検索エリア（カード化）
 ========================= */
-.item-table {
-  width: 90%;
-  margin: 22px auto;
-  border-collapse: collapse;
+.search-area{
+  display:flex;
+  justify-content:center;
+  margin-bottom:20px;
 }
 
-.item-table th {
-  background: #d9d9d9;
-  padding: 12px 10px;
-  font-size: 16px;
+.search-form{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  background:#FFFFFF;
+  padding:16px 20px;
+  border-radius:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.05);
 }
 
-.item-table td {
-  padding: 10px 8px;
-  text-align: center;
-  border-bottom: 1px solid #ccc;
+.search-box{
+  width:650px;
+  max-width:60vw;
+  padding:10px 14px;
+  border:1px solid #D1D5DB;
+  border-radius:8px;
+  font-size:15px;
+}
+
+.search-box:focus{
+  outline:none;
+  border:1px solid #2563EB;
+}
+
+.search-btn{
+  width:42px;
+  height:42px;
+  border:none;
+  border-radius:8px;
+  background:#2563EB;
+  color:#fff;
+  cursor:pointer;
+  transition:.2s;
+}
+.search-btn:hover{
+  background:#1D4ED8;
+}
+
+/* AND OR */
+.search-mode{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:8px 14px;
+  background:#F3F4F6;
+  border-radius:8px;
+  font-weight:600;
 }
 
 /* =========================
-   ★ 追記：横スクロール対応
+   右アクション
 ========================= */
-.table-wrap {
-  width: 90%;
-  margin: 22px auto;
-  overflow-x: auto;
+.right-actions{
+  width:90%;
+  margin:0 auto 10px;
+  display:flex;
+  justify-content:flex-end;
+  gap:15px;
 }
 
-/* 操作列固定 */
-.item-table th.op-col,
-.item-table td.op-col {
-  position: sticky;
-  right: 0;
-  background: #fff;
-  z-index: 2;
+.right-actions a{
+  text-decoration:none;
+  font-weight:600;
+  color:#2563EB;
+}
+.right-actions a:hover{
+  text-decoration:underline;
 }
 
-.item-table th.op-col {
-  z-index: 3;
-}
-
-/* 操作ボタン */
-.op-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
-
-.btn-edit {
-  padding: 7px 10px;
-  border-radius: 6px;
-  background: #6b7280;
-  color: #fff;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-.btn-order {
-  padding: 7px 10px;
-  border-radius: 6px;
-  background: #2563eb;
-  color: #fff;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-/* 横スクロール */
+/* =========================
+   テーブル（カード化）
+========================= */
 .table-wrap{
-  width: 90%;
-  margin: 22px auto;
-  overflow-x: auto;
+  width:90%;
+  margin:20px auto 40px;
+  background:#FFFFFF;
+  border-radius:12px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.05);
+  overflow-x:auto;
+  padding:10px 0;
+}
+
+.item-table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.item-table th{
+  background:#F9FAFB;
+  padding:14px 10px;
+  font-size:15px;
+  font-weight:600;
+  border-bottom:2px solid #E5E7EB;
+}
+
+.item-table td{
+  padding:12px 8px;
+  text-align:center;
+  border-bottom:1px solid #E5E7EB;
+}
+
+.item-table tr:hover{
+  background:#F3F4F6;
 }
 
 /* 操作列固定 */
 .item-table th.op-col,
 .item-table td.op-col{
-  position: sticky;
-  right: 0;
-  background: #fff;
-  z-index: 2;
+  position:sticky;
+  right:0;
+  background:#FFFFFF;
+  box-shadow:-4px 0 8px rgba(0,0,0,0.05);
+  z-index:2;
 }
 
-.item-table th.op-col{
-  z-index: 3;
+/* =========================
+   ボタン
+========================= */
+.op-buttons{
+  display:flex;
+  justify-content:center;
+  gap:8px;
 }
 
-/* 発注ボタン */
+.btn-edit{
+  padding:7px 12px;
+  border-radius:6px;
+  background:#6B7280;
+  color:#fff;
+  text-decoration:none;
+  font-weight:600;
+  font-size:14px;
+  transition:.2s;
+}
+.btn-edit:hover{
+  background:#4B5563;
+}
+
 .btn-order{
-  padding: 7px 10px;
-  border-radius: 6px;
-  background: #2563eb;
-  color: #fff;
-  text-decoration: none;
-  font-weight: bold;
+  padding:7px 12px;
+  border-radius:6px;
+  background:#2563EB;
+  color:#fff;
+  text-decoration:none;
+  font-weight:600;
+  font-size:14px;
+  transition:.2s;
+}
+.btn-order:hover{
+  background:#1D4ED8;
 }
 
-/* 在庫0時強調 */
 .btn-order-alert{
-  background: #d10000;
+  background:#DC2626;
+}
+.btn-order-alert:hover{
+  background:#B91C1C;
 }
