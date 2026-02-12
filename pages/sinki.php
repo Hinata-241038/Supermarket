@@ -30,7 +30,10 @@
     <div class="form-container">
         <div class="form-row">
             <label for="login_id">ID</label>
-            <input type="text" id="login_id" name="login_id" required>
+            <input type="text" id="login_id" name="login_id"
+            pattern="^[a-zA-Z0-9]+$"
+            title="英数字のみ入力できます"
+            required>
         </div>
 
         <div class="form-row">
