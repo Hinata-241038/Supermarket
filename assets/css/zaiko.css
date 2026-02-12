@@ -201,3 +201,8 @@ body{
 .btn-order-alert:hover{
   background:#B91C1C;
 }
+/* 在庫が0以下のとき強調 */
+.stock-zero{
+  font-weight: 700;
+  color: #DC2626;
+}

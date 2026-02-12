@@ -48,8 +48,8 @@ $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
    3) 期限列決定
 ========================================================= */
 $expireCol = $hasConsume ? 's.consume_date'
-           : ($hasBest  ? 's.best_before_date'
-           : 's.expire_date');
+         : ($hasBest  ? 's.best_before_date'
+                      : 's.expire_date');
 
 /* =========================================================
    4) データ取得（NULL完全対策版）
@@ -152,7 +152,8 @@ function h($v): string {
 
   <td class="op-col">
     <div class="op-buttons">
-      <a href="zaiko_edit.php?item_id=<?= $row['id'] ?>">編集</a>
+      <!-- ★ここが最大の修正点：$row をやめて $r の item_id を渡す -->
+      <a class="btn-edit" href="zaiko_edit.php?item_id=<?= (int)$r['item_id'] ?>">編集</a>
 
       <a href="hacchu_form.php?jan=<?= urlencode((string)$r['jan_code']) ?>"
          class="btn-order <?= ((int)$r['quantity'] <= 0) ? 'btn-order-alert' : '' ?>">
