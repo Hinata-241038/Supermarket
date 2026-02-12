@@ -1,12 +1,13 @@
 <?php
 require_once __DIR__ . '/../dbconnect.php';
 
-/* IDを受け取る */
-$login_id = $_POST['login_id'] ?? '';
-
-if ($login_id === '') {
-    exit('IDが指定されていません');
+if (!isset($_POST['login_id'])) {
+    echo "IDが送信されていません";
+    exit;
 }
+
+$login_id = $_POST['login_id'];
+
 
 /* ユーザー情報取得 */
 $stmt = $pdo->prepare(
