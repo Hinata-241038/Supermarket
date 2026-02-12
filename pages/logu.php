@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <label>
         パスワード:
-        <input type="password" name="password_hash" required>
+        <input type="password" name="password_hash">
       </label><br>
 
       <div class="button-group">
