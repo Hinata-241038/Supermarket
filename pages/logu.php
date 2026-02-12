@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="container">
     <h1 class="fsize">ログイン</h1>
 
-    <form action="" method="post">
+    <form action="password_reset.php" method="post">
       <label>
         ユーザー名:
         <input type="text" name="login_id" required>
