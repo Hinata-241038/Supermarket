@@ -35,7 +35,7 @@ body{
 }
 
 /* =========================
-   検索エリア（カード化）
+   検索エリア
 ========================= */
 .search-area{
   display:flex;
@@ -61,7 +61,6 @@ body{
   border-radius:8px;
   font-size:15px;
 }
-
 .search-box:focus{
   outline:none;
   border:1px solid #2563EB;
@@ -93,16 +92,54 @@ body{
 }
 
 /* =========================
-   右アクション
+   右アクション（統合版）
 ========================= */
 .right-actions{
   width:90%;
   margin:0 auto 10px;
   display:flex;
   justify-content:flex-end;
-  gap:15px;
+  align-items:center;   /* ← 統合済 */
+  gap:18px;
 }
 
+/* 現在モード表示 */
+.expire-status{
+  font-weight:600;
+  color:#1F2937;
+}
+
+/* バッジ風モード表示 */
+.expire-label{
+  background:#E0F2FE;
+  color:#2563EB;
+  padding:4px 12px;
+  border-radius:20px;
+  font-size:13px;
+  font-weight:700;
+}
+
+/* 切替ボタン（リンク風） */
+.expire-switch-form{
+  margin:0;
+}
+
+.toggle-expire-btn{
+  background:transparent;
+  border:none;
+  padding:0;
+  font:inherit;
+  font-weight:600;
+  color:#2563EB;
+  cursor:pointer;
+  transition:.2s;
+}
+.toggle-expire-btn:hover{
+  text-decoration:underline;
+  color:#1D4ED8;
+}
+
+/* 右アクション内リンク */
 .right-actions a{
   text-decoration:none;
   font-weight:600;
@@ -113,7 +150,7 @@ body{
 }
 
 /* =========================
-   テーブル（カード化）
+   テーブル
 ========================= */
 .table-wrap{
   width:90%;
@@ -201,8 +238,9 @@ body{
 .btn-order-alert:hover{
   background:#B91C1C;
 }
-/* 在庫が0以下のとき強調 */
+
+/* 在庫0強調 */
 .stock-zero{
-  font-weight: 700;
-  color: #DC2626;
+  font-weight:700;
+  color:#DC2626;
 }
