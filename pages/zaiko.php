@@ -152,8 +152,7 @@ function h($v): string {
 
   <td class="op-col">
     <div class="op-buttons">
-      <a href="zaiko_edit.php?id=<?= (int)$r['id'] ?>"
-         class="btn-edit">編集</a>
+      <a href="zaiko_edit.php?item_id=<?= $row['id'] ?>">編集</a>
 
       <a href="hacchu_form.php?jan=<?= urlencode((string)$r['jan_code']) ?>"
          class="btn-order <?= ((int)$r['quantity'] <= 0) ? 'btn-order-alert' : '' ?>">
