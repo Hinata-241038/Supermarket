@@ -16,10 +16,7 @@ $stmt = $pdo->prepare(
 $stmt->execute([$login_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-/*メッセージを表示*/
-if (!$user) {
-    exit('登録されていないIDです');
-}
+
 ?>
 
 <!DOCTYPE html>
