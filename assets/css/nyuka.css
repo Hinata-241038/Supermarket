@@ -1,0 +1,153 @@
+body{
+  margin:0;
+  background:#F3F4F6;
+  font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif;
+}
+
+.card{
+  width:700px;
+  margin:60px auto;
+  background:#fff;
+  padding:40px;
+  border-radius:12px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.08);
+  position:relative;
+}
+
+h1{
+  text-align:center;
+  margin-bottom:30px;
+  font-size:32px;
+}
+
+/* ===============================
+   商品情報ボックス強化
+=================================*/
+.info-box{
+  background:#F9FAFB;
+  padding:20px;
+  border-radius:10px;
+  margin-bottom:30px;
+  line-height:1.9;
+  border:1px solid #E5E7EB;
+  font-size:16px;
+}
+
+.info-box strong{
+  display:inline-block;
+  width:110px;
+  color:#374151;
+}
+
+/* ===============================
+   フォーム
+=================================*/
+.form-group{
+  margin-bottom:25px;
+}
+
+label{
+  display:block;
+  font-weight:bold;
+  margin-bottom:8px;
+  color:#374151;
+}
+
+input[type="number"],
+input[type="date"]{
+  width:100%;
+  padding:12px;
+  border-radius:8px;
+  border:1px solid #D1D5DB;
+  font-size:16px;
+  transition:0.2s;
+}
+
+input[type="number"]:focus,
+input[type="date"]:focus{
+  border-color:#2563EB;
+  outline:none;
+  box-shadow:0 0 0 2px rgba(37,99,235,0.15);
+}
+
+/* ===============================
+   期限選択
+=================================*/
+.expire-select{
+  display:flex;
+  align-items:center;
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+.expire-select .radio{
+  font-weight:normal;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  cursor:pointer;
+}
+
+/* ===============================
+   警告バナー（NEW）
+=================================*/
+.warning-banner{
+  display:none;
+  background:#FEF2F2;
+  border:1px solid #FCA5A5;
+  color:#B91C1C;
+  padding:12px 16px;
+  border-radius:8px;
+  margin-bottom:20px;
+  font-size:14px;
+}
+
+.warning-banner.show{
+  display:block;
+}
+
+/* ===============================
+   補足ヒント
+=================================*/
+.hint{
+  font-size:13px;
+  color:#6B7280;
+  margin-top:6px;
+}
+
+/* ===============================
+   ボタン
+=================================*/
+.btn-area{
+  display:flex;
+  justify-content:space-between;
+  margin-top:30px;
+}
+
+.btn{
+  padding:12px 28px;
+  border-radius:8px;
+  text-decoration:none;
+  font-weight:bold;
+  border:none;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.btn.back{
+  background:#E5E7EB;
+  color:#111;
+}
+
+.btn.back:hover{
+  background:#D1D5DB;
+}
+
+.btn.primary{
+  background:#2563EB;
+  color:white;
+}
+
+.btn.primary:hover{
+  background:#1E40AF;
+}
