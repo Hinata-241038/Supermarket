@@ -27,7 +27,7 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
 
-<button class="back-btn" onclick="location.href='zaiko.php'">戻る</button>
+<button class="back-btn" onclick="location.href='home.php'">戻る</button>
 
 <div class="container">
 <h1>廃棄対象</h1>
