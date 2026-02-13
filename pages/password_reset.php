@@ -45,7 +45,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
         </div>
 
         <div class="form-row">
-            <label>ID</label>
+            <label>権限</label>
             <input type="text"
                    value="<?= htmlspecialchars($user['login_id']) ?>"
                    readonly>
