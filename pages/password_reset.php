@@ -38,14 +38,14 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                value="<?= htmlspecialchars($user['login_id']) ?>">
 
         <div class="form-row">
-            <label>role</label>
+            <label>権限</label>
             <input type="text"
                    value="<?= htmlspecialchars($user['role']) ?>"
                    readonly>
         </div>
 
         <div class="form-row">
-            <label>権限</label>
+            <label>ユーザーID</label>
             <input type="text"
                    value="<?= htmlspecialchars($user['login_id']) ?>"
                    readonly>
