@@ -94,6 +94,13 @@ function fmtDate($d){
   if (!$d) return '';
   return date('Y-m-d', strtotime($d));
 }
+//権限
+if (!isset($_SESSION['role'])) {
+    header('Location: logu.php');
+    exit;
+}
+
+$role = $_SESSION['role'];
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -131,8 +138,9 @@ function fmtDate($d){
       <?= $expireMode==='consume' ? '賞味期限に切替' : '消費期限に切替' ?>
     </button>
   </form>
-
+  <?php if ($role === 'mng' || $role === 'fte'): ?>
   <a href="haiki.php">廃棄処理</a>
+  <?php endif; ?>
 </div>
 
 <div class="table-wrap">
@@ -169,11 +177,14 @@ function fmtDate($d){
             <td class="<?= $qtyClass ?>"><?= $qty ?></td>
             <td class="op-col">
               <div class="op-buttons">
+                <!-- 付与　-->
                 <!-- ✅ item_id を渡す：編集画面に反映される -->
-                <a class="btn-edit" href="zaiko_edit.php?item_id=<?= (int)$r['item_id'] ?>">編集</a>
-
+                <?php if ($role === 'mng' || $role === 'fte'): ?>
+                  <a class="btn-edit" href="zaiko_edit.php?item_id=<?= (int)$r['item_id'] ?>">編集</a>
+                
                 <!-- ✅ hacchu_form.php は jan 受け取りでOK -->
                 <a class="btn-order" href="hacchu_form.php?jan=<?= urlencode((string)($r['jan_code'] ?? '')) ?>">発注</a>
+                <?php endif; ?>
               </div>
             </td>
           </tr>
