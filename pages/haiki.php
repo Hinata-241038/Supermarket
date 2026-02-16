@@ -22,18 +22,18 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>廃棄対象一覧</title>
-<link rel="stylesheet" href="../assets/css/haiki.css">
+<title>廃棄対象</title>
+<link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body>
 
 <button class="back-btn" onclick="location.href='home.php'">戻る</button>
 
 <div class="container">
-<h1>廃棄対象</h1>
+<h1 class="page-title">廃棄対象</h1>
 
-<div class="table-card">
-<table class="item-table">
+<div class="card">
+<table class="table">
 <thead>
 <tr>
   <th>JAN</th>
@@ -46,36 +46,31 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </thead>
 <tbody>
 
-<?php if (!empty($items)): ?>
-<?php foreach ($items as $item): ?>
-<tr class="expired">
+<?php if($items): ?>
+<?php foreach($items as $item): ?>
+<tr class="row-expired">
   <td><?= htmlspecialchars($item['jan_code']) ?></td>
   <td><?= htmlspecialchars($item['item_name']) ?></td>
   <td><?= htmlspecialchars($item['category_label_ja'] ?? '') ?></td>
   <td><?= (int)$item['quantity'] ?></td>
   <td><?= htmlspecialchars($item['expire_date']) ?></td>
   <td>
-    <form method="post"
-          action="haiki_execute.php"
+    <form method="post" action="haiki_execute.php"
           onsubmit="return confirm('この在庫を廃棄しますか？');">
       <input type="hidden" name="stock_id" value="<?= $item['stock_id'] ?>">
-      <button type="submit" class="discard-btn">廃棄確定</button>
+      <button class="btn btn-danger">廃棄確定</button>
     </form>
   </td>
 </tr>
 <?php endforeach; ?>
 <?php else: ?>
-<tr>
-  <td colspan="6" class="no-data">
-    廃棄対象はありません
-  </td>
-</tr>
+<tr><td colspan="6" class="no-data">廃棄対象はありません</td></tr>
 <?php endif; ?>
 
 </tbody>
 </table>
 </div>
-</div>
 
+</div>
 </body>
 </html>
