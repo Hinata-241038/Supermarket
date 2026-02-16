@@ -74,13 +74,16 @@ $val_item_id     = $item['id']          ?? '';
     <div class="form-row">
       <label for="jan_code">JAN</label>
       <input type="text" id="jan_code" name="jan_code"
-             value="<?= htmlspecialchars($prefillJan, ENT_QUOTES, 'UTF-8') ?>"
-             maxlength="13"
-             pattern="\d{13}"
-             inputmode="numeric"
-             autocomplete="off"
-             required>
+        value="<?= htmlspecialchars($prefillJan, ENT_QUOTES, 'UTF-8') ?>"
+        maxlength="13"
+        pattern="\d{13}"
+        inputmode="numeric"
+        autocomplete="off"
+        required>
+
+    <p id="janError" style="color:red; font-size:14px;"></p>
     </div>
+
 
     <div class="form-row">
       <label for="item_name">商品名</label>
@@ -146,10 +149,24 @@ $val_item_id     = $item['id']          ?? '';
 
 <!-- ✅ ここが追加ポイント：数字のみ＆13桁固定 -->
 <script>
-document.getElementById('jan_code')?.addEventListener('input', function(){
-  this.value = this.value.replace(/\D/g, '').slice(0, 13);
-});
+const janInput = document.getElementById('jan_code');
+const janError = document.getElementById('janError');
+
+if (janInput) {
+  janInput.addEventListener('input', function(){
+    this.value = this.value.replace(/\D/g,'').slice(0,13);
+
+    if (this.value.length === 0) {
+      janError.textContent = '';
+    } else if (this.value.length < 13) {
+      janError.textContent = 'JANコードは13桁で入力してください';
+    } else {
+      janError.textContent = '';
+    }
+  });
+}
 </script>
+
 
 <!-- 合計計算 -->
 <script>

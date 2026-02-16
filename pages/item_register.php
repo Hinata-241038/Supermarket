@@ -34,11 +34,15 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="form-row">
 <label>JANコード（13桁）</label>
 <input type="text" name="jan_code"
+       id="jan_code"
        maxlength="13"
        pattern="\d{13}"
        inputmode="numeric"
        required>
+
+<p id="janError" style="color:red; font-size:14px;"></p>
 </div>
+
 
 <div class="form-row">
 <label>商品名</label>
@@ -77,10 +81,25 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <script>
-document.querySelector('[name="jan_code"]').addEventListener('input', function(){
-  this.value = this.value.replace(/\D/g,'').slice(0,13);
-});
+const janInput = document.getElementById('jan_code');
+const janError = document.getElementById('janError');
+
+if (janInput) {
+  janInput.addEventListener('input', function(){
+    this.value = this.value.replace(/\D/g,'').slice(0,13);
+
+    if (this.value.length === 0) {
+      janError.textContent = '';
+    } else if (this.value.length < 13) {
+      janError.textContent = 'JANコードは13桁で入力してください';
+    } else {
+      janError.textContent = '';
+    }
+  });
+}
 </script>
+
+
 
 </body>
 </html>
