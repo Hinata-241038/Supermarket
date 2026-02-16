@@ -32,7 +32,9 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="container">
 <h1>廃棄対象</h1>
 
+<div class="table-card">
 <table class="item-table">
+<thead>
 <tr>
   <th>JAN</th>
   <th>商品名</th>
@@ -41,12 +43,15 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <th>期限</th>
   <th>操作</th>
 </tr>
+</thead>
+<tbody>
 
+<?php if (!empty($items)): ?>
 <?php foreach ($items as $item): ?>
 <tr class="expired">
   <td><?= htmlspecialchars($item['jan_code']) ?></td>
   <td><?= htmlspecialchars($item['item_name']) ?></td>
-  <td><?= htmlspecialchars($item['category_label_ja']) ?></td>
+  <td><?= htmlspecialchars($item['category_label_ja'] ?? '') ?></td>
   <td><?= (int)$item['quantity'] ?></td>
   <td><?= htmlspecialchars($item['expire_date']) ?></td>
   <td>
@@ -59,12 +64,18 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </td>
 </tr>
 <?php endforeach; ?>
-
-<?php if (empty($items)): ?>
-<tr><td colspan="6">廃棄対象はありません</td></tr>
+<?php else: ?>
+<tr>
+  <td colspan="6" class="no-data">
+    廃棄対象はありません
+  </td>
+</tr>
 <?php endif; ?>
 
+</tbody>
 </table>
 </div>
+</div>
+
 </body>
 </html>
