@@ -244,3 +244,7 @@ body{
   font-weight:700;
   color:#DC2626;
 }
+
+input[readonly]{
+  background:#F9FAFB;
+}

@@ -1,36 +1,11 @@
 <?php
+session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
-session_start();
 require_once __DIR__ . '/../dbconnect.php';
 
-/* =========================================================
-  0) 期限モード（完全セッション制御 / URLに ?expire= を出さない）
-     - POSTでモード切替
-     - 切替後は同じGET条件でリダイレクト（検索条件を維持）
-========================================================= */
-if (!isset($_SESSION['expire_mode'])) {
-  $_SESSION['expire_mode'] = 'best'; // 初期は賞味期限モード
-}
+function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_expire_mode'])) {
-  $v = $_POST['change_expire_mode'];
-  if ($v === 'consume' || $v === 'best') {
-    $_SESSION['expire_mode'] = $v;
-  }
-
-  // ✅ 検索条件を壊さない：現在のGETを維持してリダイレクト
-  $qs = $_GET ? ('?' . http_build_query($_GET)) : '';
-  header('Location: zaiko.php' . $qs);
-  exit;
-}
-
-$expireMode = $_SESSION['expire_mode'] ?? 'best';
-
-/* =========================================================
-  1) カラム存在チェック（列が無くても落ちないようにする）
-========================================================= */
 function hasColumn(PDO $pdo, string $table, string $column): bool {
   $st = $pdo->prepare("SHOW COLUMNS FROM {$table} LIKE :c");
   $st->execute([':c'=>$column]);
@@ -39,84 +14,86 @@ function hasColumn(PDO $pdo, string $table, string $column): bool {
 
 $hasConsume = hasColumn($pdo,'stock','consume_date');
 $hasBest    = hasColumn($pdo,'stock','best_before_date');
-$hasLegacy  = hasColumn($pdo,'stock','expire_date');
+$hasLegacy  = hasColumn($pdo,'stock','expire_date'); // あなたのDBでは存在&NOT NULL
 
-/* =========================================================
-  2) GET（検索 / AND-OR）
-========================================================= */
+/* =========================
+   期限モード（セッション保持）
+========================= */
+if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['toggle_expire'])) {
+  $cur = $_SESSION['expire_mode'] ?? 'best';
+  $_SESSION['expire_mode'] = ($cur==='consume') ? 'best' : 'consume';
+  $q = $_SERVER['QUERY_STRING'] ? ('?'.$_SERVER['QUERY_STRING']) : '';
+  header('Location: zaiko.php'.$q);
+  exit;
+}
+$expireMode = $_SESSION['expire_mode'] ?? 'best';
+
+/* =========================
+   検索 AND/OR
+========================= */
 $keyword    = trim($_GET['keyword'] ?? '');
-$searchMode = ($_GET['mode'] ?? 'or') === 'and' ? 'and' : 'or';
+$searchMode = (($_GET['mode'] ?? 'or') === 'and') ? 'and' : 'or';
+
+$terms = [];
+if ($keyword !== '') {
+  $kw = preg_replace('/\s+/u', ' ', $keyword);
+  $terms = array_values(array_filter(explode(' ', $kw), fn($v)=>$v!==''));
+}
 
 $where = [];
 $params = [];
-
-if ($keyword !== '') {
-  $words = preg_split('/\s+/', $keyword);
-  $conds = [];
-
-  foreach ($words as $i => $w) {
-    $conds[] = "(
-      COALESCE(i.item_name,'') LIKE :w{$i}
-      OR COALESCE(i.jan_code,'') LIKE :w{$i}
-      OR COALESCE(c.category_label_ja,'') LIKE :w{$i}
-      OR COALESCE(i.supplier,'') LIKE :w{$i}
-    )";
-    $params[":w{$i}"] = "%{$w}%";
+if (!empty($terms)) {
+  $pieces = [];
+  foreach ($terms as $i => $t) {
+    $p = ":t{$i}";
+    $params[$p] = "%{$t}%";
+    $pieces[] = "(i.jan_code LIKE {$p} OR i.item_name LIKE {$p} OR i.supplier LIKE {$p} OR c.category_label_ja LIKE {$p})";
   }
-
-  $where[] = '(' . implode($searchMode === 'and' ? ' AND ' : ' OR ', $conds) . ')';
+  $glue = ($searchMode==='and') ? ' AND ' : ' OR ';
+  $where[] = '(' . implode($glue, $pieces) . ')';
 }
+$whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
 
-$whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+/* =========================
+   期限表示：1商品につき「最短期限」でOK → MIN()
+   モードにより表示対象を切替
+========================= */
+$consumeExpr = $hasConsume ? "MIN(s.consume_date)" : "NULL";
+$bestExpr    = $hasBest    ? "MIN(s.best_before_date)" : "NULL";
+$legacyExpr  = $hasLegacy  ? "MIN(s.expire_date)" : "NULL";
 
-/* =========================================================
-  3) 表示する期限列（モード優先）
-========================================================= */
-if ($expireMode === 'consume' && $hasConsume) {
-  $expireCol = 's.consume_date';
-} elseif ($hasBest) {
-  $expireCol = 's.best_before_date';
+if ($expireMode==='consume' && $hasConsume) {
+  $expireViewExpr = $consumeExpr;
 } else {
-  $expireCol = 's.expire_date'; // 互換
+  // 賞味期限モード：best_before_date があればそれ、なければ expire_date（互換）
+  $expireViewExpr = $hasBest ? $bestExpr : $legacyExpr;
 }
 
-/* =========================================================
-  4) データ取得（NULL完全対策版）
-========================================================= */
 $sql = "
-SELECT
-  s.id,
-  s.item_id,
-  COALESCE(i.jan_code,'') AS jan_code,
-  COALESCE(i.item_name,'') AS item_name,
-  COALESCE(c.category_label_ja,'') AS category_label_ja,
-  COALESCE(i.unit,'') AS unit,
-  COALESCE(i.supplier,'') AS supplier,
-  COALESCE({$expireCol}, '') AS expire_date,
-  COALESCE(s.quantity, 0) AS quantity
-FROM stock s
-LEFT JOIN items i ON i.id = s.item_id
-LEFT JOIN categories c ON c.id = i.category_id
-{$whereSql}
-ORDER BY i.item_name
+  SELECT
+    i.id AS item_id,
+    i.jan_code,
+    i.item_name,
+    i.unit,
+    i.supplier,
+    c.category_label_ja,
+    IFNULL(SUM(s.quantity),0) AS stock_qty,
+    {$expireViewExpr} AS expire_view
+  FROM items i
+  LEFT JOIN categories c ON c.id = i.category_id
+  LEFT JOIN stock s ON s.item_id = i.id
+  {$whereSql}
+  GROUP BY i.id
+  ORDER BY i.id DESC
 ";
+$st = $pdo->prepare($sql);
+$st->execute($params);
+$rows = $st->fetchAll(PDO::FETCH_ASSOC);
 
-$stmt = $pdo->prepare($sql);
-$stmt->execute($params);
-$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-/* =========================================================
-  5) 表示用安全関数
-========================================================= */
-function h($v): string {
-  return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
+function fmtDate($d){
+  if (!$d) return '';
+  return date('Y-m-d', strtotime($d));
 }
-
-// 表示ラベル
-$currentModeLabel = ($expireMode === 'consume') ? '消費期限モード' : '賞味期限モード';
-// ボタンは「反対側へ切替」
-$nextMode         = ($expireMode === 'consume') ? 'best' : 'consume';
-$nextModeLabel    = ($expireMode === 'consume') ? '賞味期限に切替' : '消費期限に切替';
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -128,90 +105,82 @@ $nextModeLabel    = ($expireMode === 'consume') ? '賞味期限に切替' : '消
 <body>
 
 <a href="home.php" class="back-btn">戻る</a>
-
 <h1 class="title">在庫</h1>
 
-<!-- 検索 -->
 <div class="search-area">
   <form method="get" class="search-form">
-    <input type="text" name="keyword" class="search-box"
+    <input class="search-box" type="text" name="keyword" placeholder="JAN / 商品名 / 発注先 / カテゴリ で検索"
       value="<?= h($keyword) ?>">
-    <button type="submit" class="search-btn">🔍</button>
+    <button class="search-btn" type="submit" aria-label="検索">🔍</button>
 
     <div class="search-mode">
-      <label>
-        <input type="radio" name="mode" value="and"
-          <?= $searchMode==='and'?'checked':'' ?>> AND
-      </label>
-      <label>
-        <input type="radio" name="mode" value="or"
-          <?= $searchMode==='or'?'checked':'' ?>> OR
-      </label>
+      <label><input type="radio" name="mode" value="and" <?= $searchMode==='and'?'checked':'' ?>> AND</label>
+      <label><input type="radio" name="mode" value="or"  <?= $searchMode==='or'?'checked':''  ?>> OR</label>
     </div>
   </form>
 </div>
 
-<!-- 右上：現在モード + 切替 + 廃棄 -->
 <div class="right-actions">
-
   <div class="expire-status">
-    現在：<span class="expire-label"><?= h($currentModeLabel) ?></span>
+    現在：
+    <span class="expire-label"><?= $expireMode==='consume' ? '消費期限モード' : '賞味期限モード' ?></span>
   </div>
 
-  <!-- ✅ URLを汚さない：POSTで切替（検索条件はリダイレクトで維持） -->
   <form method="post" class="expire-switch-form">
-    <button type="submit" name="change_expire_mode" value="<?= h($nextMode) ?>" class="toggle-expire-btn">
-      <?= h($nextModeLabel) ?>
+    <button type="submit" name="toggle_expire" value="1" class="toggle-expire-btn">
+      <?= $expireMode==='consume' ? '賞味期限に切替' : '消費期限に切替' ?>
     </button>
   </form>
 
-  <a href="dispose.php" class="dispose-btn">廃棄処理</a>
+  <a href="haiki.php">廃棄処理</a>
 </div>
 
-<!-- 横スクロール -->
 <div class="table-wrap">
-<table class="item-table">
-<thead>
-<tr>
-  <th>JAN</th>
-  <th>商品名</th>
-  <th>カテゴリ</th>
-  <th>単位</th>
-  <th>発注先</th>
-  <th>期限</th>
-  <th>在庫</th>
-  <th class="op-col">操作</th>
-</tr>
-</thead>
-<tbody>
-<?php foreach ($rows as $r): ?>
-<tr>
-  <td><?= h($r['jan_code']) ?></td>
-  <td><?= h($r['item_name']) ?></td>
-  <td><?= h($r['category_label_ja']) ?></td>
-  <td><?= h($r['unit']) ?></td>
-  <td><?= h($r['supplier']) ?></td>
-  <td><?= h($r['expire_date']) ?></td>
+  <table class="item-table">
+    <thead>
+      <tr>
+        <th>JAN</th>
+        <th>商品名</th>
+        <th>カテゴリ</th>
+        <th>単位</th>
+        <th>発注先</th>
+        <th>期限</th>
+        <th>在庫</th>
+        <th class="op-col">操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php if(!$rows): ?>
+        <tr><td colspan="8" style="padding:18px;">該当するデータがありません</td></tr>
+      <?php else: ?>
+        <?php foreach($rows as $r): ?>
+          <?php
+            $qty = (int)$r['stock_qty'];
+            $expire = fmtDate($r['expire_view'] ?? '');
+            $qtyClass = ($qty <= 0) ? 'stock-zero' : '';
+          ?>
+          <tr>
+            <td><?= h($r['jan_code'] ?? '') ?></td>
+            <td><?= h($r['item_name'] ?? '') ?></td>
+            <td><?= h($r['category_label_ja'] ?? '') ?></td>
+            <td><?= h($r['unit'] ?? '') ?></td>
+            <td><?= h($r['supplier'] ?? '') ?></td>
+            <td><?= h($expire) ?></td>
+            <td class="<?= $qtyClass ?>"><?= $qty ?></td>
+            <td class="op-col">
+              <div class="op-buttons">
+                <!-- ✅ item_id を渡す：編集画面に反映される -->
+                <a class="btn-edit" href="zaiko_edit.php?item_id=<?= (int)$r['item_id'] ?>">編集</a>
 
-  <td class="<?= ((int)$r['quantity'] <= 0) ? 'stock-zero' : '' ?>">
-    <?= (int)$r['quantity'] ?>
-  </td>
-
-  <td class="op-col">
-    <div class="op-buttons">
-      <!-- ✅ バグ修正：$row ではなく $r、渡すのは item_id -->
-      <a class="btn-edit" href="zaiko_edit.php?item_id=<?= (int)$r['item_id'] ?>">編集</a>
-
-      <a href="hacchu_form.php?jan=<?= urlencode((string)$r['jan_code']) ?>"
-         class="btn-order <?= ((int)$r['quantity'] <= 0) ? 'btn-order-alert' : '' ?>">
-         発注
-      </a>
-    </div>
-  </td>
-</tr>
-<?php endforeach; ?>
-</tbody>
-</table>
+                <!-- ✅ hacchu_form.php は jan 受け取りでOK -->
+                <a class="btn-order" href="hacchu_form.php?jan=<?= urlencode((string)($r['jan_code'] ?? '')) ?>">発注</a>
+              </div>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      <?php endif; ?>
+    </tbody>
+  </table>
 </div>
 
 </body>
