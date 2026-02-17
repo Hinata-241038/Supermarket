@@ -39,27 +39,32 @@ function remainingDays($end){
 }
 
 /* =========================
-   カラム存在確認（ロット非干渉）
+   カラム確認（ロット安全）
 ========================= */
 $hasConsume = hasColumn($pdo,'stock','consume_date');
 $hasBest    = hasColumn($pdo,'stock','best_before_date');
 $hasLegacy  = hasColumn($pdo,'stock','expire_date');
 
 /* =========================
-   期間限定フィルタ
+   表示モード取得
 ========================= */
-$limitedOnly = isset($_GET['limited']) && $_GET['limited']=='1';
+$view = $_GET['view'] ?? 'best'; // best / consume / limited
 
-/* =========================
-   期限モード（セッション保持）
-========================= */
-if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['toggle_expire'])) {
-  $cur = $_SESSION['expire_mode'] ?? 'best';
-  $_SESSION['expire_mode'] = ($cur==='consume') ? 'best' : 'consume';
-  header('Location: zaiko.php?' . $_SERVER['QUERY_STRING']);
-  exit;
+$expireMode = 'best';
+$limitedOnly = false;
+$expireColumnLabel = '期限';   // ← デフォルト
+
+if ($view === 'consume') {
+    $expireMode = 'consume';
+    $expireColumnLabel = '消費期限';
 }
-$expireMode = $_SESSION['expire_mode'] ?? 'best';
+elseif ($view === 'limited') {
+    $limitedOnly = true;
+    $expireColumnLabel = '販売終了日';
+}
+else {
+    $expireColumnLabel = '賞味期限';
+}
 
 /* =========================
    検索 AND/OR
@@ -82,7 +87,7 @@ if ($keyword !== '') {
   $where[] = '(' . implode($glue, $pieces) . ')';
 }
 
-/* ★ 期間限定のみ表示（終了済は除外） */
+/* 期間限定モード */
 if ($limitedOnly) {
   $where[] = "i.is_limited = 1 AND (i.limited_end IS NULL OR i.limited_end >= CURDATE())";
 }
@@ -90,11 +95,16 @@ if ($limitedOnly) {
 $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
 
 /* =========================
-   期限集約（ロット対応）
+   期限表示式
 ========================= */
-$expireExpr = $expireMode==='consume' && $hasConsume
-  ? "MIN(s.consume_date)"
-  : ($hasBest ? "MIN(s.best_before_date)" : "MIN(s.expire_date)");
+if ($limitedOnly) {
+  $expireExpr = "i.limited_end";
+}
+else {
+  $expireExpr = $expireMode==='consume' && $hasConsume
+    ? "MIN(s.consume_date)"
+    : ($hasBest ? "MIN(s.best_before_date)" : "MIN(s.expire_date)");
+}
 
 $sql = "
 SELECT
@@ -144,28 +154,20 @@ $rows = $st->fetchAll(PDO::FETCH_ASSOC);
     <div class="search-mode">
       <label><input type="radio" name="mode" value="and" <?= $searchMode==='and'?'checked':'' ?>> AND</label>
       <label><input type="radio" name="mode" value="or" <?= $searchMode==='or'?'checked':'' ?>> OR</label>
-      <label>
-        <input type="checkbox" name="limited" value="1" <?= $limitedOnly?'checked':'' ?>>
-        期間限定のみ
-      </label>
     </div>
+
+    <!-- プルダウン -->
+    <select name="view" class="view-select" onchange="this.form.submit()">
+      <option value="best" <?= $view==='best'?'selected':'' ?>>賞味期限</option>
+      <option value="consume" <?= $view==='consume'?'selected':'' ?>>消費期限</option>
+      <option value="limited" <?= $view==='limited'?'selected':'' ?>>期間限定</option>
+    </select>
+
+
   </form>
 </div>
 
 <div class="right-actions">
-  <div class="expire-status">
-    現在：
-    <span class="expire-label">
-      <?= $expireMode==='consume' ? '消費期限モード' : '賞味期限モード' ?>
-    </span>
-  </div>
-
-  <form method="post" class="expire-switch-form">
-    <button type="submit" name="toggle_expire" value="1" class="toggle-expire-btn">
-      <?= $expireMode==='consume' ? '賞味期限に切替' : '消費期限に切替' ?>
-    </button>
-  </form>
-
   <?php if ($role === 'mng' || $role === 'fte'): ?>
     <a href="haiki.php">廃棄処理</a>
   <?php endif; ?>
@@ -180,7 +182,7 @@ $rows = $st->fetchAll(PDO::FETCH_ASSOC);
         <th>カテゴリ</th>
         <th>単位</th>
         <th>発注先</th>
-        <th>期限</th>
+        <th><?= h($expireColumnLabel) ?></th>
         <th>在庫</th>
         <th class="op-col">操作</th>
       </tr>
@@ -194,7 +196,11 @@ $rows = $st->fetchAll(PDO::FETCH_ASSOC);
             $qty = (int)$r['stock_qty'];
             $expire = fmtDate($r['expire_view'] ?? '');
             $qtyClass = ($qty <= 0) ? 'stock-zero' : '';
-            $rowClass = $r['is_limited'] ? 'limited-row' : '';
+            $rowClass = '';
+            if ($r['is_limited'] && (!$r['limited_end'] || $r['limited_end'] >= date('Y-m-d'))) {
+                $rowClass = 'limited-row';
+            }
+
           ?>
           <tr class="<?= $rowClass ?>">
             <td><?= h($r['jan_code']) ?></td>

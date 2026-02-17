@@ -279,3 +279,22 @@ input[readonly]{
 tr.limited-row{
   background:#F0F9FF;
 }
+
+.view-select-form{
+  margin:0;
+}
+
+.view-select{
+  padding:8px 14px;
+  border-radius:8px;
+  border:1px solid #D1D5DB;
+  font-weight:600;
+  background:#FFFFFF;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.view-select:focus{
+  outline:none;
+  border:1px solid #2563EB;
+}
