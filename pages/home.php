@@ -34,7 +34,7 @@ $role = $_SESSION['role'];
 <?php endif; ?>
 
 <!-- ログアウト -->
-<a href="logu.php" class="logout">ログアウトa</a>
+<a href="logu.php" class="logout">ログアウト</a>
  
 </body>
 </html> 
