@@ -248,3 +248,34 @@ body{
 input[readonly]{
   background:#F9FAFB;
 }
+/* =========================
+   期間限定バッジ
+========================= */
+.badge{
+  display:inline-block;
+  margin-left:8px;
+  padding:3px 10px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:700;
+}
+
+.badge-limited{
+  background:#DBEAFE;
+  color:#1D4ED8;
+}
+
+.badge-warning{
+  background:#FEF3C7;
+  color:#B45309;
+}
+
+.badge-danger{
+  background:#FEE2E2;
+  color:#B91C1C;
+}
+
+/* 期間限定行の背景 */
+tr.limited-row{
+  background:#F0F9FF;
+}
