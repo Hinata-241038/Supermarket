@@ -1,0 +1,94 @@
+body {
+    font-family: "Arial", sans-serif;
+    background: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.home-icon {
+    font-size: 32px;
+    margin-right: auto;
+    padding-left: 20px;
+}
+
+h1 {
+    margin: 0 auto;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.edit-form {
+    margin-top: 30px;
+    text-align: left;
+}
+
+.edit-form label {
+    font-size: 16px;
+    display: block;
+    margin-top: 20px;
+}
+
+.edit-form input {
+    width: 100%;
+    height: 32px;
+    background: #dcdcdc;
+    border: none;
+    border-radius: 4px;
+    margin-top: 6px;
+    padding: 5px;
+    font-size: 16px;
+}
+
+.buttons {
+    display: block;
+    width: 250px;
+    margin: 40px auto;
+    padding: 25px 0;
+    background-color: #19f2f2;
+    font-size: 32px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+}
+
+.back-btn, .submit-btn {
+    width: 100px;
+    height: 50px;
+    background: #dcdcdc;
+    border: none;
+    font-size: 20px;
+    border-radius: 6px;
+}
+
+.tabs {
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.tabs label {
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+.tabs input[type="radio"] {
+    margin-right: 5px;
+}
+
+.dot {
+    color: #333;
+    margin-right: 4px;
+}

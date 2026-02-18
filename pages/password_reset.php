@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../dbconnect.php';
 
+
 if (!isset($_POST['login_id'])) {
     echo "IDが送信されていません";
     exit;
@@ -63,6 +64,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         <div class="button-row">
             <button type="submit">設定</button>
+        <a href="logu.php" class="back-button">戻る</a>
         </div>
 
     </form>
