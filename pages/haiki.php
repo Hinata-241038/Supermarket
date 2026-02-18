@@ -8,12 +8,12 @@ SELECT
   i.jan_code,
   c.category_label_ja,
   s.quantity,
-  s.expire_date
+  COALESCE(s.consume_date, s.best_before_date, s.expire_date) AS expire_view
 FROM stock s
 JOIN items i ON s.item_id = i.id
 LEFT JOIN categories c ON i.category_id = c.id
-WHERE s.expire_date < CURDATE()
-ORDER BY s.expire_date
+WHERE COALESCE(s.consume_date, s.best_before_date, s.expire_date) < CURDATE()
+ORDER BY expire_view
 ";
 $stmt = $pdo->query($sql);
 $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -30,7 +30,11 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <button class="back-btn" onclick="location.href='home.php'">戻る</button>
 
 <div class="container">
-<h1 class="page-title">廃棄対象</h1>
+<h1 class="page-title">廃棄対象（期限切れ）</h1>
+
+<?php if(!empty($_GET['done'])): ?>
+  <div class="notice">廃棄処理が完了しました。</div>
+<?php endif; ?>
 
 <div class="card">
 <table class="table">
@@ -53,11 +57,14 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <td><?= htmlspecialchars($item['item_name']) ?></td>
   <td><?= htmlspecialchars($item['category_label_ja'] ?? '') ?></td>
   <td><?= (int)$item['quantity'] ?></td>
-  <td><?= htmlspecialchars($item['expire_date']) ?></td>
+  <td><?= htmlspecialchars($item['expire_view']) ?></td>
   <td>
+    <!-- 互換：単発でも廃棄できる（haiki_execute.phpが両対応） -->
     <form method="post" action="haiki_execute.php"
-          onsubmit="return confirm('この在庫を廃棄しますか？');">
-      <input type="hidden" name="stock_id" value="<?= $item['stock_id'] ?>">
+          onsubmit="return confirm('この在庫ロットを廃棄しますか？');">
+      <input type="hidden" name="stock_id" value="<?= (int)$item['stock_id'] ?>">
+      <input type="hidden" name="view" value="expired">
+      <input type="hidden" name="reason" value="期限切れ">
       <button class="btn btn-danger">廃棄確定</button>
     </form>
   </td>

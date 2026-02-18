@@ -298,3 +298,68 @@ tr.limited-row{
   outline:none;
   border:1px solid #2563EB;
 }
+
+/* チェック列 */
+.check-col{
+  width: 70px;
+  text-align: center;
+}
+
+/* 廃棄バー */
+.dispose-bar{
+  width: 100%;
+}
+
+.dispose-btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.dispose-hint{
+  margin-left: 12px;
+  font-size: 13px;
+  opacity: .7;
+}
+
+/* 確認カード */
+.confirm-card{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px 0;
+}
+
+.confirm-lead{
+  margin: 8px 0 16px;
+}
+
+.reason-row{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  margin: 12px 0 18px;
+}
+
+.reason-row select{
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+
+.reason-hint{
+  font-size: 13px;
+  opacity: .7;
+}
+
+.confirm-actions{
+  margin: 18px 0 24px;
+}
+
+/* 期限切れ行 */
+.row-expired{
+  background:#FEF2F2;
+}
