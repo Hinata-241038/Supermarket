@@ -31,7 +31,11 @@ $role = $_SESSION['role'];
 <!-- 廃棄：管理者のみ -->
 <?php if ($role === 'mng'): ?>
     <a href="haiki.php" id="haikiBtn" class="menu-button">廃棄</a>
-    <a href="haiki.php" id="haikiBtn" class="menu-button">ユーザー管理</a>
+<?php endif; ?>
+
+<!-- ユーザー管理：管理者のみ -->
+ <?php if ($role === 'mng'): ?>
+    <a href="user_management.php" id="user-button" class="menu-button">ユーザー管理</a>
 <?php endif; ?>
 
 <!-- ログアウト -->
