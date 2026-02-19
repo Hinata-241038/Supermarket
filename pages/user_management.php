@@ -45,7 +45,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td><?= htmlspecialchars($user['role']) ?></td>
                     <td><?= htmlspecialchars($user['login_id']) ?></td>
                     <td>
-                        <a href="user_edit.php?id=<?= $user['id'] ?>">
+                        <a href="password_reset.php?id=<?= $user['id'] ?>">
                             <button type="button" class="btn-edit">編集</button>
                         </a>
                     </td>
