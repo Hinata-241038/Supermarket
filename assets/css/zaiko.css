@@ -363,8 +363,6 @@ tr.limited-row{
 .row-expired{
   background:#FEF2F2;
 }
-<<<<<<< HEAD
-=======
 /* テーブル上部バー */
 .table-header-bar{
   display:flex;
@@ -394,4 +392,3 @@ tr.limited-row{
 .dispose-btn:active{
   transform:translateY(0);
 }
->>>>>>> add-dust
