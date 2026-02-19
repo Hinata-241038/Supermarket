@@ -279,3 +279,183 @@ body{
   background:#FEE2E2;
   color:#B91C1C;
 }
+
+/* フラッシュ */
+.flash{
+  width:1100px;
+  max-width:92%;
+  margin:0 auto 14px;
+  padding:12px 14px;
+  border-radius:10px;
+  background:#ECFDF5;
+  border:1px solid #A7F3D0;
+  color:#065F46;
+  font-weight:700;
+}
+
+/* 4種切替ボタン */
+.view-switch{
+  display:flex;
+  gap:8px;
+  margin:0;
+}
+.view-btn{
+  height:38px;
+  padding:0 12px;
+  border-radius:10px;
+  border:1px solid #E5E7EB;
+  background:#FFFFFF;
+  color:#111827;
+  font-weight:700;
+  cursor:pointer;
+  transition:.15s;
+}
+.view-btn:hover{
+  border-color:#2563EB;
+  color:#1D4ED8;
+}
+.view-btn.is-active{
+  background:#2563EB;
+  border-color:#2563EB;
+  color:#fff;
+}
+
+/* 廃棄（ボタンでもOK） */
+.dispose-link{
+  height:38px;
+  padding:0 14px;
+  border:none;
+  border-radius:10px;
+  background:#FEE2E2;
+  color:#B91C1C;
+  font-weight:800;
+  cursor:pointer;
+  transition:.15s;
+}
+.dispose-link:hover{
+  background:#FCA5A5;
+  color:#7F1D1D;
+}
+
+/* チェック列 */
+.check-col{
+  width:70px;
+}
+.row-check{
+  width:16px;
+  height:16px;
+  accent-color:#2563EB;
+}
+
+/* 期限切れ行 */
+.row-expired{
+  background:#FEF2F2;
+}
+
+/* =========================
+   モーダル
+========================= */
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  z-index:9999;
+}
+.modal.is-open{
+  display:block;
+}
+.modal-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.35);
+}
+.modal-panel{
+  position:relative;
+  width:720px;
+  max-width:92%;
+  margin:8vh auto 0;
+  background:#fff;
+  border-radius:14px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+  overflow:hidden;
+}
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 16px;
+  background:#F9FAFB;
+  border-bottom:1px solid #E5E7EB;
+}
+.modal-title{
+  font-weight:900;
+  color:#111827;
+}
+.modal-close{
+  border:none;
+  background:transparent;
+  font-size:22px;
+  cursor:pointer;
+  color:#6B7280;
+}
+.modal-body{
+  padding:16px;
+}
+.modal-lead{
+  margin-bottom:12px;
+  color:#111827;
+}
+.modal-table-wrap{
+  border:1px solid #E5E7EB;
+  border-radius:10px;
+  overflow:hidden;
+}
+.modal-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14px;
+}
+.modal-table th{
+  background:#F9FAFB;
+  padding:10px 8px;
+  border-bottom:1px solid #E5E7EB;
+}
+.modal-table td{
+  padding:10px 8px;
+  border-bottom:1px solid #E5E7EB;
+}
+.modal-warn{
+  margin-top:10px;
+  color:#B91C1C;
+  font-weight:800;
+}
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  padding:14px 16px;
+  border-top:1px solid #E5E7EB;
+  background:#fff;
+}
+.btn-sub{
+  height:38px;
+  padding:0 14px;
+  border-radius:10px;
+  border:1px solid #E5E7EB;
+  background:#fff;
+  font-weight:800;
+  cursor:pointer;
+}
+.btn-danger{
+  height:38px;
+  padding:0 14px;
+  border-radius:10px;
+  border:none;
+  background:#DC2626;
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+.btn-danger:hover{
+  background:#B91C1C;
+}

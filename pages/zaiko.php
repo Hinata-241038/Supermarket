@@ -5,7 +5,7 @@ ini_set('display_errors', 1);
 require_once __DIR__ . '/../dbconnect.php';
 
 /* =========================
-   権限チェック（最初に実行）
+   権限
 ========================= */
 if (!isset($_SESSION['role'])) {
   header('Location: logu.php');
@@ -27,25 +27,27 @@ function fmtDate($d){
 }
 
 /* =========================
-   stockの列存在チェック（NULL耐性）
+   互換列存在
 ========================= */
 $hasConsume = hasColumn($pdo,'stock','consume_date');
 $hasBest    = hasColumn($pdo,'stock','best_before_date');
-$hasLegacy  = hasColumn($pdo,'stock','expire_date'); // 互換
+$hasLegacy  = hasColumn($pdo,'stock','expire_date'); // NOT NULL
 
 /* =========================
-   期限モード（セッション保持）
+   表示モード（4種）: セッション保持
+   consume / best / limited / expired
 ========================= */
-if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['toggle_expire'])) {
-  $cur = $_SESSION['expire_mode'] ?? 'best';
-  $_SESSION['expire_mode'] = ($cur === 'consume') ? 'best' : 'consume';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['set_view'])) {
+  $v = (string)($_POST['view_mode'] ?? 'best');
+  $allowed = ['consume','best','limited','expired'];
+  $_SESSION['view_mode'] = in_array($v, $allowed, true) ? $v : 'best';
 
-  // 検索条件を保持してリロード
+  // 検索条件を保持して戻る
   $q = $_SERVER['QUERY_STRING'] ? ('?'.$_SERVER['QUERY_STRING']) : '';
   header('Location: zaiko.php'.$q);
   exit;
 }
-$expireMode = $_SESSION['expire_mode'] ?? 'best';
+$viewMode = $_SESSION['view_mode'] ?? 'best';
 
 /* =========================
    検索 AND/OR
@@ -61,6 +63,8 @@ if ($keyword !== '') {
 
 $where = [];
 $params = [];
+
+/* 検索条件（items/categories側） */
 if (!empty($terms)) {
   $pieces = [];
   foreach ($terms as $i => $t) {
@@ -74,46 +78,109 @@ if (!empty($terms)) {
   $glue = ($searchMode === 'and') ? ' AND ' : ' OR ';
   $where[] = '(' . implode($glue, $pieces) . ')';
 }
+
+/* =========================
+   4種フィルタ（データそのものを絞る）
+========================= */
+$today = (new DateTime('today'))->format('Y-m-d');
+
+switch ($viewMode) {
+  case 'consume':
+    // 消費期限だけ（consume_dateがあるロットのみ）
+    if ($hasConsume) {
+      $where[] = "s.consume_date IS NOT NULL";
+    } else {
+      // カラムが無いなら何も出さない（安全）
+      $where[] = "1=0";
+    }
+    break;
+
+  case 'best':
+    // 賞味期限だけ（best_before_dateがあるロットのみ）
+    if ($hasBest) {
+      $where[] = "s.best_before_date IS NOT NULL";
+    } else {
+      $where[] = "1=0";
+    }
+    break;
+
+  case 'limited':
+    // 期間限定商品だけ（items.is_limited）
+    $where[] = "i.is_limited = 1";
+    // 期間内だけに絞りたいなら（任意）
+    // $where[] = "(i.limited_start IS NULL OR i.limited_start <= :today) AND (i.limited_end IS NULL OR i.limited_end >= :today)";
+    // $params[':today'] = $today;
+    break;
+
+  case 'expired':
+    // 期限切れだけ：consume/bestがあればそれを優先、無ければ互換expire_date
+    // COALESCEで「そのロットの期限」を作る
+    $where[] = "COALESCE(s.consume_date, s.best_before_date, s.expire_date) < :today";
+    $params[':today'] = $today;
+    break;
+}
+
+/* WHERE組み立て */
 $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
 
 /* =========================
-   期限表示（最短期限 = MIN）
-   モードにより表示対象を切替
+   期限表示（列）
+   - consume: consume_date
+   - best:    best_before_date
+   - limited: COALESCE(consume,best,expire)
+   - expired: COALESCE(consume,best,expire)
 ========================= */
-$consumeExpr = $hasConsume ? "MIN(s.consume_date)" : "NULL";
-$bestExpr    = $hasBest    ? "MIN(s.best_before_date)" : "NULL";
-$legacyExpr  = $hasLegacy  ? "MIN(s.expire_date)" : "NULL";
+$expireExprCommon = "COALESCE(" .
+  ($hasConsume ? "s.consume_date" : "NULL") . ", " .
+  ($hasBest    ? "s.best_before_date" : "NULL") . ", " .
+  ($hasLegacy  ? "s.expire_date" : "NULL") .
+")";
 
-if ($expireMode === 'consume' && $hasConsume) {
-  $expireViewExpr = $consumeExpr;
+if ($viewMode === 'consume') {
+  $expireViewExpr = $hasConsume ? "s.consume_date" : "NULL";
+} elseif ($viewMode === 'best') {
+  $expireViewExpr = $hasBest ? "s.best_before_date" : "NULL";
 } else {
-  // 賞味期限モード：best_before_date があればそれ、なければ expire_date（互換）
-  $expireViewExpr = $hasBest ? $bestExpr : $legacyExpr;
+  $expireViewExpr = $expireExprCommon;
 }
 
 /* =========================
-   一覧取得
+   ロット（stock.id）単位で一覧取得
 ========================= */
 $sql = "
   SELECT
-    i.id AS item_id,
+    s.id AS stock_id,
+    s.item_id,
     i.jan_code,
     i.item_name,
+    c.category_label_ja,
     i.unit,
     i.supplier,
-    c.category_label_ja,
-    IFNULL(SUM(s.quantity),0) AS stock_qty,
-    {$expireViewExpr} AS expire_view
-  FROM items i
+    i.is_limited,
+    i.limited_start,
+    i.limited_end,
+    s.quantity,
+    s.consume_date,
+    s.best_before_date,
+    s.expire_date,
+    {$expireViewExpr} AS expire_view,
+    {$expireExprCommon} AS expire_common
+  FROM stock s
+  JOIN items i ON i.id = s.item_id
   LEFT JOIN categories c ON c.id = i.category_id
-  LEFT JOIN stock s ON s.item_id = i.id
   {$whereSql}
-  GROUP BY i.id
-  ORDER BY i.id DESC
+  ORDER BY i.id DESC, {$expireExprCommon} ASC, s.id DESC
 ";
 $st = $pdo->prepare($sql);
 $st->execute($params);
 $rows = $st->fetchAll(PDO::FETCH_ASSOC);
+
+/* フラッシュメッセージ */
+$flash = $_SESSION['flash'] ?? '';
+unset($_SESSION['flash']);
+
+/* 廃棄可能権限 */
+$canDispose = ($role === 'mng' || $role === 'fte');
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -126,6 +193,10 @@ $rows = $st->fetchAll(PDO::FETCH_ASSOC);
 
 <a href="home.php" class="back-btn">戻る</a>
 <h1 class="title">在庫</h1>
+
+<?php if ($flash): ?>
+  <div class="flash"><?= h($flash) ?></div>
+<?php endif; ?>
 
 <div class="search-area">
   <form method="get" class="search-form">
@@ -145,76 +216,237 @@ $rows = $st->fetchAll(PDO::FETCH_ASSOC);
 <div class="right-actions">
   <div class="expire-status">
     現在：
-    <span class="expire-label"><?= $expireMode==='consume' ? '消費期限モード' : '賞味期限モード' ?></span>
+    <span class="expire-label">
+      <?php
+        echo match($viewMode){
+          'consume' => '消費期限',
+          'best'    => '賞味期限',
+          'limited' => '期間限定',
+          'expired' => '期限切れ',
+          default   => '賞味期限'
+        };
+      ?>
+      表示
+    </span>
   </div>
 
-  <form method="post" class="expire-switch-form">
-    <button type="submit" name="toggle_expire" value="1" class="toggle-expire-btn">
-      <?= $expireMode==='consume' ? '賞味期限に切替' : '消費期限に切替' ?>
-    </button>
+  <!-- 4種切替 -->
+  <form method="post" class="view-switch">
+    <input type="hidden" name="set_view" value="1">
+    <button class="view-btn <?= $viewMode==='consume'?'is-active':'' ?>" type="submit" name="view_mode" value="consume">消費期限</button>
+    <button class="view-btn <?= $viewMode==='best'?'is-active':'' ?>" type="submit" name="view_mode" value="best">賞味期限</button>
+    <button class="view-btn <?= $viewMode==='limited'?'is-active':'' ?>" type="submit" name="view_mode" value="limited">期間限定</button>
+    <button class="view-btn <?= $viewMode==='expired'?'is-active':'' ?>" type="submit" name="view_mode" value="expired">期限切れ</button>
   </form>
 
-  <?php if ($role === 'mng' || $role === 'fte'): ?>
-    <a class="dispose-link" href="haiki.php">廃棄処理</a>
+  <?php if ($canDispose): ?>
+    <!-- ここは「画面遷移」ではなく、チェック→二段階OK→実行 -->
+    <button type="button" class="dispose-link" id="btnDispose">廃棄処理</button>
   <?php endif; ?>
 </div>
 
-<div class="table-wrap">
-  <table class="item-table">
-    <thead>
-      <tr>
-        <th>JAN</th>
-        <th>商品名</th>
-        <th>カテゴリ</th>
-        <th>単位</th>
-        <th>発注先</th>
-        <th>期限</th>
-        <th>在庫</th>
-        <?php if ($role==='mng' || $role==='fte'): ?>
-          <th class="op-col">操作</th>
-        <?php endif; ?>
-      </tr>
-    </thead>
+<!-- 廃棄フォーム（チェックボックス送信用） -->
+<form method="post" action="zaiko_dispose_execute.php" id="disposeForm">
+  <input type="hidden" name="confirm" value="1">
 
-    <tbody>
-      <?php if(!$rows): ?>
+  <div class="table-wrap">
+    <table class="item-table">
+      <thead>
         <tr>
-          <td colspan="<?= ($role==='mng'||$role==='fte') ? 8 : 7 ?>" style="padding:18px;">
-            該当するデータがありません
-          </td>
+          <?php if ($canDispose): ?><th class="check-col">選択</th><?php endif; ?>
+          <th>JAN</th>
+          <th>商品名</th>
+          <th>カテゴリ</th>
+          <th>単位</th>
+          <th>発注先</th>
+          <th>期限</th>
+          <th>在庫</th>
+          <?php if ($role==='mng' || $role==='fte'): ?><th class="op-col">操作</th><?php endif; ?>
         </tr>
-      <?php else: ?>
-
-        <?php foreach($rows as $r): ?>
-          <?php
-            $expire = fmtDate($r['expire_view'] ?? '');
-            $qty = (int)($r['stock_qty'] ?? 0);     // ★未定義を根絶
-            $qtyClass = ($qty <= 0) ? 'stock-zero' : '';
-          ?>
+      </thead>
+      <tbody>
+        <?php if(!$rows): ?>
           <tr>
-            <td><?= h($r['jan_code'] ?? '') ?></td>
-            <td><?= h($r['item_name'] ?? '') ?></td>
-            <td><?= h($r['category_label_ja'] ?? '') ?></td>
-            <td><?= h($r['unit'] ?? '') ?></td>
-            <td><?= h($r['supplier'] ?? '') ?></td>
-            <td><?= h($expire) ?></td>
-            <td class="<?= h($qtyClass) ?>"><?= $qty ?></td>
-
-            <?php if ($role==='mng' || $role==='fte'): ?>
-              <td class="op-col">
-                <div class="op-buttons">
-                  <a class="btn-edit" href="zaiko_edit.php?item_id=<?= (int)$r['item_id'] ?>">編集</a>
-                  <a class="btn-order" href="hacchu_form.php?jan=<?= urlencode((string)($r['jan_code'] ?? '')) ?>">発注</a>
-                </div>
-              </td>
-            <?php endif; ?>
+            <td colspan="<?= $canDispose ? 9 : (($role==='mng'||$role==='fte')?8:7) ?>" style="padding:18px;">
+              該当するデータがありません
+            </td>
           </tr>
-        <?php endforeach; ?>
+        <?php else: ?>
+          <?php foreach($rows as $r): ?>
+            <?php
+              $qty = (int)($r['quantity'] ?? 0);
 
-      <?php endif; ?>
-    </tbody>
-  </table>
+              // 表示期限
+              $expire = fmtDate($r['expire_view'] ?? '');
+
+              // 期限切れ判定（行色）
+              $expireCommon = fmtDate($r['expire_common'] ?? '');
+              $isExpired = ($expireCommon !== '' && $expireCommon < $today);
+
+              // 期間限定バッジ（items.is_limited）
+              $isLimited = ((int)($r['is_limited'] ?? 0) === 1);
+
+              $rowClass = $isExpired ? 'row-expired' : '';
+            ?>
+            <tr class="<?= h($rowClass) ?>">
+              <?php if ($canDispose): ?>
+                <td class="check-col">
+                  <input
+                    type="checkbox"
+                    class="row-check"
+                    name="stock_ids[]"
+                    value="<?= (int)$r['stock_id'] ?>"
+                    data-jan="<?= h($r['jan_code'] ?? '') ?>"
+                    data-name="<?= h($r['item_name'] ?? '') ?>"
+                    data-expire="<?= h($expire) ?>"
+                    data-qty="<?= (int)$qty ?>"
+                  >
+                </td>
+              <?php endif; ?>
+
+              <td><?= h($r['jan_code'] ?? '') ?></td>
+              <td>
+                <?= h($r['item_name'] ?? '') ?>
+                <?php if ($isLimited): ?>
+                  <span class="badge badge-limited">期間限定</span>
+                <?php endif; ?>
+              </td>
+              <td><?= h($r['category_label_ja'] ?? '') ?></td>
+              <td><?= h($r['unit'] ?? '') ?></td>
+              <td><?= h($r['supplier'] ?? '') ?></td>
+              <td><?= h($expire) ?></td>
+              <td class="<?= $qty<=0 ? 'stock-zero':'' ?>"><?= $qty ?></td>
+
+              <?php if ($role==='mng' || $role==='fte'): ?>
+                <td class="op-col">
+                  <div class="op-buttons">
+                    <a class="btn-edit" href="zaiko_edit.php?item_id=<?= (int)$r['item_id'] ?>">編集</a>
+                    <a class="btn-order" href="hacchu_form.php?jan=<?= urlencode((string)($r['jan_code'] ?? '')) ?>">発注</a>
+                  </div>
+                </td>
+              <?php endif; ?>
+            </tr>
+          <?php endforeach; ?>
+        <?php endif; ?>
+      </tbody>
+    </table>
+  </div>
+</form>
+
+<!-- 最終確認モーダル -->
+<div class="modal" id="confirmModal" aria-hidden="true">
+  <div class="modal-backdrop" id="modalBackdrop"></div>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <div class="modal-title" id="modalTitle">廃棄の最終確認</div>
+      <button type="button" class="modal-close" id="modalClose">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="modal-lead">
+        選択したロットを廃棄します。<b>在庫から削除</b>され、廃棄履歴に記録されます。
+      </div>
+
+      <div class="modal-table-wrap">
+        <table class="modal-table" id="modalTable">
+          <thead>
+            <tr>
+              <th>JAN</th>
+              <th>商品名</th>
+              <th>期限</th>
+              <th>数量</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="modal-warn">
+        ※ この操作は取り消せません。
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn-sub" id="modalCancel">キャンセル</button>
+      <button type="button" class="btn-danger" id="modalOk">OK（廃棄確定）</button>
+    </div>
+  </div>
 </div>
+
+<script>
+(function(){
+  const btnDispose = document.getElementById('btnDispose');
+  const form = document.getElementById('disposeForm');
+
+  const modal = document.getElementById('confirmModal');
+  const backdrop = document.getElementById('modalBackdrop');
+  const closeBtn = document.getElementById('modalClose');
+  const cancelBtn = document.getElementById('modalCancel');
+  const okBtn = document.getElementById('modalOk');
+
+  const tbody = document.querySelector('#modalTable tbody');
+
+  function getChecked(){
+    return Array.from(document.querySelectorAll('.row-check:checked'));
+  }
+
+  function openModal(){
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden','false');
+  }
+
+  function closeModal(){
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden','true');
+    tbody.innerHTML = '';
+  }
+
+  function buildModalRows(checked){
+    tbody.innerHTML = '';
+    checked.forEach(ch => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${ch.dataset.jan || ''}</td>
+        <td>${ch.dataset.name || ''}</td>
+        <td>${ch.dataset.expire || ''}</td>
+        <td style="text-align:right;">${ch.dataset.qty || '0'}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  if (btnDispose){
+    btnDispose.addEventListener('click', () => {
+      const checked = getChecked();
+      if (checked.length === 0){
+        alert('廃棄したい商品（ロット）を選択してください。');
+        return;
+      }
+
+      // ①一次OK（要求の「OKを押す」に相当）
+      const firstOk = confirm('選択した商品を廃棄しますか？');
+      if (!firstOk) return;
+
+      // ②最終確認モーダル
+      buildModalRows(checked);
+      openModal();
+    });
+  }
+
+  backdrop.addEventListener('click', closeModal);
+  closeBtn.addEventListener('click', closeModal);
+  cancelBtn.addEventListener('click', closeModal);
+
+  okBtn.addEventListener('click', () => {
+    // 最終OK → サーバへPOST（廃棄確定）
+    form.submit();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+})();
+</script>
 
 </body>
 </html>
