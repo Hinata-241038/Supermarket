@@ -363,3 +363,35 @@ tr.limited-row{
 .row-expired{
   background:#FEF2F2;
 }
+<<<<<<< HEAD
+=======
+/* テーブル上部バー */
+.table-header-bar{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  margin:10px 0 14px 0;
+}
+
+/* 廃棄ボタン（業務用強調） */
+.dispose-btn{
+  height:38px; /* 今の高さを維持 */
+  padding:0 18px;
+  border:none;
+  border-radius:8px;
+  background:#DC2626;      /* やや強めの赤 */
+  color:#ffffff;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .2s ease;
+}
+
+.dispose-btn:hover{
+  background:#B91C1C;
+  transform:translateY(-1px);
+}
+
+.dispose-btn:active{
+  transform:translateY(0);
+}
+>>>>>>> add-dust
