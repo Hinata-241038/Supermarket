@@ -4,6 +4,15 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require_once __DIR__ . '/../dbconnect.php';
 
+/* =========================
+   権限チェック（最初に実行）
+========================= */
+if (!isset($_SESSION['role'])) {
+  header('Location: logu.php');
+  exit;
+}
+$role = $_SESSION['role'];
+
 function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
 function hasColumn(PDO $pdo, string $table, string $column): bool {
@@ -12,16 +21,26 @@ function hasColumn(PDO $pdo, string $table, string $column): bool {
   return (bool)$st->fetch(PDO::FETCH_ASSOC);
 }
 
+function fmtDate($d){
+  if (!$d) return '';
+  return date('Y-m-d', strtotime($d));
+}
+
+/* =========================
+   stockの列存在チェック（NULL耐性）
+========================= */
 $hasConsume = hasColumn($pdo,'stock','consume_date');
 $hasBest    = hasColumn($pdo,'stock','best_before_date');
-$hasLegacy  = hasColumn($pdo,'stock','expire_date'); // あなたのDBでは存在&NOT NULL
+$hasLegacy  = hasColumn($pdo,'stock','expire_date'); // 互換
 
 /* =========================
    期限モード（セッション保持）
 ========================= */
 if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['toggle_expire'])) {
   $cur = $_SESSION['expire_mode'] ?? 'best';
-  $_SESSION['expire_mode'] = ($cur==='consume') ? 'best' : 'consume';
+  $_SESSION['expire_mode'] = ($cur === 'consume') ? 'best' : 'consume';
+
+  // 検索条件を保持してリロード
   $q = $_SERVER['QUERY_STRING'] ? ('?'.$_SERVER['QUERY_STRING']) : '';
   header('Location: zaiko.php'.$q);
   exit;
@@ -47,28 +66,34 @@ if (!empty($terms)) {
   foreach ($terms as $i => $t) {
     $p = ":t{$i}";
     $params[$p] = "%{$t}%";
-    $pieces[] = "(i.jan_code LIKE {$p} OR i.item_name LIKE {$p} OR i.supplier LIKE {$p} OR c.category_label_ja LIKE {$p})";
+    $pieces[] = "(i.jan_code LIKE {$p}
+              OR i.item_name LIKE {$p}
+              OR i.supplier LIKE {$p}
+              OR c.category_label_ja LIKE {$p})";
   }
-  $glue = ($searchMode==='and') ? ' AND ' : ' OR ';
+  $glue = ($searchMode === 'and') ? ' AND ' : ' OR ';
   $where[] = '(' . implode($glue, $pieces) . ')';
 }
 $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
 
 /* =========================
-   期限表示：1商品につき「最短期限」でOK → MIN()
+   期限表示（最短期限 = MIN）
    モードにより表示対象を切替
 ========================= */
 $consumeExpr = $hasConsume ? "MIN(s.consume_date)" : "NULL";
 $bestExpr    = $hasBest    ? "MIN(s.best_before_date)" : "NULL";
 $legacyExpr  = $hasLegacy  ? "MIN(s.expire_date)" : "NULL";
 
-if ($expireMode==='consume' && $hasConsume) {
+if ($expireMode === 'consume' && $hasConsume) {
   $expireViewExpr = $consumeExpr;
 } else {
   // 賞味期限モード：best_before_date があればそれ、なければ expire_date（互換）
   $expireViewExpr = $hasBest ? $bestExpr : $legacyExpr;
 }
 
+/* =========================
+   一覧取得
+========================= */
 $sql = "
   SELECT
     i.id AS item_id,
@@ -89,18 +114,6 @@ $sql = "
 $st = $pdo->prepare($sql);
 $st->execute($params);
 $rows = $st->fetchAll(PDO::FETCH_ASSOC);
-
-function fmtDate($d){
-  if (!$d) return '';
-  return date('Y-m-d', strtotime($d));
-}
-//権限
-if (!isset($_SESSION['role'])) {
-    header('Location: logu.php');
-    exit;
-}
-
-$role = $_SESSION['role'];
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -116,8 +129,10 @@ $role = $_SESSION['role'];
 
 <div class="search-area">
   <form method="get" class="search-form">
-    <input class="search-box" type="text" name="keyword" placeholder="JAN / 商品名 / 発注先 / カテゴリ で検索"
+    <input class="search-box" type="text" name="keyword"
+      placeholder="JAN / 商品名 / 発注先 / カテゴリ で検索"
       value="<?= h($keyword) ?>">
+
     <button class="search-btn" type="submit" aria-label="検索">🔍</button>
 
     <div class="search-mode">
@@ -138,8 +153,9 @@ $role = $_SESSION['role'];
       <?= $expireMode==='consume' ? '賞味期限に切替' : '消費期限に切替' ?>
     </button>
   </form>
+
   <?php if ($role === 'mng' || $role === 'fte'): ?>
-  <a href="haiki.php">廃棄処理</a>
+    <a class="dispose-link" href="haiki.php">廃棄処理</a>
   <?php endif; ?>
 </div>
 
@@ -147,7 +163,6 @@ $role = $_SESSION['role'];
   <table class="item-table">
     <thead>
       <tr>
-        <?php if ($canDispose): ?><th class="check-col">選択</th><?php endif; ?>
         <th>JAN</th>
         <th>商品名</th>
         <th>カテゴリ</th>
@@ -155,16 +170,25 @@ $role = $_SESSION['role'];
         <th>発注先</th>
         <th>期限</th>
         <th>在庫</th>
-        <?php if ($role==='mng' || $role==='fte'): ?><th class="op-col">操作</th><?php endif; ?>
+        <?php if ($role==='mng' || $role==='fte'): ?>
+          <th class="op-col">操作</th>
+        <?php endif; ?>
       </tr>
     </thead>
+
     <tbody>
       <?php if(!$rows): ?>
-        <tr><td colspan="<?= $canDispose ? 9 : (($role==='mng'||$role==='fte')?8:7) ?>" style="padding:18px;">該当するデータがありません</td></tr>
+        <tr>
+          <td colspan="<?= ($role==='mng'||$role==='fte') ? 8 : 7 ?>" style="padding:18px;">
+            該当するデータがありません
+          </td>
+        </tr>
       <?php else: ?>
+
         <?php foreach($rows as $r): ?>
           <?php
             $expire = fmtDate($r['expire_view'] ?? '');
+            $qty = (int)($r['stock_qty'] ?? 0);     // ★未定義を根絶
             $qtyClass = ($qty <= 0) ? 'stock-zero' : '';
           ?>
           <tr>
@@ -174,32 +198,23 @@ $role = $_SESSION['role'];
             <td><?= h($r['unit'] ?? '') ?></td>
             <td><?= h($r['supplier'] ?? '') ?></td>
             <td><?= h($expire) ?></td>
-            <td><?= $qty ?></td>
+            <td class="<?= h($qtyClass) ?>"><?= $qty ?></td>
 
             <?php if ($role==='mng' || $role==='fte'): ?>
-            <td class="op-col">
-              <div class="op-buttons">
-                <!-- 付与　-->
-                <!-- ✅ item_id を渡す：編集画面に反映される -->
-                <?php if ($role === 'mng' || $role === 'fte'): ?>
+              <td class="op-col">
+                <div class="op-buttons">
                   <a class="btn-edit" href="zaiko_edit.php?item_id=<?= (int)$r['item_id'] ?>">編集</a>
-                
-                <!-- ✅ hacchu_form.php は jan 受け取りでOK -->
-                <a class="btn-order" href="hacchu_form.php?jan=<?= urlencode((string)($r['jan_code'] ?? '')) ?>">発注</a>
-                <?php endif; ?>
-              </div>
-            </td>
+                  <a class="btn-order" href="hacchu_form.php?jan=<?= urlencode((string)($r['jan_code'] ?? '')) ?>">発注</a>
+                </div>
+              </td>
             <?php endif; ?>
           </tr>
         <?php endforeach; ?>
+
       <?php endif; ?>
     </tbody>
   </table>
 </div>
-
-<?php if ($canDispose): ?>
-</form>
-<?php endif; ?>
 
 </body>
 </html>

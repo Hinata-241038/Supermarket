@@ -1,23 +1,24 @@
-/* =========================
-   全体
-========================= */
+/* =========================================================
+   全体レイアウト
+========================================================= */
 body{
   margin:0;
   font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif;
   background:#F3F4F6;
   color:#1F2937;
+  font-size:14px;
 }
 
-/* 戻るボタン */
+/* 戻る */
 .back-btn{
   position:fixed;
   top:20px;
   left:20px;
-  padding:10px 18px;
+  padding:8px 16px;
   background:#E5E7EB;
   border-radius:8px;
   text-decoration:none;
-  font-weight:bold;
+  font-weight:600;
   color:#111;
   transition:.2s;
 }
@@ -28,51 +29,59 @@ body{
 /* タイトル */
 .title{
   text-align:center;
-  font-size:42px;
+  font-size:36px;
   font-weight:700;
   margin:40px 0 30px;
-  color:#1F2937;
+  letter-spacing:1px;
 }
 
-/* =========================
-   検索エリア
-========================= */
+/* =========================================================
+   検索エリア（横長＋右整列最適化）
+========================================================= */
 .search-area{
   display:flex;
   justify-content:center;
-  margin-bottom:20px;
+  margin-bottom:22px;
 }
 
 .search-form{
+  width:1100px;
+  max-width:92%;
   display:flex;
   align-items:center;
   gap:14px;
   background:#FFFFFF;
-  padding:16px 20px;
-  border-radius:12px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.05);
+  padding:18px 22px;
+  border-radius:14px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.05);
 }
 
+/* 横長入力 */
 .search-box{
-  width:650px;
-  max-width:60vw;
-  padding:10px 14px;
+  flex:1;
+  min-width:300px;
+  height:44px;
+  padding:0 16px;
   border:1px solid #D1D5DB;
-  border-radius:8px;
+  border-radius:10px;
   font-size:15px;
+  transition:.2s;
 }
 .search-box:focus{
   outline:none;
-  border:1px solid #2563EB;
+  border-color:#2563EB;
+  box-shadow:0 0 0 3px rgba(37,99,235,.1);
 }
 
+/* 🔍ボタン */
 .search-btn{
-  width:42px;
-  height:42px;
+  width:44px;
+  height:44px;
   border:none;
-  border-radius:8px;
+  border-radius:10px;
   background:#2563EB;
   color:#fff;
+  font-size:16px;
   cursor:pointer;
   transition:.2s;
 }
@@ -80,54 +89,55 @@ body{
   background:#1D4ED8;
 }
 
-/* AND OR */
+/* AND / OR ブロック */
 .search-mode{
   display:flex;
   align-items:center;
-  gap:12px;
-  padding:8px 14px;
-  background:#F3F4F6;
-  border-radius:8px;
+  gap:14px;
+  padding:8px 18px;
+  background:#F9FAFB;
+  border:1px solid #E5E7EB;
+  border-radius:10px;
   font-weight:600;
+  white-space:nowrap;
+}
+.search-mode input{
+  accent-color:#2563EB;
+  margin-right:4px;
 }
 
-/* =========================
-   右アクション（統合版）
-========================= */
+/* =========================================================
+   右上アクションバー
+========================================================= */
 .right-actions{
-  width:90%;
+  width:1100px;
+  max-width:92%;
   margin:0 auto 10px;
   display:flex;
   justify-content:flex-end;
-  align-items:center;   /* ← 統合済 */
-  gap:18px;
+  align-items:center;
+  gap:22px;
 }
 
-/* 現在モード表示 */
+/* 現在モード */
 .expire-status{
   font-weight:600;
-  color:#1F2937;
 }
 
-/* バッジ風モード表示 */
+/* モードバッジ */
 .expire-label{
   background:#E0F2FE;
   color:#2563EB;
-  padding:4px 12px;
+  padding:5px 14px;
   border-radius:20px;
-  font-size:13px;
+  font-size:12px;
   font-weight:700;
 }
 
-/* 切替ボタン（リンク風） */
-.expire-switch-form{
-  margin:0;
-}
-
+/* 切替リンク */
 .toggle-expire-btn{
-  background:transparent;
+  background:none;
   border:none;
-  padding:0;
   font:inherit;
   font-weight:600;
   color:#2563EB;
@@ -139,46 +149,52 @@ body{
   color:#1D4ED8;
 }
 
-/* 右アクション内リンク */
-.right-actions a{
+/* 廃棄リンク */
+.dispose-link{
+  padding:8px 14px;
+  background:#FEE2E2;
+  color:#B91C1C;
+  border-radius:8px;
+  font-weight:700;
   text-decoration:none;
-  font-weight:600;
-  color:#2563EB;
+  transition:.2s;
 }
-.right-actions a:hover{
-  text-decoration:underline;
+.dispose-link:hover{
+  background:#FCA5A5;
+  color:#7F1D1D;
 }
 
-/* =========================
+/* =========================================================
    テーブル
-========================= */
+========================================================= */
 .table-wrap{
-  width:90%;
-  margin:20px auto 40px;
+  width:1100px;
+  max-width:92%;
+  margin:18px auto 50px;
   background:#FFFFFF;
-  border-radius:12px;
-  box-shadow:0 4px 14px rgba(0,0,0,0.05);
+  border-radius:14px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.05);
   overflow-x:auto;
-  padding:10px 0;
 }
 
 .item-table{
   width:100%;
   border-collapse:collapse;
+  font-size:14px;
 }
 
 .item-table th{
   background:#F9FAFB;
   padding:14px 10px;
-  font-size:15px;
   font-weight:600;
   border-bottom:2px solid #E5E7EB;
+  text-align:center;
 }
 
 .item-table td{
   padding:12px 8px;
-  text-align:center;
   border-bottom:1px solid #E5E7EB;
+  text-align:center;
 }
 
 .item-table tr:hover{
@@ -195,9 +211,9 @@ body{
   z-index:2;
 }
 
-/* =========================
+/* =========================================================
    ボタン
-========================= */
+========================================================= */
 .op-buttons{
   display:flex;
   justify-content:center;
@@ -205,13 +221,13 @@ body{
 }
 
 .btn-edit{
-  padding:7px 12px;
+  padding:6px 12px;
   border-radius:6px;
   background:#6B7280;
   color:#fff;
   text-decoration:none;
   font-weight:600;
-  font-size:14px;
+  font-size:13px;
   transition:.2s;
 }
 .btn-edit:hover{
@@ -219,50 +235,39 @@ body{
 }
 
 .btn-order{
-  padding:7px 12px;
+  padding:6px 12px;
   border-radius:6px;
   background:#2563EB;
   color:#fff;
   text-decoration:none;
   font-weight:600;
-  font-size:14px;
+  font-size:13px;
   transition:.2s;
 }
 .btn-order:hover{
   background:#1D4ED8;
 }
 
-.btn-order-alert{
-  background:#DC2626;
-}
-.btn-order-alert:hover{
-  background:#B91C1C;
-}
-
-/* 在庫0強調 */
+/* 在庫0 */
 .stock-zero{
   font-weight:700;
   color:#DC2626;
 }
 
-input[readonly]{
-  background:#F9FAFB;
-}
-/* =========================
-   期間限定バッジ
-========================= */
-.badge{
-  display:inline-block;
-  margin-left:8px;
-  padding:3px 10px;
-  border-radius:20px;
-  font-size:12px;
-  font-weight:700;
+/* =========================================================
+   期限関連
+========================================================= */
+.row-expired{
+  background:#FEF2F2;
 }
 
-.badge-limited{
-  background:#DBEAFE;
-  color:#1D4ED8;
+.badge{
+  display:inline-block;
+  margin-left:6px;
+  padding:3px 10px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:700;
 }
 
 .badge-warning{
@@ -273,122 +278,4 @@ input[readonly]{
 .badge-danger{
   background:#FEE2E2;
   color:#B91C1C;
-}
-
-/* 期間限定行の背景 */
-tr.limited-row{
-  background:#F0F9FF;
-}
-
-.view-select-form{
-  margin:0;
-}
-
-.view-select{
-  padding:8px 14px;
-  border-radius:8px;
-  border:1px solid #D1D5DB;
-  font-weight:600;
-  background:#FFFFFF;
-  cursor:pointer;
-  transition:.2s;
-}
-
-.view-select:focus{
-  outline:none;
-  border:1px solid #2563EB;
-}
-
-/* チェック列 */
-.check-col{
-  width: 70px;
-  text-align: center;
-}
-
-/* 廃棄バー */
-.dispose-bar{
-  width: 100%;
-}
-
-.dispose-btn{
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 700;
-}
-
-.dispose-hint{
-  margin-left: 12px;
-  font-size: 13px;
-  opacity: .7;
-}
-
-/* 確認カード */
-.confirm-card{
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 16px 0;
-}
-
-.confirm-lead{
-  margin: 8px 0 16px;
-}
-
-.reason-row{
-  display:flex;
-  align-items:center;
-  gap: 10px;
-  margin: 12px 0 18px;
-}
-
-.reason-row select{
-  padding: 8px 10px;
-  border-radius: 10px;
-}
-
-.reason-hint{
-  font-size: 13px;
-  opacity: .7;
-}
-
-.confirm-actions{
-  margin: 18px 0 24px;
-}
-
-/* 期限切れ行 */
-.row-expired{
-  background:#FEF2F2;
-}
-/* テーブル上部バー */
-.table-header-bar{
-  display:flex;
-  justify-content:flex-end;
-  align-items:center;
-  margin:10px 0 14px 0;
-}
-
-/* 廃棄ボタン（業務用強調） */
-.dispose-btn{
-  height:38px; /* 今の高さを維持 */
-  padding:0 18px;
-  border:none;
-  border-radius:8px;
-  background:#DC2626;      /* やや強めの赤 */
-  color:#ffffff;
-  font-weight:700;
-  cursor:pointer;
-  transition:all .2s ease;
-}
-
-.dispose-btn:hover{
-  background:#B91C1C;
-  transform:translateY(-1px);
-}
-
-.dispose-btn:active{
-  transform:translateY(0);
 }
