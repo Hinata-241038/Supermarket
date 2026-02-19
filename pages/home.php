@@ -31,6 +31,7 @@ $role = $_SESSION['role'];
 <!-- 廃棄：管理者のみ -->
 <?php if ($role === 'mng'): ?>
     <a href="haiki.php" id="haikiBtn" class="menu-button">廃棄</a>
+    <a href="haiki.php" id="haikiBtn" class="menu-button">ユーザー管理</a>
 <?php endif; ?>
 
 <!-- ログアウト -->
@@ -38,4 +39,3 @@ $role = $_SESSION['role'];
  
 </body>
 </html> 
-
