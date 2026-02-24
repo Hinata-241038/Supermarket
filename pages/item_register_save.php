@@ -14,6 +14,9 @@ $price       = (int)($_POST['price'] ?? 0);
 $unit        = trim($_POST['unit'] ?? '');
 $supplier    = trim($_POST['supplier'] ?? '');
 
+// ✅ 期間限定（任意）: チェックされていれば1、それ以外0
+$is_limited  = isset($_POST['is_limited']) ? 1 : 0;
+
 /* =========================================================
   12桁→13桁補完（サーバー側保険）
 ========================================================= */
@@ -39,7 +42,7 @@ if (!preg_match('/^\d{13}$/', $jan_code)) {
 }
 
 /* =========================================================
-  チェックデジット検証
+  チェックデジット検証（サーバー側確定）
 ========================================================= */
 function isValidJan13(string $jan): bool {
   $sum = 0;
@@ -55,33 +58,51 @@ if (!isValidJan13($jan_code)) {
   exit('無効なJANコードです');
 }
 
-if ($item_name === '' || $category_id <= 0) {
-  exit('入力不足');
+/* =========================================================
+  ✅ 入力制限（サーバー側・すり抜け防止の本丸）
+  - 「ひらがな」「カタカナ」「漢字」「アルファベット」「数字」だけ
+========================================================= */
+function onlyAllowedChars(string $s): bool {
+  return preg_match('/\A[ぁ-んァ-ヶー一-龥A-Za-z0-9]+\z/u', $s) === 1;
 }
 
+if ($item_name === '' || $unit === '' || $supplier === '' || $category_id <= 0) {
+  exit('入力不足です');
+}
+if (!onlyAllowedChars($item_name)) exit('商品名に使用できない文字が含まれています');
+if (!onlyAllowedChars($unit))      exit('単位に使用できない文字が含まれています');
+if (!onlyAllowedChars($supplier))  exit('仕入先に使用できない文字が含まれています');
+
+/* =========================================================
+  INSERT / UPDATE
+  - is_limited を追加（既存機能を壊さない：ON DUPLICATE思想維持）
+========================================================= */
 $sql = "
 INSERT INTO items
-(jan_code, item_name, category_id, price, unit, supplier, created_at, updated_at)
+(jan_code, item_name, category_id, price, unit, supplier, is_limited, created_at, updated_at)
 VALUES
-(:jan, :name, :cat, :price, :unit, :supplier, NOW(), NOW())
+(:jan, :name, :cat, :price, :unit, :supplier, :is_limited, NOW(), NOW())
 ON DUPLICATE KEY UPDATE
   item_name   = VALUES(item_name),
   category_id = VALUES(category_id),
   price       = VALUES(price),
   unit        = VALUES(unit),
   supplier    = VALUES(supplier),
+  is_limited  = VALUES(is_limited),
   updated_at  = NOW()
 ";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute([
-  ':jan'      => $jan_code,
-  ':name'     => $item_name,
-  ':cat'      => $category_id,
-  ':price'    => $price,
-  ':unit'     => $unit,
-  ':supplier' => $supplier,
+  ':jan'        => $jan_code,
+  ':name'       => $item_name,
+  ':cat'        => $category_id,
+  ':price'      => $price,
+  ':unit'       => $unit,
+  ':supplier'   => $supplier,
+  ':is_limited' => $is_limited,
 ]);
 
+// 発注画面に戻す（JANを引き継ぐ）
 header('Location: hacchu_form.php?jan=' . urlencode($jan_code));
 exit;
