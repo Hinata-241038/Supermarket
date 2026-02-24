@@ -184,3 +184,76 @@ h1{
     grid-template-columns:1fr;
   }
 }
+
+/* =========================================================
+   ▼▼ 発注履歴ページ（hacchu_list.php）専用UI ▼▼
+   ※他ページへの影響を出さないためスコープ限定
+========================================================= */
+
+/* このページは固定ボタンがあるので下に余白を確保（表に被らない） */
+body.hacchu-list-page{
+  padding-bottom:120px; /* 右下固定ボタン分の逃げ */
+}
+
+/* 共通見た目ボタン（hacchu_list.php内で使う） */
+body.hacchu-list-page .btn{
+  display:inline-block;
+  padding:10px 18px;
+  background:#dcdcdc;
+  border:none;
+  border-radius:6px;
+  font-size:16px;
+  cursor:pointer;
+  transition:.2s;
+  color:#000;
+  text-decoration:none;
+}
+body.hacchu-list-page .btn:hover{
+  background:#cfcfcf;
+}
+
+/* 固定配置ユーティリティ */
+body.hacchu-list-page .ui-fixed{
+  position:fixed;
+  z-index:9999;
+}
+body.hacchu-list-page .ui-fixed--top-left{
+  top:16px;
+  left:16px;
+}
+body.hacchu-list-page .ui-fixed--bottom-right{
+  right:16px;
+  bottom:16px;
+}
+
+/* 発注履歴テーブル：表とボタンの間に隙間を作る */
+body.hacchu-list-page .orders-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:30px;
+  margin-bottom:80px; /* ★ここが「表と右下ボタンの間の隙間」 */
+}
+body.hacchu-list-page .orders-table th,
+body.hacchu-list-page .orders-table td{
+  border:1px solid #aaa;
+  padding:8px;
+  text-align:center;
+}
+body.hacchu-list-page .orders-table th{
+  background:#f0f0f0;
+}
+
+/* スマホ：固定ボタンが押しやすいように微調整 */
+@media (max-width:600px){
+  body.hacchu-list-page{
+    padding-bottom:140px;
+  }
+  body.hacchu-list-page .ui-fixed--top-left{
+    top:10px;
+    left:10px;
+  }
+  body.hacchu-list-page .ui-fixed--bottom-right{
+    right:10px;
+    bottom:10px;
+  }
+}
