@@ -24,11 +24,8 @@ h1{
 /* =========================================================
    フォーム共通
 ========================================================= */
-.order-form{
-  margin-top:30px;
-}
+.order-form{ margin-top:30px; }
 
-/* 1行レイアウト（統一） */
 .form-row{
   display:grid;
   grid-template-columns:160px 1fr;
@@ -43,7 +40,6 @@ h1{
   font-size:16px;
 }
 
-/* 入力共通 */
 .order-form input,
 .order-form select{
   width:100%;
@@ -53,7 +49,7 @@ h1{
   border-radius:6px;
   padding:6px 10px;
   font-size:16px;
-  transition:all .2s ease;
+  transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
 }
 
 /* =========================================================
@@ -72,14 +68,8 @@ h1{
   transition:.2s;
 }
 
-.primary-btn:hover{
-  background:#cfcfcf;
-}
-
-.primary-btn.is-disabled{
-  opacity:.5;
-  cursor:not-allowed;
-}
+.primary-btn:hover{ background:#cfcfcf; }
+.primary-btn.is-disabled{ opacity:.5; cursor:not-allowed; }
 
 /* =========================================================
    右上固定ボタン
@@ -96,10 +86,7 @@ h1{
   color:#000;
   font-size:16px;
 }
-
-.register-btn-fixed.second-btn{
-  top:60px;
-}
+.register-btn-fixed.second-btn{ top:60px; }
 
 /* =========================================================
    情報ボックス
@@ -122,7 +109,6 @@ h1{
   flex-direction:column;
   gap:8px;
 }
-
 .jan-status{
   font-size:14px;
   padding:10px 12px;
@@ -131,85 +117,62 @@ h1{
   background:#F9FAFB;
   color:#6B7280;
 }
+.jan-status--idle{ border-color:#E5E7EB; background:#F9FAFB; color:#6B7280; }
+.jan-status--typing{ border-color:#93C5FD; background:#EFF6FF; color:#1D4ED8; }
+.jan-status--ok{ border-color:#86EFAC; background:#ECFDF5; color:#047857; font-weight:700; }
+.jan-status--ng{ border-color:#FCA5A5; background:#FEF2F2; color:#B91C1C; font-weight:700; }
 
-/* 状態別 */
-.jan-status--idle{
-  border-color:#E5E7EB;
-  background:#F9FAFB;
-  color:#6B7280;
-}
-
-.jan-status--typing{
-  border-color:#93C5FD;
-  background:#EFF6FF;
-  color:#1D4ED8;
-}
-
-.jan-status--ok{
-  border-color:#86EFAC;
-  background:#ECFDF5;
-  color:#047857;
-  font-weight:700;
-}
-
-.jan-status--ng{
-  border-color:#FCA5A5;
-  background:#FEF2F2;
-  color:#B91C1C;
-  font-weight:700;
-}
-
-/* 入力枠カラー */
-#jan_code.input-typing{
-  border:2px solid #93C5FD !important;
-  background:#EFF6FF;
-}
-
-#jan_code.input-ok{
-  border:2px solid #86EFAC !important;
-  background:#ECFDF5;
-}
-
-#jan_code.input-ng{
-  border:2px solid #FCA5A5 !important;
-  background:#FEF2F2;
-}
+#jan_code.input-typing{ border:2px solid #93C5FD !important; background:#EFF6FF; }
+#jan_code.input-ok{ border:2px solid #86EFAC !important; background:#ECFDF5; }
+#jan_code.input-ng{ border:2px solid #FCA5A5 !important; background:#FEF2F2; }
 
 /* =========================================================
    スマホ対応
 ========================================================= */
 @media (max-width:600px){
   .container{ max-width:95%; }
-  .form-row{
-    grid-template-columns:1fr;
-  }
+  .form-row{ grid-template-columns:1fr; }
 }
 
 /* =========================================================
    ▼▼ 発注履歴ページ（hacchu_list.php）専用UI ▼▼
-   ※他ページへの影響を出さないためスコープ限定
 ========================================================= */
 
-/* このページは固定ボタンがあるので下に余白を確保（表に被らない） */
+/* 固定ボタンがあるので上と下に余白を確保 */
 body.hacchu-list-page{
-  padding-bottom:120px; /* 右下固定ボタン分の逃げ */
+  padding-top:70px;      /* 左上固定ボタン分 */
+  padding-bottom:130px;  /* 右下固定ボタン分 */
+  background:#F3F4F6;
 }
 
-/* 共通見た目ボタン（hacchu_list.php内で使う） */
+/* このページのコンテナはカードUIに合わせる */
+body.hacchu-list-page .container{
+  text-align:center;
+}
+
+/* 共通見た目ボタン（このページだけ） */
 body.hacchu-list-page .btn{
   display:inline-block;
   padding:10px 18px;
-  background:#dcdcdc;
-  border:none;
-  border-radius:6px;
+  background:#E5E7EB;
+  border:1px solid #D1D5DB;
+  border-radius:10px;
   font-size:16px;
   cursor:pointer;
   transition:.2s;
-  color:#000;
+  color:#111;
   text-decoration:none;
+  box-shadow:0 6px 16px rgba(0,0,0,.08);
 }
 body.hacchu-list-page .btn:hover{
-  background:#cfcfcf;
+  background:#D1D5DB;
+}
+
+/* 小さいボタン（入荷用） */
+body.hacchu-list-page .btn-small{
+  padding:8px 12px;
+  font-size:14px;
+  border-radius:9px;
 }
 
 /* 固定配置ユーティリティ */
@@ -226,27 +189,75 @@ body.hacchu-list-page .ui-fixed--bottom-right{
   bottom:16px;
 }
 
-/* 発注履歴テーブル：表とボタンの間に隙間を作る */
+/* テーブルをカード化して“プロっぽく” */
+body.hacchu-list-page .table-card{
+  margin-top:24px;
+  background:#fff;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+/* テーブル */
 body.hacchu-list-page .orders-table{
   width:100%;
   border-collapse:collapse;
-  margin-top:30px;
-  margin-bottom:80px; /* ★ここが「表と右下ボタンの間の隙間」 */
-}
-body.hacchu-list-page .orders-table th,
-body.hacchu-list-page .orders-table td{
-  border:1px solid #aaa;
-  padding:8px;
-  text-align:center;
-}
-body.hacchu-list-page .orders-table th{
-  background:#f0f0f0;
 }
 
-/* スマホ：固定ボタンが押しやすいように微調整 */
+body.hacchu-list-page .orders-table thead th{
+  background:#F9FAFB;
+  border-bottom:1px solid #E5E7EB;
+  padding:12px 10px;
+  font-weight:700;
+}
+
+body.hacchu-list-page .orders-table td{
+  border-bottom:1px solid #EEF2F7;
+  padding:12px 10px;
+  text-align:center;
+}
+
+body.hacchu-list-page .orders-table tbody tr:hover{
+  background:#FAFAFA;
+}
+
+/* 商品名だけ左寄せにして読みやすく */
+body.hacchu-list-page .td-name{
+  text-align:left;
+}
+
+/* 空表示 */
+body.hacchu-list-page .empty-row{
+  padding:18px 10px;
+  color:#6B7280;
+}
+
+/* ステータスバッジ */
+body.hacchu-list-page .status-badge{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:13px;
+  border:1px solid transparent;
+}
+body.hacchu-list-page .status-badge.is-wait{
+  background:#FEF3C7;
+  border-color:#F59E0B;
+  color:#92400E;
+  font-weight:700;
+}
+body.hacchu-list-page .status-badge.is-done{
+  background:#DCFCE7;
+  border-color:#22C55E;
+  color:#166534;
+  font-weight:700;
+}
+
+/* スマホ */
 @media (max-width:600px){
   body.hacchu-list-page{
-    padding-bottom:140px;
+    padding-top:64px;
+    padding-bottom:150px;
   }
   body.hacchu-list-page .ui-fixed--top-left{
     top:10px;
@@ -255,5 +266,13 @@ body.hacchu-list-page .orders-table th{
   body.hacchu-list-page .ui-fixed--bottom-right{
     right:10px;
     bottom:10px;
+  }
+
+  /* スマホは文字が詰まるのでサイズ調整 */
+  body.hacchu-list-page h1{ font-size:34px; }
+  body.hacchu-list-page .orders-table td,
+  body.hacchu-list-page .orders-table th{
+    padding:10px 8px;
+    font-size:14px;
   }
 }
