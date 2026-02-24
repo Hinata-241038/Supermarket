@@ -34,7 +34,7 @@ function statusLabel($status)
 <head>
   <meta charset="UTF-8">
   <title>発注履歴一覧</title>
-  <link rel="stylesheet" href="../assets/css/hacchu.css">
+  <link rel="stylesheet" href="Supermarket/assets/css/hacchu.css">
 </head>
 
 <!-- ★このページ専用のUI調整を当てるため class を追加 -->
