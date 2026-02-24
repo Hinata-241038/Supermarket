@@ -2,7 +2,47 @@
   item_register.php 専用CSS（hacchu.cssを壊さず上書き）
 ========================================================= */
 
-/* タイトル余白（戻るボタンと干渉しにくく） */
+/* ✅ 戻るボタン：左上固定を「確実化」＋見た目調整 */
+.back-btn{
+  position: fixed;           /* ← 固定 */
+  top: 16px;                 /* ← 左上の余白 */
+  left: 16px;
+  z-index: 10000;            /* ← 他要素に負けない */
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px 14px;
+  min-width: 64px;
+
+  background: #ffffff;
+  border: 1px solid #D1D5DB;
+  border-radius: 10px;
+
+  color: #111827;
+  font-weight: 700;
+  text-decoration: none;
+
+  box-shadow: 0 4px 14px rgba(0,0,0,.08);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.back-btn:hover{
+  background: #F9FAFB;
+  box-shadow: 0 6px 18px rgba(0,0,0,.12);
+  transform: translateY(-1px);
+}
+
+.back-btn:active{
+  transform: translateY(0);
+  box-shadow: 0 4px 14px rgba(0,0,0,.10);
+}
+
+/* ✅ タイトルの位置：戻るボタンと被らないように余白確保 */
+.container{
+  padding-top: 18px;
+}
 .container h1{
   margin-top: 28px;
 }
@@ -12,6 +52,7 @@
   display:flex;
   flex-direction:column;
   gap:8px;
+  margin-bottom: 18px;
 }
 
 .field-help{
@@ -72,7 +113,7 @@
 
 /* 入力制限エラー表示 */
 .form-errors{
-  margin: 18px 0 0;
+  margin: 14px 0 18px;
   padding: 12px 14px;
   border-radius: 10px;
   border: 1px solid #FCA5A5;
@@ -87,4 +128,15 @@
 }
 .form-errors li{
   margin:4px 0;
+}
+/* スマホ対応：戻るボタンの当たり判定・余白調整 */
+@media (max-width: 600px){
+  .back-btn{
+    top: 12px;
+    left: 12px;
+    padding: 10px 12px;
+  }
+  .container{
+    padding-top: 10px;
+  }
 }
