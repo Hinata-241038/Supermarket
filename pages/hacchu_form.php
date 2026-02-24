@@ -37,14 +37,14 @@ if ($prefillJan !== '') {
 
 /* 初期値 */
 $val_item_id    = (int)($item['id'] ?? 0);
-$val_supplier   = $item['supplier']   ?? '';
-$val_order_date = $_GET['order_date'] ?? '';
 $val_jan        = $item['jan_code']   ?? $prefillJan;
 $val_item_name  = $item['item_name']  ?? '';
-$val_unit       = $item['unit']       ?? '';
 $val_category   = $item['category_id']?? '';
-$val_qty        = $_GET['qty']        ?? '';
+$val_supplier   = $item['supplier']   ?? '';
+$val_order_date = $_GET['order_date'] ?? '';
 $val_price      = $item['price']      ?? '';
+$val_qty        = $_GET['qty']        ?? '';
+$val_unit       = $item['unit']       ?? '';
 $val_is_limited = isset($item['is_limited']) ? (int)$item['is_limited'] : 0;
 ?>
 <!DOCTYPE html>
@@ -52,34 +52,27 @@ $val_is_limited = isset($item['is_limited']) ? (int)$item['is_limited'] : 0;
 <head>
   <meta charset="UTF-8">
   <title>発注</title>
-  <link rel="stylesheet" href="../assets/css/hacchu.css?v=2">
+  <link rel="stylesheet" href="../assets/css/hacchu.css?v=3">
 </head>
-<body>
+<body class="hacchu-form-page">
 
-<div class="top-actions">
-  <a class="top-btn" href="item_register.php">商品追加</a>
-  <a class="top-btn" href="hacchu_list.php">発注履歴</a>
-</div>
+<!-- 右上固定：戻る（homeへ） -->
+<a class="btn ui-fixed ui-fixed--top-right" href="home.php">戻る</a>
+
+<!-- 左下固定：発注（送信） -->
+<button class="btn primary ui-fixed ui-fixed--bottom-left" type="submit" form="orderForm">
+  発注
+</button>
 
 <div class="container">
   <h1 class="page-title">発注</h1>
 
-  <!-- ★保存先を hacchu.php に統一 -->
-  <form class="order-form" method="post" action="hacchu.php" novalidate>
+  <form id="orderForm" class="order-form order-form--compact" method="post" action="hacchu.php" novalidate>
 
-    <!-- ★商品が特定できたら item_id を送る（これが無いと発注できない） -->
+    <!-- 商品特定用（必須） -->
     <input type="hidden" name="item_id" id="item_id" value="<?= (int)$val_item_id ?>">
 
-    <div class="form-row">
-      <label for="supplier">発注先</label>
-      <input id="supplier" name="supplier" type="text" value="<?= h($val_supplier) ?>">
-    </div>
-
-    <div class="form-row">
-      <label for="order_date">発注日</label>
-      <input id="order_date" name="order_date" type="date" value="<?= h($val_order_date) ?>">
-    </div>
-
+    <!-- ① JAN -->
     <div class="form-row">
       <label for="jan">JAN</label>
       <input
@@ -92,12 +85,67 @@ $val_is_limited = isset($item['is_limited']) ? (int)$item['is_limited'] : 0;
       >
     </div>
 
-    <!-- ★JAN下の注意文 -->
+    <!-- JAN下の注意文 -->
     <div class="form-hint-row">
       <div class="form-hint">12桁で入力すると自動で13桁に補完します</div>
     </div>
 
-    <!-- ★期間限定（任意） -->
+    <!-- ② 商品名 -->
+    <div class="form-row">
+      <label for="item_name">商品名</label>
+      <input id="item_name" name="item_name" type="text" value="<?= h($val_item_name) ?>" readonly>
+    </div>
+
+    <!-- ③ カテゴリ -->
+    <div class="form-row">
+      <label for="category_id">カテゴリ</label>
+      <select id="category_id" name="category_id" disabled>
+        <option value="">選択してください</option>
+        <?php foreach($categories as $c): ?>
+          <option value="<?= (int)$c['id'] ?>" <?= ((string)$val_category === (string)$c['id']) ? 'selected' : '' ?>>
+            <?= h($c['category_label_ja']) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+
+    <!-- ④ 発注先 -->
+    <div class="form-row">
+      <label for="supplier">発注先</label>
+      <input id="supplier" name="supplier" type="text" value="<?= h($val_supplier) ?>">
+    </div>
+
+    <!-- ⑤ 発注日 -->
+    <div class="form-row">
+      <label for="order_date">発注日</label>
+      <input id="order_date" name="order_date" type="date" value="<?= h($val_order_date) ?>">
+    </div>
+
+    <!-- ⑥ 単価(円) -->
+    <div class="form-row">
+      <label for="price">単価（円）</label>
+      <input id="price" name="price" type="number" min="0" step="1" value="<?= h($val_price) ?>" readonly>
+    </div>
+
+    <!-- ⑦ 個数(点) -->
+    <div class="form-row">
+      <label for="order_quantity">個数（点）</label>
+      <input id="order_quantity" name="order_quantity" type="number" min="0" step="1" value="<?= h($val_qty) ?>">
+    </div>
+
+    <!-- ⑧ 単位() -->
+    <div class="form-row">
+      <label for="unit">単位</label>
+      <input id="unit" name="unit" type="text" value="<?= h($val_unit) ?>" readonly>
+    </div>
+
+    <!-- ⑨ 合計(円) -->
+    <div class="form-row">
+      <label for="total">合計（円）</label>
+      <input id="total" name="total" type="number" readonly value="">
+    </div>
+
+    <!-- ⑩ 期間限定(任意) -->
     <div class="form-row">
       <label>期間限定</label>
       <div class="inline-controls">
@@ -116,47 +164,8 @@ $val_is_limited = isset($item['is_limited']) ? (int)$item['is_limited'] : 0;
       </div>
     </div>
 
-    <div class="form-row">
-      <label for="item_name">商品名</label>
-      <input id="item_name" name="item_name" type="text" value="<?= h($val_item_name) ?>" readonly>
-    </div>
-
-    <div class="form-row">
-      <label for="unit">単位</label>
-      <input id="unit" name="unit" type="text" value="<?= h($val_unit) ?>" readonly>
-    </div>
-
-    <div class="form-row">
-      <label for="category_id">カテゴリ</label>
-      <select id="category_id" name="category_id" disabled>
-        <option value="">選択してください</option>
-        <?php foreach($categories as $c): ?>
-          <option value="<?= (int)$c['id'] ?>" <?= ((string)$val_category === (string)$c['id']) ? 'selected' : '' ?>>
-            <?= h($c['category_label_ja']) ?>
-          </option>
-        <?php endforeach; ?>
-      </select>
-    </div>
-
-    <div class="form-row">
-      <label for="order_quantity">個数（点）</label>
-      <input id="order_quantity" name="order_quantity" type="number" min="0" step="1" value="<?= h($val_qty) ?>">
-    </div>
-
-    <div class="form-row">
-      <label for="price">単価（円）</label>
-      <input id="price" name="price" type="number" min="0" step="1" value="<?= h($val_price) ?>" readonly>
-    </div>
-
-    <div class="form-row">
-      <label for="total">合計（円）</label>
-      <input id="total" name="total" type="number" readonly value="">
-    </div>
-
-    <div class="bottom-actions">
-      <a class="btn ghost" href="home.php">戻る</a>
-      <button class="btn primary" type="submit">発注</button>
-    </div>
+    <!-- 画面下部に余白：固定ボタンと被らないように -->
+    <div class="form-bottom-spacer"></div>
   </form>
 </div>
 
@@ -173,7 +182,6 @@ function calcEan13CheckDigit(twelveDigits){
 }
 
 const janEl = document.getElementById('jan');
-
 janEl.addEventListener('blur', () => {
   const raw = (janEl.value || '').replace(/\D/g,'');
   if (raw.length === 12){
@@ -183,7 +191,7 @@ janEl.addEventListener('blur', () => {
   }
 });
 
-/* 合計計算 */
+/* 合計（個数×単価） */
 const qtyEl   = document.getElementById('order_quantity');
 const priceEl = document.getElementById('price');
 const totalEl = document.getElementById('total');
