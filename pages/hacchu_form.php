@@ -3,13 +3,17 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require_once __DIR__ . '/../dbconnect.php';
 
+function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
+
+/* カテゴリ一覧 */
 $stmt = $pdo->query("SELECT id, category_label_ja FROM categories ORDER BY category_group, id");
 $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+/* JAN 事前入力（GET） */
 $prefillJan = $_GET['jan'] ?? '';
 $prefillJan = preg_replace('/\D/', '', $prefillJan);
 
-// 自動反映用（JANがある場合だけDBから引く）
+/* JANがある場合、itemsから自動反映 */
 $item = null;
 if ($prefillJan !== '') {
   $sql = "
@@ -21,9 +25,8 @@ if ($prefillJan !== '') {
       i.price,
       i.supplier,
       i.category_id,
-      c.category_label_ja
+      COALESCE(i.is_limited,0) AS is_limited
     FROM items i
-    LEFT JOIN categories c ON i.category_id = c.id
     WHERE i.jan_code = :jan
     LIMIT 1
   ";
@@ -32,86 +35,104 @@ if ($prefillJan !== '') {
   $item = $st->fetch(PDO::FETCH_ASSOC);
 }
 
-// 反映値（見つからなければ空）
-$val_supplier    = $item['supplier']    ?? '';
-$val_item_name   = $item['item_name']   ?? '';
-$val_category_id = $item['category_id'] ?? '';
-$val_price       = $item['price']       ?? '';
-$val_unit        = $item['unit']        ?? '';
-$val_item_id     = $item['id']          ?? '';
+/* 初期値 */
+$val_item_id    = (int)($item['id'] ?? 0);
+$val_supplier   = $item['supplier']   ?? '';
+$val_order_date = $_GET['order_date'] ?? '';
+$val_jan        = $item['jan_code']   ?? $prefillJan;
+$val_item_name  = $item['item_name']  ?? '';
+$val_unit       = $item['unit']       ?? '';
+$val_category   = $item['category_id']?? '';
+$val_qty        = $_GET['qty']        ?? '';
+$val_price      = $item['price']      ?? '';
+$val_is_limited = isset($item['is_limited']) ? (int)$item['is_limited'] : 0;
 ?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
   <title>発注</title>
-  <link rel="stylesheet" href="../assets/css/hacchu.css?v=3">
+  <link rel="stylesheet" href="../assets/css/hacchu.css?v=2">
 </head>
 <body>
 
-<a href="item_register.php" class="register-btn-fixed">商品追加</a>
-<a href="hacchu_list.php" class="register-btn-fixed second-btn">発注履歴</a>
+<div class="top-actions">
+  <a class="top-btn" href="item_register.php">商品追加</a>
+  <a class="top-btn" href="hacchu_list.php">発注履歴</a>
+</div>
 
 <div class="container">
-  <h1>発注</h1>
+  <h1 class="page-title">発注</h1>
 
-  <form class="order-form" method="post" action="/Supermarket/pages/hacchu.php" id="orderForm">
+  <!-- ★保存先を hacchu.php に統一 -->
+  <form class="order-form" method="post" action="hacchu.php" novalidate>
+
+    <!-- ★商品が特定できたら item_id を送る（これが無いと発注できない） -->
+    <input type="hidden" name="item_id" id="item_id" value="<?= (int)$val_item_id ?>">
 
     <div class="form-row">
       <label for="supplier">発注先</label>
-      <input type="text" id="supplier" name="supplier"
-             value="<?= htmlspecialchars($val_supplier, ENT_QUOTES, 'UTF-8') ?>"
-             <?= $item ? 'readonly' : '' ?>
-             required>
+      <input id="supplier" name="supplier" type="text" value="<?= h($val_supplier) ?>">
     </div>
 
     <div class="form-row">
       <label for="order_date">発注日</label>
-      <input type="date" id="order_date" name="order_date" required>
+      <input id="order_date" name="order_date" type="date" value="<?= h($val_order_date) ?>">
     </div>
 
-    <!-- ✅ ここが修正ポイント：13桁固定 -->
     <div class="form-row">
-      <label for="jan_code">JAN</label>
-      <input type="text" id="jan_code" name="jan_code"
-        value="<?= htmlspecialchars($prefillJan, ENT_QUOTES, 'UTF-8') ?>"
-        maxlength="13"
-        pattern="\d{13}"
+      <label for="jan">JAN</label>
+      <input
+        id="jan"
+        name="jan"
+        type="text"
         inputmode="numeric"
         autocomplete="off"
-        required>
-
-    <p id="janError" style="color:red; font-size:14px;"></p>
+        value="<?= h($val_jan) ?>"
+      >
     </div>
 
+    <!-- ★JAN下の注意文 -->
+    <div class="form-hint-row">
+      <div class="form-hint">12桁で入力すると自動で13桁に補完します</div>
+    </div>
+
+    <!-- ★期間限定（任意） -->
+    <div class="form-row">
+      <label>期間限定</label>
+      <div class="inline-controls">
+        <input type="hidden" name="is_limited" value="0">
+        <label class="check-pill">
+          <input
+            type="checkbox"
+            id="is_limited"
+            name="is_limited"
+            value="1"
+            <?= $val_is_limited === 1 ? 'checked' : '' ?>
+          >
+          <span>期間限定商品</span>
+        </label>
+        <span class="mini-note">（任意）</span>
+      </div>
+    </div>
 
     <div class="form-row">
       <label for="item_name">商品名</label>
-      <input type="text" id="item_name" name="item_name"
-             value="<?= htmlspecialchars($val_item_name, ENT_QUOTES, 'UTF-8') ?>"
-             <?= $item ? 'readonly' : '' ?>
-             required>
+      <input id="item_name" name="item_name" type="text" value="<?= h($val_item_name) ?>" readonly>
     </div>
 
     <div class="form-row">
       <label for="unit">単位</label>
-      <input type="text" id="unit" name="unit"
-             value="<?= htmlspecialchars($val_unit, ENT_QUOTES, 'UTF-8') ?>"
-             <?= $item ? 'readonly' : '' ?>
-             required>
+      <input id="unit" name="unit" type="text" value="<?= h($val_unit) ?>" readonly>
     </div>
 
     <div class="form-row">
       <label for="category_id">カテゴリ</label>
-      <select id="category_id" name="category_id" required>
+      <select id="category_id" name="category_id" disabled>
         <option value="">選択してください</option>
-        <?php foreach ($categories as $c): ?>
-          <?php
-            $cid = (string)$c['id'];
-            $selected = ((string)$val_category_id !== '' && (string)$val_category_id === $cid) ? 'selected' : '';
-          ?>
-          <option value="<?= htmlspecialchars($cid, ENT_QUOTES, 'UTF-8') ?>" <?= $selected ?>>
-            <?= htmlspecialchars((string)$c['category_label_ja'], ENT_QUOTES, 'UTF-8') ?>
+        <?php foreach($categories as $c): ?>
+          <option value="<?= (int)$c['id'] ?>" <?= ((string)$val_category === (string)$c['id']) ? 'selected' : '' ?>>
+            <?= h($c['category_label_ja']) ?>
           </option>
         <?php endforeach; ?>
       </select>
@@ -119,71 +140,62 @@ $val_item_id     = $item['id']          ?? '';
 
     <div class="form-row">
       <label for="order_quantity">個数（点）</label>
-      <input type="number" id="order_quantity" name="order_quantity" min="1" step="1" required>
+      <input id="order_quantity" name="order_quantity" type="number" min="0" step="1" value="<?= h($val_qty) ?>">
     </div>
 
     <div class="form-row">
       <label for="price">単価（円）</label>
-      <input type="number" id="price" name="price" min="0" step="1"
-             value="<?= htmlspecialchars((string)$val_price, ENT_QUOTES, 'UTF-8') ?>"
-             <?= $item ? 'readonly' : '' ?>
-             required>
+      <input id="price" name="price" type="number" min="0" step="1" value="<?= h($val_price) ?>" readonly>
     </div>
 
     <div class="form-row">
-      <label for="total_amount">合計（円）</label>
-      <input type="number" id="total_amount" name="total_amount" readonly>
+      <label for="total">合計（円）</label>
+      <input id="total" name="total" type="number" readonly value="">
     </div>
 
-    <input type="hidden" id="item_id" name="item_id" value="<?= htmlspecialchars((string)$val_item_id, ENT_QUOTES, 'UTF-8') ?>">
-    <p class="hint" id="janHint" aria-live="polite"></p>
-
-    <div class="buttons">
-      <button type="button" class="back-btn" onclick="location.href='home.php'">戻る</button>
-      <button type="submit" class="hacchu-btn">発注</button>
+    <div class="bottom-actions">
+      <a class="btn ghost" href="home.php">戻る</a>
+      <button class="btn primary" type="submit">発注</button>
     </div>
   </form>
 </div>
 
-<script src="hacchu_form.js"></script>
-
-<!-- ✅ ここが追加ポイント：数字のみ＆13桁固定 -->
 <script>
-const janInput = document.getElementById('jan_code');
-const janError = document.getElementById('janError');
-
-if (janInput) {
-  janInput.addEventListener('input', function(){
-    this.value = this.value.replace(/\D/g,'').slice(0,13);
-
-    if (this.value.length === 0) {
-      janError.textContent = '';
-    } else if (this.value.length < 13) {
-      janError.textContent = 'JANコードは13桁で入力してください';
-    } else {
-      janError.textContent = '';
-    }
-  });
-}
-</script>
-
-
-<!-- 合計計算 -->
-<script>
-(function(){
-  const q = document.getElementById('order_quantity');
-  const p = document.getElementById('price');
-  const t = document.getElementById('total_amount');
-  if (!q || !p || !t) return;
-
-  function calc(){
-    const qq = parseInt(q.value || '0', 10);
-    const pp = parseInt(p.value || '0', 10);
-    t.value = (qq > 0 && pp >= 0) ? (qq * pp) : '';
+/* 12桁→13桁 補完（EAN-13） */
+function calcEan13CheckDigit(twelveDigits){
+  let sum = 0;
+  for (let i = 0; i < 12; i++){
+    const n = parseInt(twelveDigits[i], 10);
+    sum += (i % 2 === 0) ? n : n * 3;
   }
-  q.addEventListener('input', calc);
-  p.addEventListener('input', calc);
-})();
+  const mod = sum % 10;
+  return String((10 - mod) % 10);
+}
+
+const janEl = document.getElementById('jan');
+
+janEl.addEventListener('blur', () => {
+  const raw = (janEl.value || '').replace(/\D/g,'');
+  if (raw.length === 12){
+    janEl.value = raw + calcEan13CheckDigit(raw);
+  } else {
+    janEl.value = raw;
+  }
+});
+
+/* 合計計算 */
+const qtyEl   = document.getElementById('order_quantity');
+const priceEl = document.getElementById('price');
+const totalEl = document.getElementById('total');
+
+function updateTotal(){
+  const q = parseInt(qtyEl.value || '0', 10);
+  const p = parseInt(priceEl.value || '0', 10);
+  totalEl.value = String((isNaN(q)?0:q) * (isNaN(p)?0:p));
+}
+qtyEl.addEventListener('input', updateTotal);
+priceEl.addEventListener('input', updateTotal);
+updateTotal();
 </script>
 
 </body>

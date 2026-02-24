@@ -1,278 +1,131 @@
-/* =========================================================
-   基本レイアウト
-========================================================= */
+:root{
+  --bg:#fff;
+  --text:#111827;
+  --muted:#6B7280;
+  --line:#E5E7EB;
+  --field:#DCDCDC;
+  --btn:#D1D5DB;
+  --btnText:#111827;
+  --primary:#111827;
+  --primaryText:#fff;
+}
+
+*{ box-sizing:border-box; }
 body{
-  font-family: "Arial", sans-serif;
   margin:0;
-  padding:0;
-  background:#ffffff;
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Segoe UI","Hiragino Kaku Gothic ProN","Meiryo",sans-serif;
 }
 
-.container{
-  width:100%;
-  max-width:900px;
-  margin:0 auto;
-  text-align:center;
+/* 共通コンテナ */
+.container{ max-width:1200px; margin:0 auto; padding:10px 20px 40px; }
+
+/* 右上固定（フォーム） */
+.top-actions{
+  position:fixed; top:14px; right:14px;
+  display:flex; flex-direction:column; gap:10px; z-index:50;
 }
-
-h1{
-  font-size:40px;
-  margin-top:20px;
-  font-weight:bold;
+.top-btn{
+  display:inline-flex; justify-content:center; align-items:center;
+  padding:12px 16px;
+  background:var(--btn); color:var(--btnText);
+  text-decoration:none; border-radius:8px; font-weight:800;
+  box-shadow:0 1px 0 rgba(0,0,0,.08);
 }
+.top-btn:hover{ filter:brightness(.96); }
 
-/* =========================================================
-   フォーム共通
-========================================================= */
-.order-form{ margin-top:30px; }
+/* タイトル */
+.page-title{ text-align:center; font-size:56px; margin:28px 0 24px; letter-spacing:.04em; }
 
+/* フォーム */
+.order-form{ width:100%; }
 .form-row{
-  display:grid;
-  grid-template-columns:160px 1fr;
-  align-items:center;
-  gap:16px;
-  margin-top:18px;
-  text-align:left;
+  display:grid; grid-template-columns:220px 1fr;
+  align-items:center; gap:18px; padding:14px 0;
+}
+.form-row label{ font-size:18px; font-weight:800; text-align:left; padding-left:6px; }
+.form-row input, .form-row select{
+  width:100%; height:54px;
+  border:none; border-radius:6px;
+  background:var(--field);
+  padding:0 14px; font-size:18px; outline:none;
+}
+.form-row input[readonly]{ opacity:.9; }
+
+.form-hint-row{
+  display:grid; grid-template-columns:220px 1fr;
+  gap:18px; padding:0 0 10px;
+}
+.form-hint{
+  background:#F3F4F6; border:1px solid var(--line);
+  color:#374151; border-radius:10px;
+  padding:10px 12px; font-size:14px;
 }
 
-.order-form label{
-  font-weight:bold;
-  font-size:16px;
-}
-
-.order-form input,
-.order-form select{
-  width:100%;
-  height:38px;
-  background:#dcdcdc;
-  border:1px solid #ccc;
-  border-radius:6px;
-  padding:6px 10px;
-  font-size:16px;
-  transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
-}
-
-/* =========================================================
-   ボタン
-========================================================= */
-.primary-btn,
-.back-btn,
-.hacchu-btn{
-  display:inline-block;
-  padding:10px 18px;
-  background:#dcdcdc;
-  border:none;
-  border-radius:6px;
-  font-size:16px;
-  cursor:pointer;
-  transition:.2s;
-}
-
-.primary-btn:hover{ background:#cfcfcf; }
-.primary-btn.is-disabled{ opacity:.5; cursor:not-allowed; }
-
-/* =========================================================
-   右上固定ボタン
-========================================================= */
-.register-btn-fixed{
-  position:fixed;
-  top:12px;
-  right:12px;
-  z-index:9999;
-  padding:10px 14px;
-  background:#dcdcdc;
-  border-radius:6px;
-  text-decoration:none;
-  color:#000;
-  font-size:16px;
-}
-.register-btn-fixed.second-btn{ top:60px; }
-
-/* =========================================================
-   情報ボックス
-========================================================= */
-.info-box{
-  background:#f2f2f2;
-  padding:16px;
-  border-radius:6px;
-  margin:24px 0;
-  text-align:left;
-  font-size:16px;
-}
-
-/* =========================================================
-   JAN 入力：プロ仕様
-========================================================= */
-.jan-wrap{
-  width:100%;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-.jan-status{
-  font-size:14px;
+.inline-controls{ display:flex; align-items:center; gap:12px; }
+.check-pill{
+  display:inline-flex; align-items:center; gap:10px;
   padding:10px 12px;
-  border-radius:10px;
-  border:1px solid #E5E7EB;
-  background:#F9FAFB;
-  color:#6B7280;
+  background:#F3F4F6; border:1px solid var(--line);
+  border-radius:999px; cursor:pointer; user-select:none;
 }
-.jan-status--idle{ border-color:#E5E7EB; background:#F9FAFB; color:#6B7280; }
-.jan-status--typing{ border-color:#93C5FD; background:#EFF6FF; color:#1D4ED8; }
-.jan-status--ok{ border-color:#86EFAC; background:#ECFDF5; color:#047857; font-weight:700; }
-.jan-status--ng{ border-color:#FCA5A5; background:#FEF2F2; color:#B91C1C; font-weight:700; }
+.check-pill input{ width:18px; height:18px; }
+.mini-note{ color:var(--muted); font-size:14px; }
 
-#jan_code.input-typing{ border:2px solid #93C5FD !important; background:#EFF6FF; }
-#jan_code.input-ok{ border:2px solid #86EFAC !important; background:#ECFDF5; }
-#jan_code.input-ng{ border:2px solid #FCA5A5 !important; background:#FEF2F2; }
+/* ボタン共通（フォーム/履歴で共用） */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:46px; padding:0 16px;
+  border-radius:10px; border:none;
+  background:var(--btn); color:var(--btnText);
+  font-weight:800; font-size:16px;
+  text-decoration:none; cursor:pointer;
+}
+.btn:hover{ filter:brightness(.96); }
+.btn.primary{ background:var(--primary); color:var(--primaryText); }
+.btn.ghost{ background:var(--btn); color:var(--btnText); }
+.btn-small{ height:36px; font-size:14px; border-radius:9px; padding:0 12px; }
 
-/* =========================================================
-   スマホ対応
-========================================================= */
-@media (max-width:600px){
-  .container{ max-width:95%; }
-  .form-row{ grid-template-columns:1fr; }
-}
+.bottom-actions{ display:flex; justify-content:center; gap:12px; margin-top:22px; }
 
-/* =========================================================
-   ▼▼ 発注履歴ページ（hacchu_list.php）専用UI ▼▼
-========================================================= */
+/* 固定UI（履歴で使用） */
+.ui-fixed{ position:fixed; z-index:60; }
+.ui-fixed--top-left{ top:14px; left:14px; }
+.ui-fixed--bottom-right{ right:14px; bottom:14px; }
 
-/* 固定ボタンがあるので上と下に余白を確保 */
-body.hacchu-list-page{
-  padding-top:70px;      /* 左上固定ボタン分 */
-  padding-bottom:130px;  /* 右下固定ボタン分 */
-  background:#F3F4F6;
-}
-
-/* このページのコンテナはカードUIに合わせる */
-body.hacchu-list-page .container{
-  text-align:center;
-}
-
-/* 共通見た目ボタン（このページだけ） */
-body.hacchu-list-page .btn{
-  display:inline-block;
-  padding:10px 18px;
-  background:#E5E7EB;
-  border:1px solid #D1D5DB;
-  border-radius:10px;
-  font-size:16px;
-  cursor:pointer;
-  transition:.2s;
-  color:#111;
-  text-decoration:none;
-  box-shadow:0 6px 16px rgba(0,0,0,.08);
-}
-body.hacchu-list-page .btn:hover{
-  background:#D1D5DB;
-}
-
-/* 小さいボタン（入荷用） */
-body.hacchu-list-page .btn-small{
-  padding:8px 12px;
-  font-size:14px;
-  border-radius:9px;
-}
-
-/* 固定配置ユーティリティ */
-body.hacchu-list-page .ui-fixed{
-  position:fixed;
-  z-index:9999;
-}
-body.hacchu-list-page .ui-fixed--top-left{
-  top:16px;
-  left:16px;
-}
-body.hacchu-list-page .ui-fixed--bottom-right{
-  right:16px;
-  bottom:16px;
-}
-
-/* テーブルをカード化して“プロっぽく” */
-body.hacchu-list-page .table-card{
-  margin-top:24px;
+/* 履歴テーブル */
+.table-card{
   background:#fff;
+  border:1px solid var(--line);
   border-radius:14px;
-  overflow:hidden;
-  box-shadow:0 10px 30px rgba(0,0,0,.08);
+  padding:12px;
+  box-shadow:0 1px 0 rgba(0,0,0,.06);
 }
-
-/* テーブル */
-body.hacchu-list-page .orders-table{
+.orders-table{
   width:100%;
   border-collapse:collapse;
 }
-
-body.hacchu-list-page .orders-table thead th{
-  background:#F9FAFB;
-  border-bottom:1px solid #E5E7EB;
-  padding:12px 10px;
-  font-weight:700;
-}
-
-body.hacchu-list-page .orders-table td{
-  border-bottom:1px solid #EEF2F7;
+.orders-table th, .orders-table td{
+  border-bottom:1px solid var(--line);
   padding:12px 10px;
   text-align:center;
 }
+.orders-table th{ font-weight:900; background:#F9FAFB; }
+.td-name{ text-align:left; font-weight:700; }
+.empty-row{ color:var(--muted); padding:20px 0; }
 
-body.hacchu-list-page .orders-table tbody tr:hover{
-  background:#FAFAFA;
+/* ステータスバッジ（履歴で使用） */
+.status-badge{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:6px 10px; border-radius:999px; font-weight:800; font-size:13px;
+  border:1px solid var(--line);
 }
+.status-badge.is-wait{ background:#FFF7ED; color:#9A3412; }
+.status-badge.is-done{ background:#ECFDF5; color:#065F46; }
 
-/* 商品名だけ左寄せにして読みやすく */
-body.hacchu-list-page .td-name{
-  text-align:left;
-}
-
-/* 空表示 */
-body.hacchu-list-page .empty-row{
-  padding:18px 10px;
-  color:#6B7280;
-}
-
-/* ステータスバッジ */
-body.hacchu-list-page .status-badge{
-  display:inline-block;
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:13px;
-  border:1px solid transparent;
-}
-body.hacchu-list-page .status-badge.is-wait{
-  background:#FEF3C7;
-  border-color:#F59E0B;
-  color:#92400E;
-  font-weight:700;
-}
-body.hacchu-list-page .status-badge.is-done{
-  background:#DCFCE7;
-  border-color:#22C55E;
-  color:#166534;
-  font-weight:700;
-}
-
-/* スマホ */
-@media (max-width:600px){
-  body.hacchu-list-page{
-    padding-top:64px;
-    padding-bottom:150px;
-  }
-  body.hacchu-list-page .ui-fixed--top-left{
-    top:10px;
-    left:10px;
-  }
-  body.hacchu-list-page .ui-fixed--bottom-right{
-    right:10px;
-    bottom:10px;
-  }
-
-  /* スマホは文字が詰まるのでサイズ調整 */
-  body.hacchu-list-page h1{ font-size:34px; }
-  body.hacchu-list-page .orders-table td,
-  body.hacchu-list-page .orders-table th{
-    padding:10px 8px;
-    font-size:14px;
-  }
+@media (max-width:900px){
+  .page-title{ font-size:40px; }
+  .form-row, .form-hint-row{ grid-template-columns:1fr; gap:8px; }
+  .form-row label{ padding-left:0; }
 }
