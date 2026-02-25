@@ -5,21 +5,15 @@ require_once __DIR__ . '/../dbconnect.php';
 
 function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
-/* =========================
-  カテゴリ一覧
-========================= */
+// カテゴリ一覧
 $stmt = $pdo->query("SELECT id, category_label_ja FROM categories ORDER BY category_group, id");
 $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-/* =========================
-  JANの事前入力（例：item_register.php から戻る時）
-========================= */
+// 事前入力JAN
 $prefillJan = $_GET['jan'] ?? '';
 $prefillJan = preg_replace('/\D/', '', $prefillJan);
 
-/* =========================
-  JANがある場合：itemsから自動反映
-========================= */
+// 自動反映（JANがある場合だけDBから引く）
 $item = null;
 if ($prefillJan !== '') {
   $sql = "
@@ -40,149 +34,203 @@ if ($prefillJan !== '') {
   $item = $st->fetch(PDO::FETCH_ASSOC);
 }
 
+// 誘導メッセージ（JANがあるのに商品が無いとき）
+$notice = null;
+if ($prefillJan !== '' && !$item) {
+  $notice = "このJANは未登録です。商品追加へ進んでください。";
+}
+
+// 初期値
+$itemId   = $item ? (int)$item['id'] : 0;
+$jan      = $item ? (string)$item['jan_code'] : $prefillJan;
+$name     = $item ? (string)$item['item_name'] : '';
+$unit     = $item ? (string)$item['unit'] : '';
+$price    = $item ? (int)$item['price'] : 0;
+$supplier = $item ? (string)$item['supplier'] : '';
+$catId    = $item ? (int)$item['category_id'] : 0;
+
 $today = date('Y-m-d');
-
-/* =========================
-  初期値
-========================= */
-$valJan      = $item['jan_code']    ?? $prefillJan;
-$valName     = $item['item_name']   ?? '';
-$valUnit     = $item['unit']        ?? '';
-$valPrice    = $item['price']       ?? '';
-$valSupplier = $item['supplier']    ?? '';
-$valCatId    = $item['category_id'] ?? '';
-$valItemId   = $item['id']          ?? 0;
-
-/* item_register.php から誘導された時のメッセージ（任意） */
-$msg = $_GET['msg'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
   <title>発注</title>
-  <link rel="stylesheet" href="../assets/css/hacchu.css">
+  <link rel="stylesheet" href="../assets/css/hacchu.css?v=3">
 </head>
-<body>
 
-<!-- 左上固定：戻る -->
-<a class="btn btn-back" href="home.php">戻る</a>
+<body class="hacchu-form-page">
 
-<!-- 左下固定：ショートカット -->
-<div class="shortcut">
-  <a class="btn btn-sub" href="item_register.php">商品追加</a>
-  <a class="btn btn-sub" href="hacchu_list.php">発注履歴</a>
-</div>
+  <!-- 左上固定：戻る（必要なければこのブロック削除OK） -->
+  <a href="home.php" class="btn btn-back">戻る</a>
 
-<div class="container">
-  <h1 class="page-title">発注</h1>
-
-  <div class="card">
-
-    <?php if ($msg !== ''): ?>
-      <div class="notice"><?= h($msg) ?></div>
-    <?php endif; ?>
-
-    <form class="order-form" method="post" action="hacchu.php" novalidate>
-
-      <!-- 重要：JANを変更したら0に戻す（JSで） -->
-      <input type="hidden" name="item_id" id="item_id" value="<?= (int)$valItemId ?>">
-
-      <!-- JAN：hacchu.php が見る name="jan" に統一 -->
-      <div class="form-row">
-        <label for="jan">JAN</label>
-        <input
-          id="jan"
-          type="text"
-          name="jan"
-          inputmode="numeric"
-          autocomplete="off"
-          value="<?= h($valJan) ?>"
-          placeholder="JANコード"
-        >
-      </div>
-
-      <div class="form-row">
-        <label for="item_name">商品名</label>
-        <input id="item_name" type="text" value="<?= h($valName) ?>" placeholder="商品名" readonly>
-      </div>
-
-      <div class="form-row">
-        <label for="category_id">カテゴリ</label>
-        <select id="category_id" disabled>
-          <option value="">選択してください</option>
-          <?php foreach($categories as $c): ?>
-            <option value="<?= (int)$c['id'] ?>" <?= ((string)$valCatId === (string)$c['id']) ? 'selected' : '' ?>>
-              <?= h($c['category_label_ja']) ?>
-            </option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-
-      <div class="form-row">
-        <label for="supplier">発注先</label>
-        <input id="supplier" type="text" value="<?= h($valSupplier) ?>" placeholder="発注先" readonly>
-      </div>
-
-      <div class="form-row">
-        <label for="order_date">発注日</label>
-        <input id="order_date" type="date" name="order_date" value="<?= h($today) ?>" required>
-      </div>
-
-      <div class="form-row">
-        <label for="price">単価（円）</label>
-        <input id="price" type="number" name="price" value="<?= h($valPrice) ?>" placeholder="0" readonly>
-      </div>
-
-      <div class="form-row">
-        <label for="order_quantity">個数（点）</label>
-        <input id="order_quantity" type="number" name="order_quantity" min="0" value="0" placeholder="0" required>
-      </div>
-
-      <div class="form-row">
-        <label for="unit">単位</label>
-        <input id="unit" type="text" value="<?= h($valUnit) ?>" placeholder="単位" readonly>
-      </div>
-
-      <div class="form-row">
-        <label for="total">合計（円）</label>
-        <input id="total" type="number" value="0" readonly>
-      </div>
-
-      <div class="form-row">
-        <label>期間限定</label>
-        <div class="check-wrap">
-          <input id="is_limited" type="checkbox" name="is_limited" value="1">
-          <label class="check-label" for="is_limited">期間限定商品</label>
-          <span class="optional">(任意)</span>
-        </div>
-      </div>
-
-      <!-- 右下固定：submit -->
-      <button type="submit" class="btn btn-primary btn-submit-fixed">発注</button>
-    </form>
+  <!-- 右上固定：商品追加 / 発注履歴 -->
+  <div class="top-actions">
+    <a class="btn btn-sub btn-small" href="item_register.php<?= $jan !== '' ? '?jan='.h($jan) : '' ?>">
+      商品追加
+    </a>
+    <a class="btn btn-sub btn-small" href="hacchu_list.php">
+      発注履歴
+    </a>
   </div>
-</div>
+
+  <div class="container">
+    <h1 class="page-title">発注</h1>
+
+    <div class="card">
+      <?php if ($notice): ?>
+        <div class="notice">
+          <?= h($notice) ?>
+          <div class="notice-actions">
+            <a class="btn btn-small btn-primary-soft" href="item_register.php?jan=<?= h($jan) ?>">商品追加へ</a>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <!-- 発注フォーム -->
+      <form class="order-form" method="post" action="hacchu.php" novalidate>
+
+        <!-- item_id はDBで確定できた時だけ入る -->
+        <input type="hidden" name="item_id" value="<?= (int)$itemId ?>">
+
+        <!-- 上から順番：JAN → 商品名 → カテゴリ → 発注先 → 発注日 → 単価 → 個数 → 単位 → 合計 → 期間限定 -->
+        <div class="form-row">
+          <label for="jan">JAN</label>
+          <input
+            id="jan"
+            name="jan"
+            type="text"
+            inputmode="numeric"
+            placeholder="JANコード"
+            value="<?= h($jan) ?>"
+          >
+        </div>
+
+        <div class="form-row">
+          <label for="item_name">商品名</label>
+          <input
+            id="item_name"
+            name="item_name_view"
+            type="text"
+            placeholder="商品名"
+            value="<?= h($name) ?>"
+            readonly
+          >
+        </div>
+
+        <div class="form-row">
+          <label for="category_id">カテゴリ</label>
+          <select id="category_id" name="category_id_view" disabled>
+            <option value="">選択してください</option>
+            <?php foreach ($categories as $c): ?>
+              <option value="<?= (int)$c['id'] ?>" <?= ((int)$c['id'] === $catId) ? 'selected' : '' ?>>
+                <?= h($c['category_label_ja']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="supplier">発注先</label>
+          <input
+            id="supplier"
+            name="supplier_view"
+            type="text"
+            placeholder="発注先"
+            value="<?= h($supplier) ?>"
+            readonly
+          >
+        </div>
+
+        <div class="form-row">
+          <label for="order_date">発注日</label>
+          <input
+            id="order_date"
+            name="order_date"
+            type="date"
+            value="<?= h($today) ?>"
+          >
+        </div>
+
+        <div class="form-row">
+          <label for="price">単価（円）</label>
+          <input
+            id="price"
+            name="price_view"
+            type="number"
+            value="<?= (int)$price ?>"
+            readonly
+          >
+        </div>
+
+        <div class="form-row">
+          <label for="order_quantity">個数（点）</label>
+          <input
+            id="order_quantity"
+            name="order_quantity"
+            type="number"
+            min="1"
+            value="0"
+          >
+        </div>
+
+        <div class="form-row">
+          <label for="unit">単位</label>
+          <input
+            id="unit"
+            name="unit_view"
+            type="text"
+            placeholder="単位"
+            value="<?= h($unit) ?>"
+            readonly
+          >
+        </div>
+
+        <div class="form-row">
+          <label for="total">合計（円）</label>
+          <input
+            id="total"
+            type="number"
+            value="0"
+            readonly
+          >
+        </div>
+
+        <div class="form-row form-row--check">
+          <label>期間限定</label>
+          <div class="check-wrap">
+            <input id="is_limited" type="checkbox" name="is_limited" value="1">
+            <label for="is_limited" class="check-label">期間限定商品（任意）</label>
+            <span class="optional">※必要な時だけON</span>
+          </div>
+        </div>
+
+        <!-- 右下固定：発注（submit） -->
+        <button type="submit" class="btn btn-primary btn-submit-fixed">
+          発注
+        </button>
+
+      </form>
+    </div>
+  </div>
 
 <script>
-/* =========================
-  合計計算（単価×個数）
-========================= */
-function calcTotal(){
-  const price = Number(document.getElementById('price').value || 0);
-  const qty   = Number(document.getElementById('order_quantity').value || 0);
-  document.getElementById('total').value = price * qty;
-}
-document.getElementById('order_quantity').addEventListener('input', calcTotal);
-calcTotal();
+(function(){
+  const priceEl = document.getElementById('price');
+  const qtyEl   = document.getElementById('order_quantity');
+  const totalEl = document.getElementById('total');
 
-/* =========================
-  重要：JANを変更したら item_id を0に戻す
-  → 古いitem_idで別商品が発注される事故防止
-========================= */
-document.getElementById('jan').addEventListener('input', () => {
-  document.getElementById('item_id').value = 0;
-});
+  function recalc(){
+    const price = parseInt(priceEl?.value || '0', 10) || 0;
+    const qty   = parseInt(qtyEl?.value || '0', 10) || 0;
+    totalEl.value = price * qty;
+  }
+
+  if (qtyEl) {
+    qtyEl.addEventListener('input', recalc);
+  }
+  recalc();
+})();
 </script>
 
 </body>

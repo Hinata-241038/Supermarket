@@ -16,15 +16,7 @@
 
   --focus:#2563EB;
 
-  /* 追加：テーブル/バッジ用 */
-  --thead:#F9FAFB;
-  --hover:#F3F4F6;
   --shadow: 0 10px 24px rgba(0,0,0,.08);
-
-  --waitBg:#FEF3C7;
-  --waitText:#92400E;
-  --doneBg:#DCFCE7;
-  --doneText:#166534;
 }
 
 *{ box-sizing:border-box; }
@@ -36,20 +28,13 @@ body{
   color:var(--text);
 }
 
-/* container */
 .container{
   width:100%;
   max-width:980px;
   margin:0 auto;
-  padding:28px 18px 60px;
+  padding:28px 18px 140px; /* 右下固定ボタン分の余白 */
 }
 
-/* 一覧ページは横幅を少し広くして見やすく */
-.container--wide{
-  max-width:1100px;
-}
-
-/* タイトル */
 .page-title{
   text-align:center;
   font-size:44px;
@@ -58,7 +43,6 @@ body{
   letter-spacing:2px;
 }
 
-/* 汎用カード */
 .card{
   background:var(--card);
   border:1px solid var(--line);
@@ -68,7 +52,7 @@ body{
 }
 
 /* =========================
-  notice（誘導メッセージ表示用）
+  notice
 ========================= */
 .notice{
   margin: 0 0 14px;
@@ -79,9 +63,12 @@ body{
   color: #9A3412;
   font-weight: 800;
 }
+.notice-actions{
+  margin-top:10px;
+}
 
 /* =========================
-  フォーム（既存：そのまま残す）
+  フォーム
 ========================= */
 .order-form{
   display:flex;
@@ -127,16 +114,17 @@ body{
   color:#111;
 }
 
-/* disabled select の見た目 */
 .form-row select:disabled{
   background:#EEF2F7;
   color:#111;
   opacity:1;
 }
 
-/* =========================
-  チェック
-========================= */
+/* 期間限定（チェック行） */
+.form-row--check{
+  margin-top:4px;
+}
+
 .check-wrap{
   display:flex;
   align-items:center;
@@ -147,7 +135,6 @@ body{
 .check-label{
   font-weight:800;
 }
-
 .optional{
   color:var(--muted);
   font-weight:700;
@@ -171,12 +158,19 @@ body{
   user-select:none;
 }
 
-/* ✅ 左上固定：戻る（このページはこれだけ使う） */
+/* 小さいボタン */
+.btn-small{
+  padding:10px 14px;
+  border-radius:10px;
+  font-weight:900;
+}
+
+/* 左上固定：戻る */
 .btn-back{
   position:fixed;
   top:18px;
   left:18px;
-  z-index:50;
+  z-index:60;
   background:var(--sub);
   color:var(--subText);
   border:1px solid var(--line);
@@ -184,14 +178,31 @@ body{
 }
 .btn-back:hover{ transform:translateY(-1px); }
 
-/* 小さいボタン */
-.btn-small{
-  padding:9px 14px;
-  border-radius:10px;
-  font-weight:900;
+/* 右上固定：商品追加 / 発注履歴（横並び） */
+.top-actions{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:60;
+  display:flex;
+  gap:10px;
 }
 
-/* 入荷ボタン：黒ベタだと強すぎるので“ソフト” */
+/* 右上のボタンは“サブ”として統一 */
+.btn-sub{
+  background:var(--sub);
+  color:var(--subText);
+  border:1px solid var(--line);
+  box-shadow:0 8px 18px rgba(0,0,0,.08);
+}
+.btn-sub:hover{ transform:translateY(-1px); }
+
+/* 右下固定：発注 */
+.btn-primary{
+  background:var(--btn);
+  color:var(--btnText);
+}
+
 .btn-primary-soft{
   background:#111827;
   color:#fff;
@@ -199,105 +210,16 @@ body{
 }
 .btn-primary-soft:hover{ transform:translateY(-1px); }
 
-/* =========================
-  ✅ 発注履歴（一覧） UI
-========================= */
-.hacchu-list-page .table-card{
-  background:var(--card);
-  border:1px solid var(--line);
+.btn-submit-fixed{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  z-index:70;
+  padding:16px 26px;
   border-radius:16px;
-  overflow:hidden;            /* 角丸をテーブルに反映 */
-  box-shadow:var(--shadow);
+  box-shadow:0 10px 26px rgba(0,0,0,.22);
 }
-
-/* テーブル */
-.orders-table{
-  width:100%;
-  border-collapse:separate;
-  border-spacing:0;
-  font-size:15px;
-}
-
-/* ヘッダー */
-.orders-table thead th{
-  background:var(--thead);
-  border-bottom:1px solid var(--line);
-  padding:14px 12px;
-  text-align:left;
-  font-weight:900;
-  color:#111827;
-  position:sticky;   /* スクロール時にヘッダが残る（効く環境のみ） */
-  top:0;
-  z-index:2;
-}
-
-/* 本文 */
-.orders-table tbody td{
-  border-bottom:1px solid var(--line);
-  padding:13px 12px;
-  vertical-align:middle;
-  background:#fff;
-}
-
-/* 行ホバー */
-.orders-table tbody tr:hover td{
-  background:var(--hover);
-}
-
-/* 空表示 */
-.empty-row{
-  text-align:center;
-  color:var(--muted);
-  font-weight:800;
-  padding:26px 12px !important;
-}
-
-/* 列幅調整（見やすく固定） */
-.col-id{ width:70px; }
-.col-jan{ width:170px; }
-.col-qty{ width:90px; }
-.col-date{ width:140px; }
-.col-status{ width:110px; }
-.col-action{ width:110px; }
-
-/* 文字スタイル */
-.td-name{ font-weight:900; }
-.td-mono{ font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-.td-num{ text-align:right; font-variant-numeric: tabular-nums; }
-
-/* バッジ */
-.status-badge{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding:7px 10px;
-  border-radius:999px;
-  font-weight:900;
-  font-size:13px;
-  border:1px solid var(--line);
-  white-space:nowrap;
-}
-
-.status-badge.is-wait{
-  background:var(--waitBg);
-  color:var(--waitText);
-  border-color:#FDE68A;
-}
-
-.status-badge.is-done{
-  background:var(--doneBg);
-  color:var(--doneText);
-  border-color:#BBF7D0;
-}
-
-.muted{ color:var(--muted); font-weight:800; }
-
-.foot-note{
-  margin-top:12px;
-  color:var(--muted);
-  font-weight:800;
-  text-align:right;
-}
+.btn-submit-fixed:hover{ transform:translateY(-2px); }
 
 /* =========================
   画面が狭いとき
@@ -308,14 +230,12 @@ body{
     gap:8px;
   }
   .page-title{ font-size:34px; }
-  .container{ padding-bottom:70px; }
-  .container--wide{ max-width:980px; }
+  .container{ padding-bottom:160px; }
 
-  /* 一覧は横スクロール許可（スマホで崩れない） */
-  .hacchu-list-page .table-card{
-    overflow:auto;
-  }
-  .orders-table{
-    min-width:860px; /* 列が潰れない最低幅 */
+  /* 右上ボタンが被るのを避ける（スマホは縦並び） */
+  .top-actions{
+    flex-direction:column;
+    align-items:flex-end;
+    gap:8px;
   }
 }
