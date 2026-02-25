@@ -20,7 +20,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="container">
 
     <div class="top-area">
-        <button class="btn-back" onclick="history.back()">戻る</button>
+        <button class="btn-back" onclick="location.href='home.php'">戻る</button>
     </div>
 
     <h1 class="title">ユーザー管理</h1>
