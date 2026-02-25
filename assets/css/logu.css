@@ -1,75 +1,99 @@
-/* logu.css */
-
+/* 画面全体中央 */
 body {
-  /* 画面全体の中央に配置するための設定 */
   display: flex;
-  justify-content: center; /* 水平方向の中央寄せ */
-  align-items: center; /* 垂直方向の中央寄せ */
-  min-height: 100vh; /* 画面の高さ全体を使う */
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
   margin: 0;
-  font-family: sans-serif; /* 一般的なフォント */
-  background-color: #f0f0f0; 
+  font-family: sans-serif;
+  background-color: #f0f0f0;
 }
 
+/* 白カード */
 .container {
-  /* フォームのコンテナ */
-  background-color: white;
+  background: #fff;
   padding: 40px 60px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  text-align: center; 
-  width: 300px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  width: 320px;
+  text-align: center;
 }
 
-/* logu.htmlのh1要素 */
+/* タイトル */
 .fsize {
-  /* 画像に合わせて「SuperMarketManagement」のサイズと余白を設定 */
   font-size: 24px;
-  margin-bottom: 30px;
   font-weight: bold;
-  /* HTMLのh1が「ログイン」ですが、画像は「SuperMarketManagement」のため、
-     サイズは画像に合わせて調整しています。 */
+  margin-bottom: 30px;
 }
 
-/* 入力フィールドのスタイル調整 */
+/* ラベル横並び */
 form label {
-  display: flex; /* ラベルと入力欄を横並びに */
+  display: flex;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  font-size: 16px;
-  /* 画像は「ID」「パスワード」が左寄せ、入力欄が右寄せなので、space-betweenを使用 */
-  justify-content: space-between; 
+  font-size: 15px;
 }
 
+/* 入力欄 */
 form input[type="text"],
 form input[type="password"] {
   padding: 8px;
   border: 1px solid #ccc;
-  border-radius: 5px;
-  flex-grow: 1; /* 入力欄が残りのスペースを占めるように */
-  margin-left: 10px; /* ラベルとの間にスペース */
-  background-color: #eee; /* 画像にある薄いグレーの背景色を再現 */
-  /* 画像の入力欄の幅に合わせて調整 */
-  width: 160px; 
+  border-radius: 6px;
+  margin-left: 10px;
+  flex: 1;
+  background: #eee;
 }
 
-/* 改行タグ <br> の影響を無効化 */
-form br {
-    display: none;
-}
-
-/* 画像のように「新規登録」と「ログイン」を横並びにするためのスタイル */
+/* ボタンエリア */
 .button-group {
-    display: flex;
-    justify-content: space-around; /* 左右に均等に配置 */
-    margin-top: 50px; /* 画像に合わせて入力欄から離す */
-    font-size: 16px;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  gap: 10px;
 }
 
+/* 新規登録リンク */
 .button-group a {
-    /* 画像の「新規登録」と「ログイン」のテキストスタイル */
-    text-decoration: none; /* リンクの下線を消す */
-    color: black;
-    cursor: pointer;
-    /* ボタンとしてではなく、テキストリンクとして画像通りのスタイルを適用 */
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  transition: 0.2s;
+}
+
+.button-group a:hover {
+  background: #eee;
+}
+
+/* ボタン共通 */
+.button-group button {
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+/* 再設定 */
+.button-group button[formaction="password_reset.php"] {
+  background: #ffffff;
+  color: rgb(255, 0, 0);
+}
+
+.button-group button[formaction="password_reset.php"]:hover {
+  background: #006aff;
+}
+
+/* ログイン */
+.button-group button[type="submit"]:not([formaction]) {
+  background: #ffffff;
+  color: rgb(255, 0, 0);
+}
+
+.button-group button[type="submit"]:not([formaction]):hover {
+  background: #006aff;
 }

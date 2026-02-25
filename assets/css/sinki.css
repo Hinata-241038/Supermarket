@@ -30,11 +30,12 @@ body {
     margin-right: 30px;
 }
 
-.form-row input {
+.form-row input,
+.form-row select {
     width: 300px;
     padding: 12px;
     font-size: 20px;
-    background-color: #c0bebe; /* グレー */
+    background-color: #0040ff;
     border: none;
     border-radius: 4px;
 }
@@ -44,7 +45,7 @@ body {
     margin-top: 80px;
     display: flex;
     justify-content: center;
-    gap: 50px; /* ボタンの間隔 */
+    gap: 50px;
 }
 
 .back-btn,
@@ -54,4 +55,8 @@ body {
     background: none;
     border: none;
     cursor: pointer;
+}
+
+.error{
+    color:red;
 }
