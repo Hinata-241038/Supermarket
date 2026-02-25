@@ -38,44 +38,46 @@ function statusLabel($status)
   <title>発注履歴一覧</title>
 
   <!-- ★キャッシュ対策：更新しても反映されない時の保険 -->
-  <link rel="stylesheet" href="../assets/css/hacchu.css?v=1">
+  <link rel="stylesheet" href="../assets/css/hacchu.css?v=2">
 </head>
 
 <body class="hacchu-list-page">
 
-  <!-- 左上固定：発注画面に戻る -->
-  <a href="hacchu_form.php" class="btn ui-fixed ui-fixed--top-left">戻る</a>
+  <!-- ✅ 左上固定：戻る（発注画面へ戻る） -->
+  <a href="hacchu_form.php" class="btn btn-back">戻る</a>
 
-  <div class="container">
-    <h1>発注履歴</h1>
+  <div class="container container--wide">
+    <h1 class="page-title">発注履歴</h1>
 
     <div class="table-card">
       <table class="orders-table">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>JAN</th>
-            <th>商品名</th>
-            <th>数量</th>
-            <th>発注日</th>
-            <th>状態</th>
-            <th>操作</th>
+            <th class="col-id">ID</th>
+            <th class="col-jan">JAN</th>
+            <th class="col-name">商品名</th>
+            <th class="col-qty">数量</th>
+            <th class="col-date">発注日</th>
+            <th class="col-status">状態</th>
+            <th class="col-action">操作</th>
           </tr>
         </thead>
 
         <tbody>
         <?php if (empty($orders)): ?>
-          <tr><td colspan="7" class="empty-row">発注履歴がありません</td></tr>
+          <tr>
+            <td colspan="7" class="empty-row">発注履歴がありません</td>
+          </tr>
         <?php else: ?>
           <?php foreach ($orders as $o): ?>
+            <?php $st = (int)$o['status']; ?>
             <tr>
-              <td><?= h($o['id']) ?></td>
-              <td><?= h($o['jan_code'] ?? '') ?></td>
+              <td class="td-mono"><?= h($o['id']) ?></td>
+              <td class="td-mono"><?= h($o['jan_code'] ?? '') ?></td>
               <td class="td-name"><?= h($o['item_name'] ?? '') ?></td>
-              <td><?= h($o['order_quantity']) ?></td>
-              <td><?= h($o['order_date']) ?></td>
+              <td class="td-num"><?= h($o['order_quantity']) ?></td>
+              <td class="td-mono"><?= h($o['order_date']) ?></td>
 
-              <?php $st = (int)$o['status']; ?>
               <td>
                 <span class="status-badge <?= $st === 0 ? 'is-wait' : 'is-done' ?>">
                   <?= h(statusLabel($st)) ?>
@@ -84,9 +86,9 @@ function statusLabel($status)
 
               <td>
                 <?php if ($st === 0): ?>
-                  <a class="btn btn-small" href="nyuka_form.php?order_id=<?= (int)$o['id'] ?>">入荷</a>
+                  <a class="btn btn-small btn-primary-soft" href="nyuka_form.php?order_id=<?= (int)$o['id'] ?>">入荷</a>
                 <?php else: ?>
-                  -
+                  <span class="muted">-</span>
                 <?php endif; ?>
               </td>
             </tr>
@@ -95,12 +97,13 @@ function statusLabel($status)
         </tbody>
       </table>
     </div>
+
+    <div class="foot-note">
+      ※「未入荷」のみ入荷処理ができます。
+    </div>
   </div>
 
-  <!-- 右下固定：発注画面へ -->
-  <button class="btn ui-fixed ui-fixed--bottom-right" onclick="location.href='hacchu_form.php'">
-    発注画面へ
-  </button>
+  <!-- ✅ 「発注画面へ」ボタンは削除 -->
 
 </body>
 </html>
