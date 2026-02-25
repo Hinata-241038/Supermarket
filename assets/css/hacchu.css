@@ -1,122 +1,212 @@
+/* =========================
+  全体
+========================= */
 :root{
-  --bg:#fff;
+  --bg:#F3F4F6;
+  --card:#FFFFFF;
   --text:#111827;
   --muted:#6B7280;
   --line:#E5E7EB;
-  --field:#DCDCDC;
-  --btn:#D1D5DB;
-  --btnText:#111827;
-  --primary:#111827;
-  --primaryText:#fff;
+  --btn:#111827;
+  --btnText:#FFFFFF;
+  --sub:#E5E7EB;
+  --subText:#111827;
+  --focus:#2563EB;
 }
 
 *{ box-sizing:border-box; }
+
 body{
   margin:0;
+  font-family: "Segoe UI","Hiragino Kaku Gothic ProN",sans-serif;
   background:var(--bg);
   color:var(--text);
-  font-family:"Segoe UI","Hiragino Kaku Gothic ProN","Meiryo",sans-serif;
 }
 
-/* コンテナ */
-.container{ max-width:1200px; margin:0 auto; padding:10px 20px 40px; }
+.container{
+  width:100%;
+  max-width:980px;
+  margin:0 auto;
+  padding:28px 18px 140px; /* 下に固定ボタン分の余白 */
+}
 
-/* タイトル */
-.page-title{ text-align:center; font-size:54px; margin:26px 0 20px; letter-spacing:.04em; }
+.page-title{
+  text-align:center;
+  font-size:44px;
+  margin:10px 0 24px;
+  font-weight:800;
+  letter-spacing:2px;
+}
 
-/* フォーム（コンパクト） */
-.order-form{ width:100%; }
-.order-form--compact .form-row{
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:26px 22px;
+  box-shadow:0 6px 18px rgba(0,0,0,.06);
+}
+
+/* =========================
+  notice（誘導メッセージ表示用）
+========================= */
+.notice{
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #FFF7ED;
+  border: 1px solid #FED7AA;
+  color: #9A3412;
+  font-weight: 800;
+}
+
+/* =========================
+  フォーム
+========================= */
+.order-form{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+/* ラベル列 + 入力列 */
+.form-row{
   display:grid;
-  grid-template-columns:220px 1fr;
+  grid-template-columns: 170px 1fr;
   align-items:center;
   gap:16px;
-  padding:10px 0;                 /* 少し詰める */
-}
-.order-form--compact .form-row label{
-  font-size:16px;                 /* 少し小さく */
-  font-weight:800;
-  text-align:left;
-  padding-left:6px;
 }
 
-.order-form--compact .form-row input,
-.order-form--compact .form-row select{
+.form-row label{
+  font-weight:800;
+  color:var(--text);
+  letter-spacing:.5px;
+}
+
+/* 入力欄：少し小さめ */
+.form-row input,
+.form-row select{
   width:100%;
-  height:46px;                    /* ★小さく */
-  border:none;
-  border-radius:6px;
-  background:var(--field);
-  padding:0 12px;
-  font-size:16px;                 /* 少し小さく */
+  height:38px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  padding:8px 12px;
+  background:#F9FAFB;
+  font-size:15px;
   outline:none;
 }
 
-.form-row input[readonly]{ opacity:.9; }
-
-/* JAN下ヒント */
-.form-hint-row{
-  display:grid;
-  grid-template-columns:220px 1fr;
-  gap:16px;
-  padding:0 0 8px;
-}
-.form-hint{
-  background:#F3F4F6;
-  border:1px solid var(--line);
-  color:#374151;
-  border-radius:10px;
-  padding:10px 12px;
-  font-size:13px;
+.form-row input:focus,
+.form-row select:focus{
+  border-color:var(--focus);
+  box-shadow:0 0 0 3px rgba(37,99,235,.15);
 }
 
-/* 期間限定 */
-.inline-controls{ display:flex; align-items:center; gap:12px; }
-.check-pill{
-  display:inline-flex; align-items:center; gap:10px;
-  padding:8px 12px;
-  background:#F3F4F6;
-  border:1px solid var(--line);
-  border-radius:999px;
+.form-row input[readonly]{
+  background:#EEF2F7;
+  color:#111;
+}
+
+/* disabled select の見た目 */
+.form-row select:disabled{
+  background:#EEF2F7;
+  color:#111;
+  opacity:1;
+}
+
+/* =========================
+  チェック
+========================= */
+.check-wrap{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.check-label{
+  font-weight:800;
+}
+
+.optional{
+  color:var(--muted);
+  font-weight:700;
+}
+
+/* =========================
+  ボタン共通
+========================= */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+  border:none;
   cursor:pointer;
+  border-radius:12px;
+  padding:12px 18px;
+  font-weight:900;
+  letter-spacing:.5px;
+  transition:.15s;
   user-select:none;
 }
-.check-pill input{ width:18px; height:18px; }
-.mini-note{ color:var(--muted); font-size:13px; }
 
-/* 共通ボタン */
-.btn{
-  display:inline-flex; align-items:center; justify-content:center;
-  height:44px;
-  padding:0 16px;
-  border-radius:10px;
-  border:none;
+/* 左上固定：戻る */
+.btn-back{
+  position:fixed;
+  top:18px;
+  left:18px;
+  z-index:50;
+  background:var(--sub);
+  color:var(--subText);
+  border:1px solid var(--line);
+}
+.btn-back:hover{ transform:translateY(-1px); }
+
+/* 左下固定：ショートカット */
+.shortcut{
+  position:fixed;
+  left:18px;
+  bottom:18px;
+  z-index:50;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.btn-sub{
+  background:var(--sub);
+  color:var(--subText);
+  border:1px solid var(--line);
+  min-width:140px;
+}
+.btn-sub:hover{ transform:translateY(-1px); }
+
+/* 右下固定：発注 */
+.btn-primary{
   background:var(--btn);
   color:var(--btnText);
-  font-weight:900;
-  font-size:16px;
-  text-decoration:none;
-  cursor:pointer;
-  box-shadow:0 1px 0 rgba(0,0,0,.08);
 }
-.btn:hover{ filter:brightness(.96); }
-.btn.primary{ background:var(--primary); color:var(--primaryText); }
 
-/* 固定UI */
-.ui-fixed{ position:fixed; z-index:80; }
-.ui-fixed--top-right{ top:14px; right:14px; }
-.ui-fixed--bottom-left{ left:14px; bottom:14px; }
+.btn-submit-fixed{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  z-index:60;
+  padding:16px 26px;
+  border-radius:16px;
+  box-shadow:0 10px 26px rgba(0,0,0,.22);
+}
+.btn-submit-fixed:hover{ transform:translateY(-2px); }
 
-/* 固定ボタンと被らない余白 */
-.form-bottom-spacer{ height:80px; }
-
-/* レスポンシブ */
-@media (max-width:900px){
-  .page-title{ font-size:40px; }
-  .order-form--compact .form-row,
-  .form-hint-row{
-    grid-template-columns:1fr;
+/* =========================
+  画面が狭いとき
+========================= */
+@media (max-width: 720px){
+  .form-row{
+    grid-template-columns: 1fr;
     gap:8px;
   }
-  .order-form--compact .form-row label{ padding-left:0; }
+  .page-title{ font-size:34px; }
+  .container{ padding-bottom:160px; }
+  .btn-sub{ min-width:120px; }
 }
