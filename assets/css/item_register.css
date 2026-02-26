@@ -140,3 +140,45 @@
     padding-top: 10px;
   }
 }
+/* =========================================================
+  商品追加ボタンを戻るボタンと同じUIにする（見た目のみ）
+  ※positionは固定にしない（submitなので中央配置維持）
+========================================================= */
+
+.item-register-page .submit-btn,
+.item-register-page button[type="submit"]{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:10px 14px;
+  min-width: 220px;
+
+  background:#ffffff;
+  border:1px solid #D1D5DB;
+  border-radius:10px;
+
+  color:#111827;
+  font-weight:700;
+
+  box-shadow:0 4px 14px rgba(0,0,0,.08);
+  transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.item-register-page button[type="submit"]:hover{
+  background:#F9FAFB;
+  box-shadow:0 6px 18px rgba(0,0,0,.12);
+  transform:translateY(-1px);
+}
+
+.item-register-page button[type="submit"]:active{
+  transform:translateY(0);
+  box-shadow:0 4px 14px rgba(0,0,0,.10);
+}
+
+/* 中央配置（既存構造を壊さない） */
+.item-register-page .form-actions{
+  display:flex;
+  justify-content:center;
+  margin-top:20px;
+}
