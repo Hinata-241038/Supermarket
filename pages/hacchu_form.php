@@ -56,12 +56,12 @@ $today = date('Y-m-d');
 <head>
   <meta charset="UTF-8">
   <title>発注</title>
-  <link rel="stylesheet" href="../assets/css/hacchu.css?v=3">
+  <link rel="stylesheet" href="../assets/css/hacchu.css?v=4">
 </head>
 
 <body class="hacchu-form-page">
 
-  <!-- 左上固定：戻る（必要なければこのブロック削除OK） -->
+  <!-- 左上固定：戻る -->
   <a href="home.php" class="btn btn-back">戻る</a>
 
   <!-- 右上固定：商品追加 / 発注履歴 -->
@@ -87,35 +87,18 @@ $today = date('Y-m-d');
         </div>
       <?php endif; ?>
 
-      <!-- 発注フォーム -->
       <form class="order-form" method="post" action="hacchu.php" novalidate>
 
-        <!-- item_id はDBで確定できた時だけ入る -->
         <input type="hidden" name="item_id" value="<?= (int)$itemId ?>">
 
-        <!-- 上から順番：JAN → 商品名 → カテゴリ → 発注先 → 発注日 → 単価 → 個数 → 単位 → 合計 → 期間限定 -->
         <div class="form-row">
           <label for="jan">JAN</label>
-          <input
-            id="jan"
-            name="jan"
-            type="text"
-            inputmode="numeric"
-            placeholder="JANコード"
-            value="<?= h($jan) ?>"
-          >
+          <input id="jan" name="jan" type="text" inputmode="numeric" placeholder="JANコード" value="<?= h($jan) ?>">
         </div>
 
         <div class="form-row">
           <label for="item_name">商品名</label>
-          <input
-            id="item_name"
-            name="item_name_view"
-            type="text"
-            placeholder="商品名"
-            value="<?= h($name) ?>"
-            readonly
-          >
+          <input id="item_name" name="item_name_view" type="text" placeholder="商品名" value="<?= h($name) ?>" readonly>
         </div>
 
         <div class="form-row">
@@ -132,83 +115,47 @@ $today = date('Y-m-d');
 
         <div class="form-row">
           <label for="supplier">発注先</label>
-          <input
-            id="supplier"
-            name="supplier_view"
-            type="text"
-            placeholder="発注先"
-            value="<?= h($supplier) ?>"
-            readonly
-          >
+          <input id="supplier" name="supplier_view" type="text" placeholder="発注先" value="<?= h($supplier) ?>" readonly>
         </div>
 
         <div class="form-row">
           <label for="order_date">発注日</label>
-          <input
-            id="order_date"
-            name="order_date"
-            type="date"
-            value="<?= h($today) ?>"
-          >
+          <input id="order_date" name="order_date" type="date" value="<?= h($today) ?>">
         </div>
 
         <div class="form-row">
           <label for="price">単価（円）</label>
-          <input
-            id="price"
-            name="price_view"
-            type="number"
-            value="<?= (int)$price ?>"
-            readonly
-          >
+          <input id="price" name="price_view" type="number" value="<?= (int)$price ?>" readonly>
         </div>
 
         <div class="form-row">
           <label for="order_quantity">個数（点）</label>
-          <input
-            id="order_quantity"
-            name="order_quantity"
-            type="number"
-            min="1"
-            value="0"
-          >
+          <input id="order_quantity" name="order_quantity" type="number" min="1" value="0">
         </div>
 
         <div class="form-row">
           <label for="unit">単位</label>
-          <input
-            id="unit"
-            name="unit_view"
-            type="text"
-            placeholder="単位"
-            value="<?= h($unit) ?>"
-            readonly
-          >
+          <input id="unit" name="unit_view" type="text" placeholder="単位" value="<?= h($unit) ?>" readonly>
         </div>
 
         <div class="form-row">
           <label for="total">合計（円）</label>
-          <input
-            id="total"
-            type="number"
-            value="0"
-            readonly
-          >
+          <input id="total" type="number" value="0" readonly>
         </div>
 
-        <div class="form-row form-row--check">
-          <label>期間限定</label>
-          <div class="check-wrap">
+        <!-- ✅ ここが希望の形： 期間限定  ☐  任意 -->
+        <div class="form-row form-row--limited">
+          <label class="limited-label">期間限定</label>
+
+          <div class="limited-inline">
+            <!-- name/value は絶対に変えない（機能維持） -->
             <input id="is_limited" type="checkbox" name="is_limited" value="1">
-            <label for="is_limited" class="check-label">期間限定商品（任意）</label>
-            <span class="optional">※必要な時だけON</span>
+            <label for="is_limited" class="limited-checktext">任意</label>
           </div>
         </div>
 
         <!-- 右下固定：発注（submit） -->
-        <button type="submit" class="btn btn-primary btn-submit-fixed">
-          発注
-        </button>
+        <button type="submit" class="btn btn-primary btn-submit-fixed">発注</button>
 
       </form>
     </div>
@@ -226,9 +173,7 @@ $today = date('Y-m-d');
     totalEl.value = price * qty;
   }
 
-  if (qtyEl) {
-    qtyEl.addEventListener('input', recalc);
-  }
+  if (qtyEl) qtyEl.addEventListener('input', recalc);
   recalc();
 })();
 </script>
