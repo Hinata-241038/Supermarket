@@ -245,3 +245,141 @@ body{
     gap:8px;
   }
 }
+
+/* =================================================
+  発注履歴（hacchu_list.php）専用UI
+  ※既存フォームUIに影響しないように body クラスで限定
+================================================= */
+
+.hacchu-list-page .container--wide{
+  max-width: 1180px; /* 画面を有効活用してスカスカを解消 */
+}
+
+.hacchu-list-page .page-head{
+  text-align:center;
+  margin-top: 10px;
+  margin-bottom: 18px;
+}
+
+.hacchu-list-page .page-sub{
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+/* カード化 */
+.hacchu-list-page .table-card{
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.08);
+  overflow: hidden; /* 角丸をテーブルにも反映 */
+}
+
+/* 横幅が狭い環境はスクロールで崩れない */
+.hacchu-list-page .table-wrap{
+  overflow: auto;
+}
+
+/* テーブル */
+.hacchu-list-page .orders-table{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 15px;
+  min-width: 980px; /* 列が潰れるのを防ぐ */
+}
+
+/* ヘッダー */
+.hacchu-list-page .orders-table thead th{
+  background: #F9FAFB;
+  border-bottom: 1px solid var(--line);
+  padding: 14px 12px;
+  text-align: left;
+  font-weight: 900;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* セル */
+.hacchu-list-page .orders-table tbody td{
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  padding: 13px 12px;
+  vertical-align: middle;
+}
+
+/* 行ホバー（業務画面の視認性UP） */
+.hacchu-list-page .orders-table tbody tr:hover td{
+  background: #F3F4F6;
+}
+
+/* 列幅（読みやすさ重視） */
+.hacchu-list-page .col-id{ width: 70px; }
+.hacchu-list-page .col-jan{ width: 170px; }
+.hacchu-list-page .col-qty{ width: 90px; }
+.hacchu-list-page .col-date{ width: 140px; }
+.hacchu-list-page .col-status{ width: 110px; }
+.hacchu-list-page .col-action{ width: 110px; }
+
+/* テキスト */
+.hacchu-list-page .td-name{ font-weight: 900; }
+.hacchu-list-page .td-mono{
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.hacchu-list-page .td-num{
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.hacchu-list-page .empty-row{
+  text-align: center;
+  color: var(--muted);
+  font-weight: 900;
+  padding: 26px 12px !important;
+}
+
+/* バッジ */
+.hacchu-list-page .status-badge{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 13px;
+  border: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.hacchu-list-page .status-badge.is-wait{
+  background: #FEF3C7;
+  color: #92400E;
+  border-color: #FDE68A;
+}
+
+.hacchu-list-page .status-badge.is-done{
+  background: #DCFCE7;
+  color: #166534;
+  border-color: #BBF7D0;
+}
+
+/* フッター注記 */
+.hacchu-list-page .table-foot{
+  display:flex;
+  justify-content:flex-end;
+  padding: 12px 14px;
+  background: #fff;
+}
+
+.hacchu-list-page .hint{
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.hacchu-list-page .muted{
+  color: var(--muted);
+  font-weight: 900;
+}
