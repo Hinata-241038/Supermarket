@@ -2,6 +2,7 @@ body {
     font-family: sans-serif;
     margin: 0;
     text-align: center;
+    background-color: #f5f5f5;
 }
 
 .title {
@@ -14,6 +15,10 @@ body {
 .form-container {
     width: 60%;
     margin: 0 auto;
+    background: white;
+    padding: 50px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 .form-row {
@@ -24,7 +29,7 @@ body {
 }
 
 .form-row label {
-    font-size: 24px;
+    font-size: 22px;
     width: 150px;
     text-align: right;
     margin-right: 30px;
@@ -34,29 +39,91 @@ body {
 .form-row select {
     width: 300px;
     padding: 12px;
-    font-size: 20px;
-    background-color: #949494;
-    border: none;
-    border-radius: 4px;
+    font-size: 18px;
+    background-color: #f0f0f0;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+/* フォーカス時 */
+.form-row input:focus,
+.form-row select:focus {
+    outline: none;
+    border: 2px solid #4CAF50;
+    background-color: #fff;
 }
 
 /* ボタン配置 */
 .button-area {
-    margin-top: 80px;
+    margin-top: 60px;
     display: flex;
     justify-content: center;
-    gap: 50px;
+    gap: 40px;
 }
 
 .back-btn,
 .submit-btn {
-    font-size: 28px;
-    padding: 15px 40px;
-    background: none;
-    border: none;
+    font-size: 20px;
+    padding: 12px 35px;
+    border-radius: 6px;
     cursor: pointer;
+    border: none;
+    transition: 0.2s;
 }
 
-.error{
-    color:red;
+/* 戻るボタン */
+.back-btn {
+    background-color: #ccc;
+}
+
+/* 送信ボタン */
+.submit-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* ホバー */
+.back-btn:hover {
+    background-color: #b5b5b5;
+}
+
+.submit-btn:hover {
+    background-color: #43a047;
+}
+
+/* エラー */
+.error {
+    color: red;
+    font-size: 16px;
+    margin-top: 8px;
+}
+
+/* スマホ対応 */
+@media (max-width: 768px){
+    .form-container{
+        width: 90%;
+        padding: 30px;
+    }
+
+    .form-row{
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-row label{
+        width: auto;
+        text-align: left;
+        margin-bottom: 8px;
+    }
+
+    .form-row input,
+    .form-row select{
+        width: 100%;
+    }
+
+    .button-area{
+        flex-direction: column;
+        gap: 20px;
+    }
 }
