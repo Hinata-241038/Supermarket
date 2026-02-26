@@ -1,13 +1,20 @@
 /* =========================================================
   item_register.php 専用CSS（hacchu.cssを壊さず上書き）
+  ※前提：<body class="item-register-page"> を付ける
 ========================================================= */
 
-/* ✅ 戻るボタン：左上固定を「確実化」＋見た目調整 */
-.back-btn{
-  position: fixed;           /* ← 固定 */
-  top: 16px;                 /* ← 左上の余白 */
+.item-register-page{
+  /* 必要ならページ専用の微調整変数を置ける（任意） */
+}
+
+/* =========================================================
+  ✅ 戻るボタン：左上固定を確実化（item_register限定）
+========================================================= */
+.item-register-page .back-btn{
+  position: fixed;
+  top: 16px;
   left: 16px;
-  z-index: 10000;            /* ← 他要素に負けない */
+  z-index: 10000;
 
   display: inline-flex;
   align-items: center;
@@ -28,40 +35,45 @@
   transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
 }
 
-.back-btn:hover{
+.item-register-page .back-btn:hover{
   background: #F9FAFB;
   box-shadow: 0 6px 18px rgba(0,0,0,.12);
   transform: translateY(-1px);
 }
 
-.back-btn:active{
+.item-register-page .back-btn:active{
   transform: translateY(0);
   box-shadow: 0 4px 14px rgba(0,0,0,.10);
 }
 
-/* ✅ タイトルの位置：戻るボタンと被らないように余白確保 */
-.container{
+/* =========================================================
+  ✅ タイトルの位置：戻るボタンと被らないように余白確保（限定）
+========================================================= */
+.item-register-page .container{
   padding-top: 18px;
 }
-.container h1{
+.item-register-page .container h1{
   margin-top: 28px;
 }
 
-/* 期間限定フィールド */
-.limited-field{
+/* =========================================================
+  期間限定フィールド（トグルUI）
+========================================================= */
+.item-register-page .limited-field{
   display:flex;
   flex-direction:column;
   gap:8px;
   margin-bottom: 18px;
 }
 
-.field-help{
+.item-register-page .field-help{
   font-size:13px;
   color:#6B7280;
 }
 
 /* トグル風UI（純CSS） */
-.toggle{
+.item-register-page .toggle{
+  position: relative;            /* ← input absoluteの基準にする */
   display:flex;
   align-items:center;
   gap:12px;
@@ -69,13 +81,17 @@
   cursor:pointer;
 }
 
-.toggle input{
+/* ラベル全体が確実にクリックできるようにする */
+.item-register-page .toggle input{
   position:absolute;
+  inset:0;                       /* ← toggle全体をクリック領域に */
   opacity:0;
-  pointer-events:none;
+  margin:0;
+  cursor:pointer;
 }
 
-.toggle-ui{
+/* 見た目のスイッチ部分 */
+.item-register-page .toggle-ui{
   width:48px;
   height:28px;
   border-radius:999px;
@@ -85,7 +101,7 @@
   flex:0 0 auto;
 }
 
-.toggle-ui::after{
+.item-register-page .toggle-ui::after{
   content:"";
   width:22px;
   height:22px;
@@ -98,21 +114,23 @@
   box-shadow: 0 2px 6px rgba(0,0,0,.15);
 }
 
-.toggle input:checked + .toggle-ui{
+/* checked時（inputがtoggle-uiの直前にある構造を前提） */
+.item-register-page .toggle input:checked + .toggle-ui{
   background:#86EFAC;
 }
-
-.toggle input:checked + .toggle-ui::after{
+.item-register-page .toggle input:checked + .toggle-ui::after{
   left:23px;
 }
 
-.toggle-text{
+.item-register-page .toggle-text{
   font-weight:700;
   color:#111827;
 }
 
-/* 入力制限エラー表示 */
-.form-errors{
+/* =========================================================
+  入力制限エラー表示（限定）
+========================================================= */
+.item-register-page .form-errors{
   margin: 14px 0 18px;
   padding: 12px 14px;
   border-radius: 10px;
@@ -122,37 +140,32 @@
   text-align:left;
   font-size:14px;
 }
-.form-errors ul{
+.item-register-page .form-errors ul{
   margin:0;
   padding-left:18px;
 }
-.form-errors li{
+.item-register-page .form-errors li{
   margin:4px 0;
 }
-/* スマホ対応：戻るボタンの当たり判定・余白調整 */
-@media (max-width: 600px){
-  .back-btn{
-    top: 12px;
-    left: 12px;
-    padding: 10px 12px;
-  }
-  .container{
-    padding-top: 10px;
-  }
-}
-/* =========================================================
-  商品追加ボタンを戻るボタンと同じUIにする（見た目のみ）
-  ※positionは固定にしない（submitなので中央配置維持）
-========================================================= */
 
-.item-register-page .submit-btn,
-.item-register-page button[type="submit"]{
+/* =========================================================
+  商品追加ボタン：戻るボタンと同じUI（見た目のみ）
+  ※submitの対象を form-actions 内に限定して暴発防止
+========================================================= */
+.item-register-page .form-actions{
+  display:flex;
+  justify-content:center;
+  margin-top:20px;
+}
+
+.item-register-page .form-actions .primary-btn,
+.item-register-page .form-actions button[type="submit"]{
   display:inline-flex;
   align-items:center;
   justify-content:center;
 
   padding:10px 14px;
-  min-width: 220px;
+  min-width:220px;
 
   background:#ffffff;
   border:1px solid #D1D5DB;
@@ -165,20 +178,38 @@
   transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
 }
 
-.item-register-page button[type="submit"]:hover{
+.item-register-page .form-actions .primary-btn:hover,
+.item-register-page .form-actions button[type="submit"]:hover{
   background:#F9FAFB;
   box-shadow:0 6px 18px rgba(0,0,0,.12);
   transform:translateY(-1px);
 }
 
-.item-register-page button[type="submit"]:active{
+.item-register-page .form-actions .primary-btn:active,
+.item-register-page .form-actions button[type="submit"]:active{
   transform:translateY(0);
   box-shadow:0 4px 14px rgba(0,0,0,.10);
 }
 
-/* 中央配置（既存構造を壊さない） */
-.item-register-page .form-actions{
-  display:flex;
-  justify-content:center;
-  margin-top:20px;
+/* disabledの見た目 */
+.item-register-page .form-actions .primary-btn.is-disabled,
+.item-register-page .form-actions .primary-btn:disabled,
+.item-register-page .form-actions button[type="submit"]:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  transform:none !important;
+}
+
+/* =========================================================
+  スマホ対応：戻るボタンの当たり判定・余白調整
+========================================================= */
+@media (max-width: 600px){
+  .item-register-page .back-btn{
+    top: 12px;
+    left: 12px;
+    padding: 10px 12px;
+  }
+  .item-register-page .container{
+    padding-top: 10px;
+  }
 }

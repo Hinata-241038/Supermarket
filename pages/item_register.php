@@ -22,12 +22,13 @@ function h($s){
 
   <!-- 共通CSS -->
   <link rel="stylesheet" href="../assets/css/hacchu.css">
-  <!-- 商品登録専用CSS（肥大化防止・機能影響なし） -->
+  <!-- 商品登録専用CSS（hacchu.cssを壊さず上書き） -->
   <link rel="stylesheet" href="../assets/css/item_register.css">
 </head>
-<body>
 
-<!-- ✅ hacchu_form.phpに戻るボタン（固定） -->
+<!-- ✅ CSSを確実に当てるためにクラス追加（機能影響なし） -->
+<body class="item-register-page">
+
 <a href="hacchu_form.php" class="back-btn">戻る</a>
 
 <div class="container">
@@ -93,7 +94,7 @@ function h($s){
       <input type="text" id="supplier" name="supplier" placeholder="例：トライアル / ダイソー" required>
     </div>
 
-    <!-- ✅ 期間限定（任意） -->
+    <!-- 期間限定（任意） -->
     <div class="form-row">
       <label>期間限定</label>
       <div class="limited-field">
@@ -106,17 +107,19 @@ function h($s){
       </div>
     </div>
 
-    <!-- ✅ 入力制限エラー表示（JSでここに出す） -->
+    <!-- ✅ エラー表示 -->
     <div id="form_errors" class="form-errors" style="display:none;"></div>
 
-    <button type="submit" class="primary-btn" id="submitBtn">商品追加</button>
+    <!-- ✅ 中央配置用ラッパ（CSSが当てやすい） -->
+    <div class="form-actions">
+      <button type="submit" class="primary-btn" id="submitBtn">商品追加</button>
+    </div>
   </form>
 </div>
 
 <script>
 /* =========================================================
   JAN13: チェックデジット計算（EAN-13）
-  - 1桁目から見て偶数位置(2,4,6,...)を×3
 ========================================================= */
 function calcJanCheckDigit(jan12) {
   let sum = 0;
@@ -126,7 +129,6 @@ function calcJanCheckDigit(jan12) {
   }
   return (10 - (sum % 10)) % 10;
 }
-
 function isValidJan13(jan13) {
   if (!/^\d{13}$/.test(jan13)) return false;
   const check = calcJanCheckDigit(jan13.slice(0, 12));
@@ -134,7 +136,7 @@ function isValidJan13(jan13) {
 }
 
 /* =========================================================
-  JAN UI制御（色・メッセージ・送信禁止）
+  JAN UI制御
 ========================================================= */
 const janInput  = document.getElementById('jan_code');
 const janStatus = document.getElementById('jan_status');
@@ -142,19 +144,14 @@ const submitBtn = document.getElementById('submitBtn');
 
 function setJanState(state, message) {
   janStatus.classList.remove(
-    'jan-status--idle',
-    'jan-status--typing',
-    'jan-status--ok',
-    'jan-status--ng'
+    'jan-status--idle','jan-status--typing','jan-status--ok','jan-status--ng'
   );
   janStatus.classList.add(state);
   janStatus.textContent = message;
 }
-
 function normalizeDigits(value) {
   return value.replace(/\D/g, '');
 }
-
 function refreshJanUI() {
   let v = normalizeDigits(janInput.value);
   janInput.value = v;
@@ -164,14 +161,12 @@ function refreshJanUI() {
     setJanState('jan-status--idle', '12桁で入力すると自動で13桁に補完します');
     return;
   }
-
   if (v.length < 12) {
     janInput.classList.remove('input-ok', 'input-ng');
     janInput.classList.add('input-typing');
     setJanState('jan-status--typing', `あと ${12 - v.length} 桁で自動補完できます`);
     return;
   }
-
   if (v.length === 12) {
     const check = calcJanCheckDigit(v);
     janInput.classList.remove('input-ok', 'input-ng');
@@ -179,7 +174,6 @@ function refreshJanUI() {
     setJanState('jan-status--typing', `自動補完予定 → ${v}${check}`);
     return;
   }
-
   if (v.length === 13) {
     janInput.classList.remove('input-typing');
     if (isValidJan13(v)) {
@@ -193,47 +187,36 @@ function refreshJanUI() {
     }
     return;
   }
-
-  // 14桁以上
   janInput.classList.remove('input-ok', 'input-typing');
   janInput.classList.add('input-ng');
   setJanState('jan-status--ng', '✕ 13桁までです');
 }
-
 janInput.addEventListener('input', refreshJanUI);
-
 janInput.addEventListener('blur', () => {
   let v = normalizeDigits(janInput.value);
-  // 12桁なら確定時に13桁へ
   if (/^\d{12}$/.test(v)) {
     const check = calcJanCheckDigit(v);
     janInput.value = v + String(check);
   }
   refreshJanUI();
 });
-
-// 初期表示（GET jan対応）
 refreshJanUI();
 
 /* =========================================================
-  ✅ 入力制限（商品名/単位/仕入れ先）
-  - 「ひらがな」「カタカナ」「漢字」「アルファベット」「数字」だけ許可
-  - スペース/記号は不可（要件が"しか"なので厳密）
+  入力制限（商品名/単位/仕入れ先）
 ========================================================= */
 const itemName   = document.getElementById('item_name');
 const unit       = document.getElementById('unit');
 const supplier   = document.getElementById('supplier');
 const formErrors = document.getElementById('form_errors');
-
-// 許可文字だけ
 const allowedRe = /^[ぁ-んァ-ヶー一-龥A-Za-z0-9]+$/;
+
+/* ✅ 最初はエラー枠を出さない（UX改善、機能は維持） */
+let showErrors = false;
 
 function validateTextField(el, label) {
   const v = (el.value ?? '').trim();
-
-  if (v.length === 0) {
-    return { ok:false, msg:`${label}を入力してください` };
-  }
+  if (v.length === 0) return { ok:false, msg:`${label}を入力してください` };
   if (!allowedRe.test(v)) {
     return { ok:false, msg:`${label}は「ひらがな・カタカナ・漢字・アルファベット・数字」のみ入力できます（スペース/記号は不可）` };
   }
@@ -241,6 +224,11 @@ function validateTextField(el, label) {
 }
 
 function renderErrors(messages) {
+  if (!showErrors) {
+    formErrors.style.display = 'none';
+    formErrors.innerHTML = '';
+    return;
+  }
   if (messages.length === 0) {
     formErrors.style.display = 'none';
     formErrors.innerHTML = '';
@@ -262,13 +250,12 @@ function refreshFormValidation() {
   const r3 = validateTextField(supplier, '仕入先');
   if (!r3.ok) messages.push(r3.msg);
 
-  // JAN最終判定もここで統合（NGなら送信不可）
   const janOk = /^\d{13}$/.test(janInput.value) && isValidJan13(janInput.value);
   if (!janOk) messages.push('JANコードが有効ではありません');
 
   renderErrors(messages);
 
-  // エラーがあれば送信不可
+  /* 以前どおり：エラーがあれば送信不可 */
   if (messages.length > 0) {
     submitBtn.disabled = true;
     submitBtn.classList.add('is-disabled');
@@ -276,20 +263,24 @@ function refreshFormValidation() {
     submitBtn.disabled = false;
     submitBtn.classList.remove('is-disabled');
   }
+
+  return messages;
 }
 
-[itemName, unit, supplier].forEach(el => {
-  el.addEventListener('input', refreshFormValidation);
-  el.addEventListener('blur', refreshFormValidation);
+/* 入力中は判定だけ更新（エラー枠は出さない） */
+[itemName, unit, supplier, janInput].forEach(el => {
+  el.addEventListener('input', () => refreshFormValidation());
+  el.addEventListener('blur',  () => refreshFormValidation());
 });
 
-// 送信直前ガード（JS無効化対策はPHP側でもやるが、UI的にも止める）
+/* 送信しようとした瞬間にエラー枠を解禁して表示 */
 document.querySelector('form').addEventListener('submit', (e) => {
-  refreshFormValidation();
-  if (submitBtn.disabled) e.preventDefault();
+  showErrors = true;
+  const messages = refreshFormValidation();
+  if (messages.length > 0) e.preventDefault();
 });
 
-// 初期
+/* 初期判定：disabledは維持、でもエラー枠は出さない */
 refreshFormValidation();
 </script>
 
