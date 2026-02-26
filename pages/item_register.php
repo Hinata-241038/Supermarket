@@ -26,7 +26,6 @@ function h($s){
   <link rel="stylesheet" href="../assets/css/item_register.css">
 </head>
 
-<!-- ✅ CSSを確実に当てるためにクラス追加（機能影響なし） -->
 <body class="item-register-page">
 
 <a href="hacchu_form.php" class="back-btn">戻る</a>
@@ -107,10 +106,10 @@ function h($s){
       </div>
     </div>
 
-    <!-- ✅ エラー表示 -->
+    <!-- エラー表示 -->
     <div id="form_errors" class="form-errors" style="display:none;"></div>
 
-    <!-- ✅ 中央配置用ラッパ（CSSが当てやすい） -->
+    <!-- 送信ボタン（見た目/配置はCSSで“発注ボタン風”にする） -->
     <div class="form-actions">
       <button type="submit" class="primary-btn" id="submitBtn">商品追加</button>
     </div>
@@ -211,7 +210,6 @@ const supplier   = document.getElementById('supplier');
 const formErrors = document.getElementById('form_errors');
 const allowedRe = /^[ぁ-んァ-ヶー一-龥A-Za-z0-9]+$/;
 
-/* ✅ 最初はエラー枠を出さない（UX改善、機能は維持） */
 let showErrors = false;
 
 function validateTextField(el, label) {
@@ -255,7 +253,6 @@ function refreshFormValidation() {
 
   renderErrors(messages);
 
-  /* 以前どおり：エラーがあれば送信不可 */
   if (messages.length > 0) {
     submitBtn.disabled = true;
     submitBtn.classList.add('is-disabled');
@@ -263,24 +260,20 @@ function refreshFormValidation() {
     submitBtn.disabled = false;
     submitBtn.classList.remove('is-disabled');
   }
-
   return messages;
 }
 
-/* 入力中は判定だけ更新（エラー枠は出さない） */
 [itemName, unit, supplier, janInput].forEach(el => {
   el.addEventListener('input', () => refreshFormValidation());
   el.addEventListener('blur',  () => refreshFormValidation());
 });
 
-/* 送信しようとした瞬間にエラー枠を解禁して表示 */
 document.querySelector('form').addEventListener('submit', (e) => {
   showErrors = true;
   const messages = refreshFormValidation();
   if (messages.length > 0) e.preventDefault();
 });
 
-/* 初期判定：disabledは維持、でもエラー枠は出さない */
 refreshFormValidation();
 </script>
 

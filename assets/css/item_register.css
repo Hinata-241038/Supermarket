@@ -1,14 +1,21 @@
 /* =========================================================
   item_register.php 専用CSS（hacchu.cssを壊さず上書き）
-  ※前提：<body class="item-register-page"> を付ける
+  前提：<body class="item-register-page">
 ========================================================= */
 
+/* ✅ 横スクロール（下のスクロールバー）を確実に消す */
+html, body{
+  overflow-x: hidden;
+}
+
+/* ページ全体：発注画面の雰囲気に寄せる */
 .item-register-page{
-  /* 必要ならページ専用の微調整変数を置ける（任意） */
+  background: #F3F4F6;
+  color: #111827;
 }
 
 /* =========================================================
-  ✅ 戻るボタン：左上固定を確実化（item_register限定）
+  ✅ 戻るボタン：左上固定（そのまま）
 ========================================================= */
 .item-register-page .back-btn{
   position: fixed;
@@ -34,26 +41,56 @@
   box-shadow: 0 4px 14px rgba(0,0,0,.08);
   transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
 }
-
 .item-register-page .back-btn:hover{
   background: #F9FAFB;
   box-shadow: 0 6px 18px rgba(0,0,0,.12);
   transform: translateY(-1px);
 }
-
 .item-register-page .back-btn:active{
   transform: translateY(0);
   box-shadow: 0 4px 14px rgba(0,0,0,.10);
 }
 
 /* =========================================================
-  ✅ タイトルの位置：戻るボタンと被らないように余白確保（限定）
+  ✅ タイトルをどんな状態でも「中央」に固定
 ========================================================= */
 .item-register-page .container{
-  padding-top: 18px;
+  max-width: 980px;          /* 発注画面の余白感に寄せる */
+  margin: 0 auto;
+  padding: 28px 18px 40px;   /* 左右余白を必ず確保 → はみ出し防止 */
 }
+
 .item-register-page .container h1{
-  margin-top: 28px;
+  text-align: center;        /* ✅ 強制中央 */
+  font-size: 44px;
+  font-weight: 800;
+  margin: 28px 0 22px;
+  letter-spacing: .04em;
+}
+
+/* =========================================================
+  ✅ フォームを「中央カード」にする（発注画面寄せ）
+  ※hacchu.cssの .order-form を壊さず上書き
+========================================================= */
+.item-register-page .order-form{
+  background: #ffffff;
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.06);
+
+  padding: 28px 28px 96px; /* ✅ 下に固定ボタンが被らないよう余白 */
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+/* 1行（ラベル/入力）の横幅が原因で溢れないように */
+.item-register-page .form-row{
+  max-width: 100%;
+}
+
+/* jan-wrapが幅を超えないよう保険 */
+.item-register-page .jan-wrap{
+  max-width: 100%;
 }
 
 /* =========================================================
@@ -63,7 +100,6 @@
   display:flex;
   flex-direction:column;
   gap:8px;
-  margin-bottom: 18px;
 }
 
 .item-register-page .field-help{
@@ -73,7 +109,7 @@
 
 /* トグル風UI（純CSS） */
 .item-register-page .toggle{
-  position: relative;            /* ← input absoluteの基準にする */
+  position: relative;
   display:flex;
   align-items:center;
   gap:12px;
@@ -81,16 +117,15 @@
   cursor:pointer;
 }
 
-/* ラベル全体が確実にクリックできるようにする */
+/* ラベル全体クリック */
 .item-register-page .toggle input{
   position:absolute;
-  inset:0;                       /* ← toggle全体をクリック領域に */
+  inset:0;
   opacity:0;
   margin:0;
   cursor:pointer;
 }
 
-/* 見た目のスイッチ部分 */
 .item-register-page .toggle-ui{
   width:48px;
   height:28px;
@@ -114,7 +149,6 @@
   box-shadow: 0 2px 6px rgba(0,0,0,.15);
 }
 
-/* checked時（inputがtoggle-uiの直前にある構造を前提） */
 .item-register-page .toggle input:checked + .toggle-ui{
   background:#86EFAC;
 }
@@ -128,7 +162,7 @@
 }
 
 /* =========================================================
-  入力制限エラー表示（限定）
+  入力制限エラー表示
 ========================================================= */
 .item-register-page .form-errors{
   margin: 14px 0 18px;
@@ -149,67 +183,84 @@
 }
 
 /* =========================================================
-  商品追加ボタン：戻るボタンと同じUI（見た目のみ）
-  ※submitの対象を form-actions 内に限定して暴発防止
+  ✅ 商品追加ボタン：発注画面の「発注ボタン」風（固定）
+  - 機能は submit のまま
+  - UIだけ変更
 ========================================================= */
 .item-register-page .form-actions{
-  display:flex;
-  justify-content:center;
-  margin-top:20px;
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9999;
+  display: flex;
+  justify-content: flex-end;
 }
 
+/* submitボタン本体 */
 .item-register-page .form-actions .primary-btn,
 .item-register-page .form-actions button[type="submit"]{
   display:inline-flex;
   align-items:center;
   justify-content:center;
 
-  padding:10px 14px;
-  min-width:220px;
+  height: 54px;
+  min-width: 160px;
+  padding: 0 22px;
 
-  background:#ffffff;
-  border:1px solid #D1D5DB;
-  border-radius:10px;
+  border: none;
+  border-radius: 999px;
 
-  color:#111827;
-  font-weight:700;
+  background: #111827;   /* 発注ボタン系の濃色 */
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: .02em;
 
-  box-shadow:0 4px 14px rgba(0,0,0,.08);
-  transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+  box-shadow: 0 12px 26px rgba(17,24,39,.28);
+  transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+  cursor: pointer;
 }
 
 .item-register-page .form-actions .primary-btn:hover,
 .item-register-page .form-actions button[type="submit"]:hover{
-  background:#F9FAFB;
-  box-shadow:0 6px 18px rgba(0,0,0,.12);
-  transform:translateY(-1px);
+  transform: translateY(-1px);
+  box-shadow: 0 16px 30px rgba(17,24,39,.32);
 }
 
 .item-register-page .form-actions .primary-btn:active,
 .item-register-page .form-actions button[type="submit"]:active{
-  transform:translateY(0);
-  box-shadow:0 4px 14px rgba(0,0,0,.10);
+  transform: translateY(0);
+  box-shadow: 0 12px 26px rgba(17,24,39,.26);
 }
 
-/* disabledの見た目 */
+/* disabled */
 .item-register-page .form-actions .primary-btn.is-disabled,
 .item-register-page .form-actions .primary-btn:disabled,
 .item-register-page .form-actions button[type="submit"]:disabled{
-  opacity:.55;
-  cursor:not-allowed;
-  transform:none !important;
+  opacity: .55;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: 0 10px 22px rgba(17,24,39,.18);
 }
 
 /* =========================================================
-  スマホ対応：戻るボタンの当たり判定・余白調整
+  スマホ：固定ボタンが邪魔にならないよう少し縮める
 ========================================================= */
 @media (max-width: 600px){
-  .item-register-page .back-btn{
-    top: 12px;
-    left: 12px;
-    padding: 10px 12px;
-  }
   .item-register-page .container{
-    padding-top: 10px;
+    padding: 22px 12px 36px;
+  }
+
+  .item-register-page .order-form{
+    padding: 22px 16px 92px;
+  }
+
+  .item-register-page .form-actions{
+    right: 14px;
+    bottom: 14px;
+  }
+
+  .item-register-page .form-actions button[type="submit"]{
+    height: 50px;
+    min-width: 150px;
   }
 }
