@@ -30,7 +30,7 @@ body{
   width:100%;
   max-width:980px;
   margin:0 auto;
-  padding:28px 18px 140px;
+  padding:28px 18px 100px;
 }
 
 .page-title{
@@ -382,4 +382,8 @@ body{
 .hacchu-list-page .muted{
   color: var(--muted);
   font-weight: 900;
+}
+
+body.hacchu-form-page{
+  overflow-y: hidden;
 }
