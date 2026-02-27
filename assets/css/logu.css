@@ -1,99 +1,99 @@
-/* 画面全体中央 */
+/* 全体の中央配置 */
 body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  margin: 0;
-  font-family: sans-serif;
-  background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+    background-color: #f0f0f0;
 }
 
-/* 白カード */
+/* 白カード（コンテナ） */
 .container {
-  background: #fff;
-  padding: 40px 60px;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-  width: 320px;
-  text-align: center;
+    background: #fff;
+    padding: 40px 50px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    width: 350px;
+    text-align: center;
 }
 
 /* タイトル */
 .fsize {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 30px;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #333;
 }
 
-/* ラベル横並び */
+/* 入力エリアのラベルとインプット */
 form label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  font-size: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 15px;
+    font-weight: bold;
 }
 
-/* 入力欄 */
-form input[type="text"],
-form input[type="password"] {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  margin-left: 10px;
-  flex: 1;
-  background: #eee;
+form input {
+    flex: 1;
+    margin-left: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
 }
 
-/* ボタンエリア */
+form input:focus {
+    outline: none;
+    border-color: #000000;
+}
+
+/* ボタン・リンクのグループを均等に配置 */
 .button-group {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 40px;
-  gap: 10px;
+    display: flex;
+    justify-content: bace-between; /* 要素間の隙間を均等に */
+    align-items: center;
+    margin-top: 30px;
+    gap: 10px; /* ボタン同士の間の余白 */
 }
 
-/* 新規登録リンク */
+/* 3つの要素すべてに同じ「幅」のルールを適用 */
+.button-group a,
+.button-group button {
+    flex: 1;           /* 3つの要素をすべて同じ幅に広げる */
+    text-align: center;
+    padding: 10px 0;   /* 上下パディング。横はflexで決まるので0 */
+    font-size: 13px;
+    font-weight: bold;
+    border-radius: 6px;
+    text-decoration: none;
+    box-sizing: border-box; /* パディングを幅に含める */
+    display: block;    /* aタグをボタンと同じ振る舞いにする */
+}
+
+/* 新規登録（リンク）の個別スタイル */
 .button-group a {
-  text-decoration: none;
-  color: #333;
-  font-size: 14px;
-  padding: 8px 10px;
-  border-radius: 6px;
-  transition: 0.2s;
+    color: #0040ff;
+    background-color: transparent;
+    border: 1px solid transparent; /* 配置を崩さないための透明な枠線 */
 }
 
 .button-group a:hover {
-  background: #eee;
+    text-decoration: underline;
 }
 
-/* ボタン共通 */
+/* 再設定・ログインボタンの共通スタイル */
 .button-group button {
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: 0.2s;
+    background-color: #0040ff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 
-/* 再設定 */
-.button-group button[formaction="password_reset.php"] {
-  background: #ffffff;
-  color: rgb(255, 0, 0);
-}
-
-.button-group button[formaction="password_reset.php"]:hover {
-  background: #006aff;
-}
-
-/* ログイン */
-.button-group button[type="submit"]:not([formaction]) {
-  background: #ffffff;
-  color: rgb(255, 0, 0);
-}
-
-.button-group button[type="submit"]:not([formaction]):hover {
-  background: #006aff;
+.button-group button:hover {
+    background-color: #1100ff;
 }
