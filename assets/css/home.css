@@ -1,38 +1,115 @@
-body {
-    font-family: sans-serif;
-    text-align: center;
-    margin: 0;
-    padding: 0;
+/* ===============================
+   全体レイアウト
+=============================== */
+body{
+    margin:0;
+    font-family: "Segoe UI","Hiragino Kaku Gothic ProN",sans-serif;
+    background:#F3F4F6;
+    color:#111827;
 }
 
-h1 {
-    font-size: 48px;
-    margin-top: 80px;
-}
-/*test*/
-.menu-button {
-    display: block;
-    width: 250px;
-    margin: 40px auto;
-    padding: 25px 0;
-    background-color: #19f2f2;
-    font-size: 32px;
-    border-radius: 10px;
-    text-decoration: none;
-    color: black;
-    font-weight: bold;
+/* 中央レイアウト */
+.container{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
 }
 
-/* 左下ログアウト */
-.logout {
-    position: fixed;
-    left: 40px;
-    bottom: 40px;
-    background-color: #f2e430;
-    padding: 20px 30px;
-    font-size: 24px;
-    border-radius: 10px;
-    text-decoration: none;
-    color: black;
-    font-weight: bold;
+/* タイトル */
+.title{
+    font-size:48px;
+    font-weight:700;
+    margin-bottom:60px;
+    letter-spacing:1px;
+}
+
+/* メニューエリア */
+.menu-area{
+    display:flex;
+    flex-direction:column;
+    gap:30px;
+}
+
+/* ===============================
+   メニューボタン
+=============================== */
+.menu-button{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:320px;
+    height:90px;
+
+    background:#14C8C8;
+    color:#111;
+
+    font-size:28px;
+    font-weight:700;
+    text-decoration:none;
+
+    border-radius:16px;
+    box-shadow:0 6px 18px rgba(0,0,0,.12);
+
+    transition:all .25s ease;
+}
+
+/* ホバー効果 */
+.menu-button:hover{
+    transform:translateY(-4px);
+    box-shadow:0 10px 24px rgba(0,0,0,.18);
+    background:#10B8B8;
+}
+
+/* ===============================
+   ログアウトボタン（右下固定）
+=============================== */
+.logout{
+    position:fixed;
+    right:40px;
+    bottom:40px;
+
+    background:#FACC15;
+    color:#111;
+
+    padding:18px 28px;
+    font-size:20px;
+    font-weight:700;
+    text-decoration:none;
+
+    border-radius:12px;
+    box-shadow:0 6px 16px rgba(0,0,0,.15);
+
+    transition:.2s;
+}
+
+.logout:hover{
+    background:#EAB308;
+    transform:translateY(-2px);
+}
+
+/* ===============================
+   レスポンシブ
+=============================== */
+@media (max-width:600px){
+
+    .title{
+        font-size:32px;
+        margin-bottom:40px;
+    }
+
+    .menu-button{
+        width:260px;
+        height:75px;
+        font-size:22px;
+    }
+
+    .logout{
+        right:20px;
+        bottom:20px;
+        font-size:16px;
+        padding:14px 22px;
+    }
 }
