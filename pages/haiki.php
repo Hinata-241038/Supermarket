@@ -1,77 +1,84 @@
 <?php
+session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 require_once __DIR__ . '/../dbconnect.php';
+
+if (!isset($_SESSION['role'])) {
+  header('Location: logu.php');
+  exit;
+}
+
+function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
+
+/* =========================
+   廃棄履歴を取得（disposal）
+========================= */
 
 $sql = "
 SELECT
-  s.id AS stock_id,
-  i.item_name,
+  d.id,
+  d.disposal_date,
+  d.disposal_quantity,
+  d.reason,
+  d.expire_date,
   i.jan_code,
-  c.category_label_ja,
-  s.quantity,
-  COALESCE(s.consume_date, s.best_before_date, s.expire_date) AS expire_view
-FROM stock s
-JOIN items i ON s.item_id = i.id
-LEFT JOIN categories c ON i.category_id = c.id
-WHERE COALESCE(s.consume_date, s.best_before_date, s.expire_date) < CURDATE()
-ORDER BY expire_view
+  i.item_name,
+  c.category_label_ja
+FROM disposal d
+LEFT JOIN items i ON i.id = d.item_id
+LEFT JOIN categories c ON c.id = i.category_id
+ORDER BY d.disposal_date DESC, d.id DESC
 ";
+
 $stmt = $pdo->query($sql);
-$items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>廃棄対象</title>
-<link rel="stylesheet" href="../assets/css/admin.css">
+<title>廃棄履歴</title>
+<link rel="stylesheet" href="../assets/css/haiki.css">
 </head>
 <body>
 
 <button class="back-btn" onclick="location.href='home.php'">戻る</button>
 
 <div class="container">
-<h1 class="page-title">廃棄対象（期限切れ）</h1>
+<h1>廃棄履歴</h1>
 
-<?php if(!empty($_GET['done'])): ?>
-  <div class="notice">廃棄処理が完了しました。</div>
-<?php endif; ?>
-
-<div class="card">
-<table class="table">
+<div class="table-card">
+<table class="item-table">
 <thead>
 <tr>
+  <th>廃棄日</th>
   <th>JAN</th>
   <th>商品名</th>
   <th>カテゴリ</th>
   <th>数量</th>
   <th>期限</th>
-  <th>操作</th>
+  <th>理由</th>
 </tr>
 </thead>
 <tbody>
 
-<?php if($items): ?>
-<?php foreach($items as $item): ?>
-<tr class="row-expired">
-  <td><?= htmlspecialchars($item['jan_code']) ?></td>
-  <td><?= htmlspecialchars($item['item_name']) ?></td>
-  <td><?= htmlspecialchars($item['category_label_ja'] ?? '') ?></td>
-  <td><?= (int)$item['quantity'] ?></td>
-  <td><?= htmlspecialchars($item['expire_view']) ?></td>
-  <td>
-    <!-- 互換：単発でも廃棄できる（haiki_execute.phpが両対応） -->
-    <form method="post" action="haiki_execute.php"
-          onsubmit="return confirm('この在庫ロットを廃棄しますか？');">
-      <input type="hidden" name="stock_id" value="<?= (int)$item['stock_id'] ?>">
-      <input type="hidden" name="view" value="expired">
-      <input type="hidden" name="reason" value="期限切れ">
-      <button class="btn btn-danger">廃棄確定</button>
-    </form>
-  </td>
-</tr>
-<?php endforeach; ?>
+<?php if($rows): ?>
+  <?php foreach($rows as $r): ?>
+  <tr>
+    <td><?= h($r['disposal_date']) ?></td>
+    <td><?= h($r['jan_code']) ?></td>
+    <td><?= h($r['item_name']) ?></td>
+    <td><?= h($r['category_label_ja']) ?></td>
+    <td><?= (int)$r['disposal_quantity'] ?></td>
+    <td><?= h($r['expire_date']) ?></td>
+    <td><?= h($r['reason']) ?></td>
+  </tr>
+  <?php endforeach; ?>
 <?php else: ?>
-<tr><td colspan="6" class="no-data">廃棄対象はありません</td></tr>
+  <tr>
+    <td colspan="7" class="no-data">廃棄履歴はありません</td>
+  </tr>
 <?php endif; ?>
 
 </tbody>
