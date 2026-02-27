@@ -4,6 +4,16 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require_once __DIR__ . '/../dbconnect.php';
 
+/* 権限（保存もmng/fteのみ） */
+if (!isset($_SESSION['role'])) {
+  header('Location: logu.php');
+  exit;
+}
+$role = $_SESSION['role'];
+if (!in_array($role, ['mng','fte'], true)) {
+  exit('権限がありません');
+}
+
 function hasColumn(PDO $pdo, string $table, string $column): bool {
   $st = $pdo->prepare("SHOW COLUMNS FROM {$table} LIKE :c");
   $st->execute([':c'=>$column]);
@@ -22,14 +32,13 @@ $consume  = $hasConsume ? trim($_POST['consume_date'] ?? '') : '';
 $best     = $hasBest    ? trim($_POST['best_before_date'] ?? '') : '';
 $legacyIn = (!$hasBest && $hasLegacy) ? trim($_POST['expire_date'] ?? '') : '';
 
-$consume = ($consume !== '') ? $consume : null;
-$best    = ($best !== '') ? $best : null;
-$legacyIn= ($legacyIn !== '') ? $legacyIn : null;
+$consume  = ($consume !== '') ? $consume : null;
+$best     = ($best !== '') ? $best : null;
+$legacyIn = ($legacyIn !== '') ? $legacyIn : null;
 
 try {
   $pdo->beginTransaction();
 
-  // 現在値を取得（expire_date維持に使う）
   $st = $pdo->prepare("SELECT expire_date FROM stock WHERE id = :id FOR UPDATE");
   $st->execute([':id'=>$stock_id]);
   $cur = $st->fetch(PDO::FETCH_ASSOC);
@@ -41,7 +50,6 @@ try {
   $newExpire = $best ?? $consume ?? $legacyIn ?? $currentExpire;
   if (!$newExpire) throw new Exception('期限日が必須です');
 
-  // UPDATE句を動的に（列がない環境でも落ちない）
   $sets = ["quantity = :qty"];
   $params = [':qty'=>$quantity, ':id'=>$stock_id];
 
@@ -54,10 +62,11 @@ try {
   $up->execute($params);
 
   $pdo->commit();
+
   header('Location: zaiko.php');
   exit;
 
 } catch (Exception $e) {
-  $pdo->rollBack();
+  if ($pdo->inTransaction()) $pdo->rollBack();
   exit('保存エラー: ' . $e->getMessage());
 }

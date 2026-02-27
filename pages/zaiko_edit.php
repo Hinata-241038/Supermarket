@@ -4,6 +4,16 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require_once __DIR__ . '/../dbconnect.php';
 
+/* 権限（編集はmng/fteに限定して安全に） */
+if (!isset($_SESSION['role'])) {
+  header('Location: logu.php');
+  exit;
+}
+$role = $_SESSION['role'];
+if (!in_array($role, ['mng','fte'], true)) {
+  exit('権限がありません');
+}
+
 function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 function hasColumn(PDO $pdo, string $table, string $column): bool {
   $st = $pdo->prepare("SHOW COLUMNS FROM {$table} LIKE :c");
@@ -32,7 +42,7 @@ $st->execute([':id'=>$stock_id]);
 $r = $st->fetch(PDO::FETCH_ASSOC);
 if(!$r) exit('在庫ロットが見つかりません');
 
-$qty = (int)$r['quantity'];
+$qty = (int)($r['quantity'] ?? 0);
 $consume = $hasConsume ? ($r['consume_date'] ?? '') : '';
 $best    = $hasBest ? ($r['best_before_date'] ?? '') : '';
 $legacy  = $hasLegacy ? ($r['expire_date'] ?? '') : '';
@@ -42,20 +52,9 @@ $legacy  = $hasLegacy ? ($r['expire_date'] ?? '') : '';
 <head>
 <meta charset="UTF-8">
 <title>在庫ロット 編集</title>
-<link rel="stylesheet" href="../assets/css/zaiko.css">
-<style>
-.edit-wrap{width:90%; margin:20px auto; max-width:820px;}
-.edit-card{background:#ffffff; padding:20px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,0.05);}
-.row{display:flex; gap:12px; margin:12px 0; flex-wrap:wrap; align-items:center;}
-.row label{width:140px; font-weight:700;}
-.row input{flex:1; min-width:220px; padding:10px 12px; border:1px solid #D1D5DB; border-radius:8px;}
-.btns{display:flex; gap:10px; justify-content:flex-end; margin-top:16px;}
-.btn{padding:10px 16px; border:none; border-radius:8px; cursor:pointer; font-weight:700;}
-.btn-save{background:#2563EB; color:#fff;}
-.btn-cancel{background:#E5E7EB;}
-hr{border:none; border-top:1px solid #E5E7EB; margin:16px 0;}
-.error-box{background:#FEF2F2; border:1px solid #FCA5A5; padding:10px 12px; border-radius:10px; color:#991B1B; font-weight:700; margin-bottom:12px; display:none;}
-</style>
+
+<!-- ★編集画面専用CSSに分離 -->
+<link rel="stylesheet" href="../assets/css/zaiko_edit.css">
 </head>
 <body>
 
@@ -71,12 +70,12 @@ hr{border:none; border-top:1px solid #E5E7EB; margin:16px 0;}
 
       <div class="row">
         <label>JAN</label>
-        <input type="text" value="<?= h($r['jan_code']) ?>" readonly>
+        <input type="text" value="<?= h($r['jan_code'] ?? '') ?>" readonly>
       </div>
 
       <div class="row">
         <label>商品名</label>
-        <input type="text" value="<?= h($r['item_name']) ?>" readonly>
+        <input type="text" value="<?= h($r['item_name'] ?? '') ?>" readonly>
       </div>
 
       <hr>
@@ -128,7 +127,6 @@ document.addEventListener("DOMContentLoaded", function () {
     err.style.display = 'none';
   }
 
-  // expire_date NOT NULL 前提：少なくとも何かの日付は必要（消費or賞味or期限）
   form.addEventListener('submit', function(e){
     clearError();
     const consume = form.querySelector('input[name="consume_date"]');
