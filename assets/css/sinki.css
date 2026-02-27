@@ -1,129 +1,113 @@
+/* 全体のリセットとベース設定 */
 body {
-    font-family: sans-serif;
-    margin: 0;
-    text-align: center;
-    background-color: #f5f5f5;
-}
-
-.title {
-    font-size: 40px;
-    margin-top: 80px;
-    margin-bottom: 60px;
-}
-
-/* フォーム領域 */
-.form-container {
-    width: 60%;
-    margin: 0 auto;
-    background: white;
-    padding: 50px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-.form-row {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    margin: 30px 0;
+    padding: 40px 20px;
+    margin: 0;
+}
+
+/* タイトル */
+.title {
+    font-size: 24px;
+    margin-bottom: 30px;
+    color: #2c3e50;
+    border-bottom: 3px solid #004cff; /* スーパーらしい緑のアクセント */
+    padding-bottom: 10px;
+}
+
+/* エラーメッセージ */
+.error {
+    color: #e74c3c;
+    background-color: #fdeaea;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 1px solid #e74c3c;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* フォームの外枠 */
+form {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+/* 入力行のレイアウト */
+.form-row {
+    margin-bottom: 20px;
 }
 
 .form-row label {
-    font-size: 22px;
-    width: 150px;
-    text-align: right;
-    margin-right: 30px;
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 14px;
 }
 
-.form-row input,
-.form-row select {
-    width: 300px;
+/* 入力要素（input/select）の共通スタイル */
+input[type="text"],
+input[type="password"],
+select {
+    width: 100%;
     padding: 12px;
-    font-size: 18px;
-    background-color: #f0f0f0;
-    border: 2px solid transparent;
-    border-radius: 6px;
-    transition: 0.2s;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* paddingを含めたサイズ計算 */
+    font-size: 16px;
+    transition: border-color 0.3s;
 }
 
-/* フォーカス時 */
-.form-row input:focus,
-.form-row select:focus {
+input:focus,
+select:focus {
     outline: none;
-    border: 2px solid #4CAF50;
-    background-color: #fff;
+    border-color: #004cff;
+    box-shadow: 0 0 5px rgba(39, 174, 96, 0.2);
 }
 
-/* ボタン配置 */
-.button-area {
-    margin-top: 60px;
+/* ボタンエリアのレイアウト */
+.button-container {
     display: flex;
-    justify-content: center;
-    gap: 40px;
-}
-
-.back-btn,
-.submit-btn {
-    font-size: 20px;
-    padding: 12px 35px;
-    border-radius: 6px;
-    cursor: pointer;
-    border: none;
-    transition: 0.2s;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
 }
 
 /* 戻るボタン */
 .back-btn {
-    background-color: #ccc;
+    text-decoration: none;
+    color: #7f8c8d;
+    font-size: 14px;
+    padding: 10px 20px;
+    border: 1px solid #bdc3c7;
+    border-radius: 4px;
+    transition: background 0.3s;
 }
 
-/* 送信ボタン */
-.submit-btn {
-    background-color: #4CAF50;
-    color: white;
-}
-
-/* ホバー */
 .back-btn:hover {
-    background-color: #b5b5b5;
+    background-color: #eee;
+}
+
+/* 登録ボタン */
+.submit-btn {
+    background-color: #004cff;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 
 .submit-btn:hover {
-    background-color: #43a047;
-}
-
-/* エラー */
-.error {
-    color: red;
-    font-size: 16px;
-    margin-top: 8px;
-}
-
-/* スマホ対応 */
-@media (max-width: 768px){
-    .form-container{
-        width: 90%;
-        padding: 30px;
-    }
-
-    .form-row{
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .form-row label{
-        width: auto;
-        text-align: left;
-        margin-bottom: 8px;
-    }
-
-    .form-row input,
-    .form-row select{
-        width: 100%;
-    }
-
-    .button-area{
-        flex-direction: column;
-        gap: 20px;
-    }
+    background-color: #5903f8;
 }
