@@ -63,7 +63,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
         </div>
 
         <div class="button-row">
-            <button type="submit">設定</button>
+            <button type="submit" class="submit-btn">設定</button>
         <a href="logu.php" class="back-button">戻る</a>
         </div>
 
