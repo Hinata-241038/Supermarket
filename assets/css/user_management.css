@@ -6,8 +6,11 @@ body {
 .container {
     width: 80%;
     margin: 40px auto;
-    background-color: #e6e6e6;
+    background-color: #fdf5e6;
     padding: 30px;
+    border-radius: 8px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* ← 影 */
+    transition: 0.2s;
 }
 
 .top-area {
@@ -15,11 +18,15 @@ body {
 }
 
 .btn-back {
-    background-color: #cfcfcf;
+    background-color: #008000;
+    color: #fff;
     border: none;
     padding: 10px 20px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 29px;
+    border-radius: 8px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* ← 影 */
+    transition: 0.2s;
 }
 
 .title {
@@ -28,20 +35,23 @@ body {
 }
 
 .user-table {
-    width: 100%;
-    border-collapse: collapse;
+ width: 100%;
+    border-collapse: separate;   /* ← 変更 */
+    border-spacing: 0;           /* ← 追加 */
     margin-bottom: 40px;
-}
-
-.user-table th {
-    background-color: #cfcfcf;
-    padding: 15px;
-    text-align: center;
+    border: 2px solid #999;      /* 外枠 */
+    border-radius: 10px;         /* 角丸 */
+    overflow: hidden;            /* 角丸を有効にする */
 }
 
 .user-table td {
     text-align: center;
     padding: 20px;
+    background-color: white;
+}
+
+.user-table tr:hover td {
+    background-color: #f0f8ff;
 }
 
 .btn-edit {
@@ -50,6 +60,9 @@ body {
     border: none;
     padding: 10px 20px;
     cursor: pointer;
+    border-radius: 8px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* ← 影 */
+    transition: 0.2s;
 }
 
 .delete-area {
@@ -61,6 +74,31 @@ body {
     color: white;
     border: none;
     padding: 15px 40px;
-    font-size: 18px;
+    font-size: 27px;
     cursor: pointer;
+    border-radius: 8px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* ← 影 */
+    transition: 0.2s;
+}
+
+.user-table th,
+.user-table td {
+    border: 1px solid #999;
+}
+
+.user-table th:first-child {
+    border-top-left-radius: 10px;
+}
+
+.user-table th:last-child {
+    border-top-right-radius: 10px;
+}
+
+.user-table input[type="checkbox"] {
+    transform: scale(1.7);
+    cursor: pointer;
+}
+
+.user-table tr {
+    font-size: 20px;
 }
