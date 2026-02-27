@@ -68,7 +68,7 @@ select {
 input:focus,
 select:focus {
     outline: none;
-    border-color: #004cff;
+    border-color: #000000;
     box-shadow: 0 0 5px rgba(39, 174, 96, 0.2);
 }
 
@@ -101,7 +101,7 @@ select:focus {
     color: white;
     border: none;
     padding: 12px 30px;
-    font-size: 12px;
+    font-size: 16px;
     font-weight: bold;
     border-radius: 4px;
     cursor: pointer;
