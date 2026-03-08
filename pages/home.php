@@ -31,7 +31,7 @@ $role = $_SESSION['role'];
         <a href="zaiko.php" class="menu-button">在庫情報</a>
 
         <?php if ($role === 'mng'): ?>
-            <a href="haiki.php" class="menu-button">廃棄</a>
+            <a href="haiki.php" class="menu-button">廃棄一覧</a>
         <?php endif; ?>
 
         <?php if ($role === 'mng'): ?>

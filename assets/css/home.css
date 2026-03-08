@@ -10,30 +10,39 @@ body{
 
 /* 中央レイアウト */
 .container{
+    min-height:100vh;
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    min-height:100vh;
+    padding:40px 20px 120px; /* 右下ログアウトと干渉しにくくする */
+    box-sizing:border-box;
 }
 
 /* タイトル */
 .title{
     font-size:48px;
     font-weight:700;
-    margin-bottom:60px;
+    margin:0 0 56px;
     letter-spacing:1px;
+    text-align:center;
 }
 
-/* メニューエリア */
+/* ===============================
+   メニューエリア
+   4ボタンを 2列×2行 で並べる
+=============================== */
 .menu-area{
-    display:flex;
-    flex-direction:column;
-    gap:30px;
+    display:grid;
+    grid-template-columns:repeat(2, 320px);
+    gap:28px 28px;
+    justify-content:center;
+    align-content:center;
 }
 
 /* ===============================
    メニューボタン
+   業務ボタンは統一感のある落ち着いた青緑系
 =============================== */
 .menu-button{
     display:flex;
@@ -41,75 +50,140 @@ body{
     justify-content:center;
 
     width:320px;
-    height:90px;
+    height:96px;
 
-    background:#14C8C8;
-    color:#111;
+    background:#33C3C8;
+    color:#0F172A;
 
     font-size:28px;
     font-weight:700;
     text-decoration:none;
+    letter-spacing:.02em;
 
     border-radius:16px;
-    box-shadow:0 6px 18px rgba(0,0,0,.12);
+    box-shadow:0 8px 20px rgba(15, 23, 42, .10);
+    border:1px solid rgba(15, 23, 42, .06);
 
-    transition:all .25s ease;
+    transition:
+        transform .22s ease,
+        box-shadow .22s ease,
+        background .22s ease;
 }
 
-/* ホバー効果 */
 .menu-button:hover{
-    transform:translateY(-4px);
-    box-shadow:0 10px 24px rgba(0,0,0,.18);
-    background:#10B8B8;
+    transform:translateY(-3px);
+    background:#2CB5BA;
+    box-shadow:0 12px 24px rgba(15, 23, 42, .14);
+}
+
+.menu-button:active{
+    transform:translateY(-1px);
+}
+
+.menu-button:focus-visible,
+.logout:focus-visible{
+    outline:3px solid rgba(59, 130, 246, .35);
+    outline-offset:3px;
 }
 
 /* ===============================
-   ログアウトボタン（右下固定）
+   ログアウトボタン
+   業務ボタンとは系統を分けるが、
+   目立ちすぎない落ち着いた配色にする
 =============================== */
 .logout{
     position:fixed;
-    right:40px;
-    bottom:40px;
+    right:32px;
+    bottom:32px;
 
-    background:#FACC15;
-    color:#111;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
 
-    padding:18px 28px;
+    min-width:148px;
+    height:72px;
+    padding:0 24px;
+
+    background:#E5E7EB;
+    color:#1F2937;
+
     font-size:20px;
     font-weight:700;
     text-decoration:none;
 
-    border-radius:12px;
-    box-shadow:0 6px 16px rgba(0,0,0,.15);
+    border-radius:14px;
+    border:1px solid #D1D5DB;
+    box-shadow:0 6px 16px rgba(0,0,0,.10);
 
-    transition:.2s;
+    transition:
+        transform .2s ease,
+        background .2s ease,
+        box-shadow .2s ease;
 }
 
 .logout:hover{
-    background:#EAB308;
+    background:#DDE2E8;
     transform:translateY(-2px);
+    box-shadow:0 10px 20px rgba(0,0,0,.12);
 }
 
 /* ===============================
-   レスポンシブ
+   中サイズ端末
 =============================== */
-@media (max-width:600px){
-
+@media (max-width:900px){
     .title{
-        font-size:32px;
-        margin-bottom:40px;
+        font-size:40px;
+        margin-bottom:44px;
+    }
+
+    .menu-area{
+        grid-template-columns:repeat(2, 280px);
+        gap:22px;
     }
 
     .menu-button{
-        width:260px;
-        height:75px;
+        width:280px;
+        height:88px;
+        font-size:24px;
+    }
+}
+
+/* ===============================
+   スマホ
+   1列にして押しやすさ優先
+=============================== */
+@media (max-width:600px){
+    .container{
+        padding:32px 16px 110px;
+    }
+
+    .title{
+        font-size:32px;
+        margin-bottom:32px;
+        line-height:1.3;
+    }
+
+    .menu-area{
+        grid-template-columns:1fr;
+        gap:18px;
+        width:100%;
+        max-width:300px;
+    }
+
+    .menu-button{
+        width:100%;
+        height:76px;
         font-size:22px;
+        border-radius:14px;
     }
 
     .logout{
-        right:20px;
-        bottom:20px;
+        right:16px;
+        bottom:16px;
+        min-width:124px;
+        height:60px;
         font-size:16px;
-        padding:14px 22px;
+        padding:0 18px;
+        border-radius:12px;
     }
 }
