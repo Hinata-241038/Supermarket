@@ -1,11 +1,19 @@
 /* =========================
    全体
 ========================= */
+html{
+    height:100%;
+}
+
 body{
+    min-height:100%;
     margin:0;
     font-family:"Segoe UI","Hiragino Kaku Gothic ProN",sans-serif;
     background:#F3F4F6;
     color:#1F2937;
+
+    /* 右端に常時縦スクロールバーを表示 */
+    overflow-y:scroll;
 }
 
 /* 戻るボタン */
@@ -20,6 +28,7 @@ body{
     font-weight:600;
     cursor:pointer;
     transition:.2s;
+    z-index:1000;
 }
 .back-btn:hover{
     background:#D1D5DB;
@@ -27,7 +36,7 @@ body{
 
 /* コンテナ */
 .container{
-    max-width:1100px;
+    max-width:1280px;
     margin:0 auto;
     padding:40px 20px 80px;
 }
@@ -37,23 +46,67 @@ h1{
     text-align:center;
     font-size:42px;
     font-weight:700;
-    margin-bottom:30px;
+    margin:40px 0 24px;
+}
+
+/* 通知 */
+.notice{
+    max-width:1100px;
+    margin:0 auto 16px;
+    padding:14px 18px;
+    border-radius:10px;
+    font-size:14px;
+    font-weight:600;
+    border:1px solid transparent;
+}
+
+.notice.success{
+    background:#ECFDF5;
+    color:#065F46;
+    border-color:#A7F3D0;
+}
+
+.notice.info{
+    background:#EFF6FF;
+    color:#1D4ED8;
+    border-color:#BFDBFE;
+}
+
+/* 件数・保持期間 */
+.history-meta{
+    max-width:1100px;
+    margin:0 auto 14px;
+    display:flex;
+    justify-content:flex-end;
+    gap:20px;
+    font-size:14px;
+    color:#4B5563;
 }
 
 /* =========================
    テーブルカード
 ========================= */
 .table-card{
+    max-width:1100px;
+    margin:0 auto;
     background:#fff;
     border-radius:12px;
     box-shadow:0 8px 24px rgba(0,0,0,.08);
     overflow:hidden;
 }
 
+/* テーブル専用スクロール */
+.table-scroll{
+    max-height:520px;
+    overflow-y:auto;
+    overflow-x:auto;
+}
+
 /* テーブル */
 .item-table{
     width:100%;
     border-collapse:collapse;
+    min-width:900px;
 }
 
 .item-table th{
@@ -63,12 +116,16 @@ h1{
     font-weight:600;
     text-align:left;
     border-bottom:1px solid #E5E7EB;
+    position:sticky;
+    top:0;
+    z-index:1;
 }
 
 .item-table td{
     padding:16px;
     border-bottom:1px solid #E5E7EB;
     font-size:14px;
+    vertical-align:middle;
 }
 
 /* 行ホバー */
@@ -84,21 +141,6 @@ tr.warning{
     background:#FEF3C7;
 }
 
-/* 廃棄ボタン */
-.discard-btn{
-    background:#DC2626;
-    color:#fff;
-    border:none;
-    padding:8px 16px;
-    border-radius:6px;
-    font-size:14px;
-    cursor:pointer;
-    transition:.2s;
-}
-.discard-btn:hover{
-    background:#B91C1C;
-}
-
 /* 空データ表示 */
 .no-data{
     text-align:center;
@@ -107,12 +149,48 @@ tr.warning{
     color:#6B7280;
 }
 
+/* スクロールバー調整（対応ブラウザ向け） */
+.table-scroll::-webkit-scrollbar{
+    width:12px;
+    height:12px;
+}
+.table-scroll::-webkit-scrollbar-track{
+    background:#F3F4F6;
+}
+.table-scroll::-webkit-scrollbar-thumb{
+    background:#CBD5E1;
+    border-radius:999px;
+    border:3px solid #F3F4F6;
+}
+.table-scroll::-webkit-scrollbar-thumb:hover{
+    background:#94A3B8;
+}
+
 /* レスポンシブ */
 @media(max-width:768px){
-    h1{font-size:30px;}
+    .container{
+        padding:80px 12px 40px;
+    }
+
+    h1{
+        font-size:30px;
+        margin-bottom:18px;
+    }
+
+    .history-meta{
+        justify-content:flex-start;
+        flex-direction:column;
+        gap:6px;
+        padding:0 2px;
+    }
+
     .item-table th,
     .item-table td{
         padding:10px;
         font-size:12px;
+    }
+
+    .table-scroll{
+        max-height:420px;
     }
 }
