@@ -96,8 +96,6 @@ form input:focus {
 
 .button-group button:hover {
     background-color: #1100ff;
-<<<<<<< HEAD
-=======
 }
 /* --- タブレット・デスクトップ対応 (768px以上) --- */
 @media screen and (min-width: 768px) {
@@ -138,5 +136,5 @@ form input:focus {
     .button-group a, .button-group button {
         width: 100%;
     }
->>>>>>> add-zaiko125
 }
+/*aaaaaa*/

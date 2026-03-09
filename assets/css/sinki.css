@@ -13,10 +13,7 @@ body {
 /* タイトル */
 .title {
     font-size: 24px;
-<<<<<<< HEAD
-=======
     font-weight: bold;
->>>>>>> add-zaiko125
     margin-bottom: 30px;
     color: #2c3e50;
     border-bottom: 3px solid #004cff; /* スーパーらしい緑のアクセント */
@@ -72,11 +69,7 @@ select {
 input:focus,
 select:focus {
     outline: none;
-<<<<<<< HEAD
-    border-color: #000000;
-=======
     border-color: #004cff;
->>>>>>> add-zaiko125
     box-shadow: 0 0 5px rgba(39, 174, 96, 0.2);
 }
 
@@ -91,27 +84,16 @@ select:focus {
 /* 戻るボタン */
 .back-btn {
     text-decoration: none;
-<<<<<<< HEAD
-    color: #7f8c8d;
-    font-size: 14px;
-    padding: 10px 20px;
-    border: 1px solid #bdc3c7;
-=======
     color: #000000;
     font-size: 14px;
     padding: 10px 20px;
     border: 1px solid #595959;
->>>>>>> add-zaiko125
     border-radius: 4px;
     transition: background 0.3s;
 }
 
 .back-btn:hover {
-<<<<<<< HEAD
-    background-color: #eee;
-=======
     background-color: #9a9a9a;
->>>>>>> add-zaiko125
 }
 
 /* 登録ボタン */
@@ -129,8 +111,6 @@ select:focus {
 
 .submit-btn:hover {
     background-color: #5903f8;
-<<<<<<< HEAD
-=======
 }
 
 /* --- タブレット・デスクトップ対応 --- */
@@ -171,5 +151,5 @@ select:focus {
         width: 100%;
         text-align: center;
     }
->>>>>>> add-zaiko125
 }
+/*aaaaaaaaaaaaaa*/
