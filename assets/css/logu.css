@@ -1,75 +1,139 @@
-/* logu.css */
-
+/* 全体の中央配置 */
 body {
-  /* 画面全体の中央に配置するための設定 */
-  display: flex;
-  justify-content: center; /* 水平方向の中央寄せ */
-  align-items: center; /* 垂直方向の中央寄せ */
-  min-height: 100vh; /* 画面の高さ全体を使う */
-  margin: 0;
-  font-family: sans-serif; /* 一般的なフォント */
-  background-color: #f0f0f0; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+    background-color: #f0f0f0;
 }
 
+/* 白カード（コンテナ） */
 .container {
-  /* フォームのコンテナ */
-  background-color: white;
-  padding: 40px 60px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  text-align: center; 
-  width: 300px;
+    background: #fff;
+    padding: 40px 50px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    width: 350px;
+    text-align: center;
 }
 
-/* logu.htmlのh1要素 */
+/* タイトル */
 .fsize {
-  /* 画像に合わせて「SuperMarketManagement」のサイズと余白を設定 */
-  font-size: 24px;
-  margin-bottom: 30px;
-  font-weight: bold;
-  /* HTMLのh1が「ログイン」ですが、画像は「SuperMarketManagement」のため、
-     サイズは画像に合わせて調整しています。 */
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #333;
 }
 
-/* 入力フィールドのスタイル調整 */
+/* 入力エリアのラベルとインプット */
 form label {
-  display: flex; /* ラベルと入力欄を横並びに */
-  align-items: center;
-  margin-bottom: 20px;
-  font-size: 16px;
-  /* 画像は「ID」「パスワード」が左寄せ、入力欄が右寄せなので、space-betweenを使用 */
-  justify-content: space-between; 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 15px;
+    font-weight: bold;
 }
 
-form input[type="text"],
-form input[type="password"] {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  flex-grow: 1; /* 入力欄が残りのスペースを占めるように */
-  margin-left: 10px; /* ラベルとの間にスペース */
-  background-color: #eee; /* 画像にある薄いグレーの背景色を再現 */
-  /* 画像の入力欄の幅に合わせて調整 */
-  width: 160px; 
+form input {
+    flex: 1;
+    margin-left: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
 }
 
-/* 改行タグ <br> の影響を無効化 */
-form br {
-    display: none;
+form input:focus {
+    outline: none;
+    border-color: #000000;
 }
 
-/* 画像のように「新規登録」と「ログイン」を横並びにするためのスタイル */
+/* ボタン・リンクのグループを均等に配置 */
 .button-group {
     display: flex;
-    justify-content: space-around; /* 左右に均等に配置 */
-    margin-top: 50px; /* 画像に合わせて入力欄から離す */
-    font-size: 16px;
+    justify-content: bace-between; /* 要素間の隙間を均等に */
+    align-items: center;
+    margin-top: 30px;
+    gap: 10px; /* ボタン同士の間の余白 */
 }
 
+/* 3つの要素すべてに同じ「幅」のルールを適用 */
+.button-group a,
+.button-group button {
+    flex: 1;           /* 3つの要素をすべて同じ幅に広げる */
+    text-align: center;
+    padding: 10px 0;   /* 上下パディング。横はflexで決まるので0 */
+    font-size: 13px;
+    font-weight: bold;
+    border-radius: 6px;
+    text-decoration: none;
+    box-sizing: border-box; /* パディングを幅に含める */
+    display: block;    /* aタグをボタンと同じ振る舞いにする */
+}
+
+/* 新規登録（リンク）の個別スタイル */
 .button-group a {
-    /* 画像の「新規登録」と「ログイン」のテキストスタイル */
-    text-decoration: none; /* リンクの下線を消す */
-    color: black;
+    color: #0040ff;
+    background-color: transparent;
+    border: 1px solid transparent; /* 配置を崩さないための透明な枠線 */
+}
+
+.button-group a:hover {
+    text-decoration: underline;
+}
+
+/* 再設定・ログインボタンの共通スタイル */
+.button-group button {
+    background-color: #0040ff;
+    color: white;
+    border: none;
     cursor: pointer;
-    /* ボタンとしてではなく、テキストリンクとして画像通りのスタイルを適用 */
+    transition: background 0.3s;
+}
+
+.button-group button:hover {
+    background-color: #1100ff;
+}
+/* --- タブレット・デスクトップ対応 (768px以上) --- */
+@media screen and (min-width: 768px) {
+    .container {
+        /* タブレットでは少しカードを大きく見せる */
+        max-width: 450px; 
+        padding: 50px 60px;
+    }
+
+    .fsize {
+        font-size: 28px; /* タイトルを強調 */
+    }
+
+    form label {
+        font-size: 16px; /* 文字を少し大きくして視認性アップ */
+    }
+
+    form input {
+        padding: 12px; /* 入力しやすくするために高さを出す */
+    }
+
+    .button-group {
+        gap: 15px; /* ボタン間の余白を広げる */
+    }
+
+    .button-group a,
+    .button-group button {
+        padding: 12px 0;
+        font-size: 14px; /* ボタンの文字を少し大きく */
+    }
+}
+
+/* --- 超小型デバイス用 (350px以下) --- */
+@media screen and (max-width: 350px) {
+    .button-group {
+        flex-direction: column; /* 非常に狭い場合は縦に並べる */
+    }
+    .button-group a, .button-group button {
+        width: 100%;
+    }
 }

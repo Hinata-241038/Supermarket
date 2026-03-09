@@ -1,57 +1,154 @@
+/* 全体のリセットとベース設定 */
 body {
-    font-family: sans-serif;
-    margin: 0;
-    text-align: center;
-}
-
-.title {
-    font-size: 40px;
-    margin-top: 80px;
-    margin-bottom: 60px;
-}
-
-/* フォーム領域 */
-.form-container {
-    width: 60%;
-    margin: 0 auto;
-}
-
-.form-row {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    margin: 30px 0;
+    padding: 40px 20px;
+    margin: 0;
+}
+
+/* タイトル */
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #2c3e50;
+    border-bottom: 3px solid #004cff; /* スーパーらしい緑のアクセント */
+    padding-bottom: 10px;
+}
+
+/* エラーメッセージ */
+.error {
+    color: #e74c3c;
+    background-color: #fdeaea;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 1px solid #e74c3c;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* フォームの外枠 */
+form {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+/* 入力行のレイアウト */
+.form-row {
+    margin-bottom: 20px;
 }
 
 .form-row label {
-    font-size: 24px;
-    width: 150px;
-    text-align: right;
-    margin-right: 30px;
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 14px;
 }
 
-.form-row input {
-    width: 300px;
+/* 入力要素（input/select）の共通スタイル */
+input[type="text"],
+input[type="password"],
+select {
+    width: 100%;
     padding: 12px;
-    font-size: 20px;
-    background-color: #c0bebe; /* グレー */
-    border: none;
+    border: 1px solid #ccc;
     border-radius: 4px;
+    box-sizing: border-box; /* paddingを含めたサイズ計算 */
+    font-size: 16px;
+    transition: border-color 0.3s;
 }
 
-/* ボタン配置 */
-.button-area {
-    margin-top: 80px;
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #004cff;
+    box-shadow: 0 0 5px rgba(39, 174, 96, 0.2);
+}
+
+/* ボタンエリアのレイアウト */
+.button-container {
     display: flex;
-    justify-content: center;
-    gap: 50px; /* ボタンの間隔 */
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
 }
 
-.back-btn,
+/* 戻るボタン */
+.back-btn {
+    text-decoration: none;
+    color: #000000;
+    font-size: 14px;
+    padding: 10px 20px;
+    border: 1px solid #595959;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.back-btn:hover {
+    background-color: #9a9a9a;
+}
+
+/* 登録ボタン */
 .submit-btn {
-    font-size: 28px;
-    padding: 15px 40px;
-    background: none;
+    background-color: #004cff;
+    color: white;
     border: none;
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 4px;
     cursor: pointer;
+    transition: background 0.3s;
+}
+
+.submit-btn:hover {
+    background-color: #5903f8;
+}
+
+/* --- タブレット・デスクトップ対応 --- */
+@media screen and (min-width: 768px) {
+    body {
+        padding: 60px 20px; /* 上下の余白を少し広げる */
+    }
+
+    .title {
+        font-size: 28px; /* タイトルを少し大きく */
+        margin-bottom: 40px;
+    }
+
+    form {
+        max-width: 500px; /* タブレットでは少し横幅を広げる */
+        padding: 40px;    /* 内部の余白を増やして高級感を出す */
+    }
+
+    .form-row label {
+        font-size: 16px; /* ラベルの視認性向上 */
+    }
+
+    /* ボタンのホバーエフェクトをPC/タブレット用に強化 */
+    .submit-btn:hover {
+        transform: translateY(-1px); /* 軽く浮き上がる演出 */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+}
+
+/* 非常に小さい画面（古いスマホ等）への配慮 */
+@media screen and (max-width: 350px) {
+    .button-container {
+        flex-direction: column-reverse; /* ボタンを縦並びに */
+        gap: 15px;
+    }
+    
+    .back-btn, .submit-btn {
+        width: 100%;
+        text-align: center;
+    }
 }
