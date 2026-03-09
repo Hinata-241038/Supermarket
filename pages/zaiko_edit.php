@@ -149,7 +149,7 @@ $isLimited   = $hasLimited ? (int)($r['is_limited'] ?? 0) : 0;
       <div class="row">
         <label>カテゴリ</label>
         <?php if ($hasCategory && $hasCategoriesTable && $hasCategoryLabel): ?>
-          <select name="category_id">
+          <select name="category_id" class="form-select">
             <option value="">選択してください</option>
             <?php foreach ($categories as $cat): ?>
               <option value="<?= (int)$cat['id'] ?>" <?= ($categoryId === (int)$cat['id']) ? 'selected' : '' ?>>
@@ -199,10 +199,9 @@ $isLimited   = $hasLimited ? (int)($r['is_limited'] ?? 0) : 0;
       <div class="row row-checkbox">
         <label>期間限定</label>
         <?php if ($hasLimited): ?>
-          <label class="checkbox-wrap">
+          <div class="checkbox-box">
             <input type="checkbox" name="is_limited" value="1" <?= $isLimited ? 'checked' : '' ?>>
-            <span>☐</span>
-          </label>
+          </div>
         <?php else: ?>
           <input type="text" value="" readonly placeholder="is_limited列がありません">
         <?php endif; ?>
