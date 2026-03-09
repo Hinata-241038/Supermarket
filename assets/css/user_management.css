@@ -1,16 +1,30 @@
 body {
     background-color: #f5f5f5;
-    font-family: sans-serif;
+    font-family: 'Helvetica Neue', Arial, sans-serif; /* 少しモダンな書体に */
+    color: #333;
+    margin: 0;
+}
+
+/* 共通のボタン・カードスタイル（DRY原則: 繰り返しを避ける） */
+.container, .btn-back, .btn-edit, .btn-delete {
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+}
+
+/* ホバー時の演出（浮き上がるような動き） */
+button:hover, .btn-back:hover, .btn-edit:hover, .btn-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    opacity: 0.9;
 }
 
 .container {
-    width: 80%;
+    width: 90%;
+    max-width: 1000px; /* 広がりすぎ防止 */
     margin: 40px auto;
     background-color: #fff;
     padding: 30px;
-    border-radius: 8px; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* ← 影 */
-    transition: 0.2s;
 }
 
 .top-area {
@@ -21,12 +35,9 @@ body {
     background-color: #008000;
     color: #fff;
     border: none;
-    padding: 10px 20px;
+    padding: 10px 24px;
     cursor: pointer;
-    font-size: 29px;
-    border-radius: 8px; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* ← 影 */
-    transition: 0.2s;
+    font-size: 18px; /* 29pxは少し大きすぎたので調整 */
 }
 
 .title {
@@ -34,20 +45,33 @@ body {
     margin-bottom: 30px;
 }
 
+/* テーブルの修正 */
 .user-table {
- width: 100%;
-    border-collapse: separate;   /* ← 変更 */
-    border-spacing: 0;           /* ← 追加 */
+    width: 100%;
+    border-collapse: separate; 
+    border-spacing: 0;
     margin-bottom: 40px;
-    border: 2px solid #999;      /* 外枠 */
-    border-radius: 10px;         /* 角丸 */
-    overflow: hidden;            /* 角丸を有効にする */
+    border: 1px solid #ccc; /* 外枠を少し細く */
+    border-radius: 10px;
+    overflow: hidden; 
 }
 
+.user-table th, 
 .user-table td {
+    padding: 15px;
     text-align: center;
-    padding: 20px;
-    background-color: white;
+    border-bottom: 1px solid #eee;
+    border-right: 1px solid #eee;
+}
+
+/* 最後の列と行のボーダーを消して見た目を整える */
+.user-table th:last-child, 
+.user-table td:last-child {
+    border-right: none;
+}
+
+.user-table tr:last-child td {
+    border-bottom: none;
 }
 
 .user-table tr:hover td {
@@ -58,11 +82,8 @@ body {
     background-color: #0044ff;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 8px 16px;
     cursor: pointer;
-    border-radius: 8px; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* ← 影 */
-    transition: 0.2s;
 }
 
 .delete-area {
@@ -70,35 +91,20 @@ body {
 }
 
 .btn-delete {
-    background-color: red;
+    background-color: #dc3545; /* 標準的な削除赤 */
     color: white;
     border: none;
-    padding: 15px 40px;
-    font-size: 27px;
+    padding: 12px 30px;
+    font-size: 20px;
     cursor: pointer;
-    border-radius: 8px; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* ← 影 */
-    transition: 0.2s;
 }
 
-.user-table th,
-.user-table td {
-    border: 1px solid #999;
-}
-
-.user-table th:first-child {
-    border-top-left-radius: 10px;
-}
-
-.user-table th:last-child {
-    border-top-right-radius: 10px;
-}
-
+/* チェックボックスの調整 */
 .user-table input[type="checkbox"] {
-    transform: scale(1.7);
+    transform: scale(1.5);
     cursor: pointer;
 }
 
 .user-table tr {
-    font-size: 20px;
+    font-size: 18px;
 }
