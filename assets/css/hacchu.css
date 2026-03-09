@@ -30,7 +30,7 @@ body{
   width:100%;
   max-width:980px;
   margin:0 auto;
-  padding:28px 18px 100px;
+  padding:88px 18px 140px;
 }
 
 .page-title{
@@ -252,7 +252,7 @@ body{
 ================================================= */
 
 .hacchu-list-page .container--wide{
-  max-width: 1180px; /* 画面を有効活用してスカスカを解消 */
+  max-width: 1180px;
 }
 
 .hacchu-list-page .page-head{
@@ -273,7 +273,7 @@ body{
   border: 1px solid var(--line);
   border-radius: 16px;
   box-shadow: 0 10px 24px rgba(0,0,0,.08);
-  overflow: hidden; /* 角丸をテーブルにも反映 */
+  overflow: hidden;
 }
 
 /* 横幅が狭い環境はスクロールで崩れない */
@@ -287,7 +287,7 @@ body{
   border-collapse: separate;
   border-spacing: 0;
   font-size: 15px;
-  min-width: 980px; /* 列が潰れるのを防ぐ */
+  min-width: 980px;
 }
 
 /* ヘッダー */
@@ -310,12 +310,12 @@ body{
   vertical-align: middle;
 }
 
-/* 行ホバー（業務画面の視認性UP） */
+/* 行ホバー */
 .hacchu-list-page .orders-table tbody tr:hover td{
   background: #F3F4F6;
 }
 
-/* 列幅（読みやすさ重視） */
+/* 列幅 */
 .hacchu-list-page .col-id{ width: 70px; }
 .hacchu-list-page .col-jan{ width: 170px; }
 .hacchu-list-page .col-qty{ width: 90px; }
@@ -385,5 +385,5 @@ body{
 }
 
 body.hacchu-form-page{
-  overflow-y: hidden;
+  overflow-y: auto;
 }

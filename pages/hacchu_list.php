@@ -4,6 +4,15 @@ ini_set('display_errors', 1);
 
 require_once __DIR__ . '/../dbconnect.php';
 
+/*
+  並び順の要件
+  1. 未入荷(status=0)を上に表示
+  2. 入荷済(status=1)を下に表示
+  3. 各グループ内では基本的に昇順（ID昇順）
+  
+  → CASE式で未入荷を先頭グループにし、
+    その後 id ASC で安定した昇順にする
+*/
 $sql = "
   SELECT
     o.id,
@@ -15,12 +24,21 @@ $sql = "
     o.status
   FROM orders o
   LEFT JOIN items i ON i.id = o.item_id
-  ORDER BY o.order_date DESC, o.id DESC
+  ORDER BY
+    CASE
+      WHEN o.status = 0 THEN 0
+      WHEN o.status = 1 THEN 1
+      ELSE 2
+    END ASC,
+    o.id ASC
 ";
+
 $stmt = $pdo->query($sql);
 $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
+function h($s){
+  return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
+}
 
 function statusLabel($status)
 {
@@ -38,7 +56,7 @@ function statusLabel($status)
   <title>発注履歴一覧</title>
 
   <!-- キャッシュ対策 -->
-  <link rel="stylesheet" href="../assets/css/hacchu.css?v=10">
+  <link rel="stylesheet" href="../assets/css/hacchu.css?v=11">
 </head>
 
 <body class="hacchu-list-page">
@@ -49,7 +67,7 @@ function statusLabel($status)
   <div class="container container--wide">
     <div class="page-head">
       <h1 class="page-title">発注履歴</h1>
-      <p class="page-sub">最新の発注から順に表示します。</p>
+      <p class="page-sub">未入荷の商品を上に、入荷済の商品を下に表示します。</p>
     </div>
 
     <div class="table-card">
