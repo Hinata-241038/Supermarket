@@ -7,7 +7,7 @@ body {
     width: 500px;
     margin: 120px auto;
     padding: 80px;
-    background-color: #fdf5e6;
+    background-color: #fff;
     border-radius: 8px; 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* ← 影 */
     transition: 0.2s;
