@@ -96,4 +96,47 @@ form input:focus {
 
 .button-group button:hover {
     background-color: #1100ff;
+<<<<<<< HEAD
+=======
+}
+/* --- タブレット・デスクトップ対応 (768px以上) --- */
+@media screen and (min-width: 768px) {
+    .container {
+        /* タブレットでは少しカードを大きく見せる */
+        max-width: 450px; 
+        padding: 50px 60px;
+    }
+
+    .fsize {
+        font-size: 28px; /* タイトルを強調 */
+    }
+
+    form label {
+        font-size: 16px; /* 文字を少し大きくして視認性アップ */
+    }
+
+    form input {
+        padding: 12px; /* 入力しやすくするために高さを出す */
+    }
+
+    .button-group {
+        gap: 15px; /* ボタン間の余白を広げる */
+    }
+
+    .button-group a,
+    .button-group button {
+        padding: 12px 0;
+        font-size: 14px; /* ボタンの文字を少し大きく */
+    }
+}
+
+/* --- 超小型デバイス用 (350px以下) --- */
+@media screen and (max-width: 350px) {
+    .button-group {
+        flex-direction: column; /* 非常に狭い場合は縦に並べる */
+    }
+    .button-group a, .button-group button {
+        width: 100%;
+    }
+>>>>>>> add-zaiko125
 }

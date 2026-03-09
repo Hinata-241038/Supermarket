@@ -13,6 +13,10 @@ body {
 /* タイトル */
 .title {
     font-size: 24px;
+<<<<<<< HEAD
+=======
+    font-weight: bold;
+>>>>>>> add-zaiko125
     margin-bottom: 30px;
     color: #2c3e50;
     border-bottom: 3px solid #004cff; /* スーパーらしい緑のアクセント */
@@ -68,7 +72,11 @@ select {
 input:focus,
 select:focus {
     outline: none;
+<<<<<<< HEAD
     border-color: #000000;
+=======
+    border-color: #004cff;
+>>>>>>> add-zaiko125
     box-shadow: 0 0 5px rgba(39, 174, 96, 0.2);
 }
 
@@ -83,16 +91,27 @@ select:focus {
 /* 戻るボタン */
 .back-btn {
     text-decoration: none;
+<<<<<<< HEAD
     color: #7f8c8d;
     font-size: 14px;
     padding: 10px 20px;
     border: 1px solid #bdc3c7;
+=======
+    color: #000000;
+    font-size: 14px;
+    padding: 10px 20px;
+    border: 1px solid #595959;
+>>>>>>> add-zaiko125
     border-radius: 4px;
     transition: background 0.3s;
 }
 
 .back-btn:hover {
+<<<<<<< HEAD
     background-color: #eee;
+=======
+    background-color: #9a9a9a;
+>>>>>>> add-zaiko125
 }
 
 /* 登録ボタン */
@@ -110,4 +129,47 @@ select:focus {
 
 .submit-btn:hover {
     background-color: #5903f8;
+<<<<<<< HEAD
+=======
+}
+
+/* --- タブレット・デスクトップ対応 --- */
+@media screen and (min-width: 768px) {
+    body {
+        padding: 60px 20px; /* 上下の余白を少し広げる */
+    }
+
+    .title {
+        font-size: 28px; /* タイトルを少し大きく */
+        margin-bottom: 40px;
+    }
+
+    form {
+        max-width: 500px; /* タブレットでは少し横幅を広げる */
+        padding: 40px;    /* 内部の余白を増やして高級感を出す */
+    }
+
+    .form-row label {
+        font-size: 16px; /* ラベルの視認性向上 */
+    }
+
+    /* ボタンのホバーエフェクトをPC/タブレット用に強化 */
+    .submit-btn:hover {
+        transform: translateY(-1px); /* 軽く浮き上がる演出 */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+}
+
+/* 非常に小さい画面（古いスマホ等）への配慮 */
+@media screen and (max-width: 350px) {
+    .button-container {
+        flex-direction: column-reverse; /* ボタンを縦並びに */
+        gap: 15px;
+    }
+    
+    .back-btn, .submit-btn {
+        width: 100%;
+        text-align: center;
+    }
+>>>>>>> add-zaiko125
 }
