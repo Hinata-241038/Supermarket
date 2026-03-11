@@ -76,7 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div class="button-group">
         <a href="sinki.php">新規登録</a>
-        <button type="submit" formaction="password_reset.php">再設定</button>
         <button type="submit">ログイン</button>
       </div>
     </form>

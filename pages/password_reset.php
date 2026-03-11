@@ -1,6 +1,6 @@
 <?php
+session_start();
 require_once __DIR__ . '/../dbconnect.php';
-
 
 if (!isset($_POST['login_id'])) {
     echo "IDが送信されていません";
@@ -16,8 +16,11 @@ $stmt = $pdo->prepare(
 $stmt->execute([$login_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-/* ★ mngは変更不可 */
-if ($user && $user['role'] === 'mng') {
+/* ★ ログインユーザーの権限 */
+$my_role = $_SESSION['role'];
+
+/* ★ fte・ptjはmngを変更できない */
+if (($my_role === 'fte' || $my_role === 'ptj') && $user['role'] === 'mng') {
     echo "<script>
             alert('管理者のパスワードは変更できません');
             location.href='logu.php';
