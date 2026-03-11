@@ -2,8 +2,6 @@
 session_start();
 require_once __DIR__ . '/../dbconnect.php';
 
-$login_id = $_POST['login_id'];
-
 /* ユーザー情報取得 */
 $stmt = $pdo->prepare(
     'SELECT login_id, role FROM users WHERE login_id = ?'
