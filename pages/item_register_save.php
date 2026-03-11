@@ -12,7 +12,8 @@ $item_name   = trim($_POST['item_name'] ?? '');
 $category_id = (int)($_POST['category_id'] ?? 0);
 $price       = (int)($_POST['price'] ?? 0);
 $unit        = trim($_POST['unit'] ?? '');
-$supplier    = trim($_POST['supplier'] ?? '');
+$supplier    = $_POST['supplier'] ?? '';
+$supplier    = trim($supplier);
 
 // ✅ 期間限定（任意）: チェックされていれば1、それ以外0
 $is_limited  = isset($_POST['is_limited']) ? 1 : 0;
@@ -59,23 +60,34 @@ if (!isValidJan13($jan_code)) {
 }
 
 /* =========================================================
-  ✅ 入力制限（サーバー側・すり抜け防止の本丸）
-  - 「ひらがな」「カタカナ」「漢字」「アルファベット」「数字」だけ
+  入力制限（サーバー側）
 ========================================================= */
 function onlyAllowedChars(string $s): bool {
   return preg_match('/\A[ぁ-んァ-ヶー一-龥A-Za-z0-9]+\z/u', $s) === 1;
 }
 
+function onlyAllowedSupplierChars(string $s): bool {
+  return preg_match('/\A[ぁ-んァ-ヶー一-龥A-Za-z0-9（）()・ 　]+\z/u', $s) === 1;
+}
+
 if ($item_name === '' || $unit === '' || $supplier === '' || $category_id <= 0) {
   exit('入力不足です');
 }
-if (!onlyAllowedChars($item_name)) exit('商品名に使用できない文字が含まれています');
-if (!onlyAllowedChars($unit))      exit('単位に使用できない文字が含まれています');
-if (!onlyAllowedChars($supplier))  exit('仕入先に使用できない文字が含まれています');
+
+if (!onlyAllowedChars($item_name)) {
+  exit('商品名に使用できない文字が含まれています');
+}
+
+if (!onlyAllowedChars($unit)) {
+  exit('単位に使用できない文字が含まれています');
+}
+
+if (!onlyAllowedSupplierChars($supplier)) {
+  exit('仕入先に使用できない文字が含まれています');
+}
 
 /* =========================================================
   INSERT / UPDATE
-  - is_limited を追加（既存機能を壊さない：ON DUPLICATE思想維持）
 ========================================================= */
 $sql = "
 INSERT INTO items
@@ -103,6 +115,5 @@ $stmt->execute([
   ':is_limited' => $is_limited,
 ]);
 
-// 発注画面に戻す（JANを引き継ぐ）
 header('Location: hacchu_form.php?jan=' . urlencode($jan_code));
 exit;

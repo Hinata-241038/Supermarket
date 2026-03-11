@@ -208,8 +208,12 @@ const itemName   = document.getElementById('item_name');
 const unit       = document.getElementById('unit');
 const supplier   = document.getElementById('supplier');
 const formErrors = document.getElementById('form_errors');
+
+/* 商品名・単位：従来どおり */
 const allowedRe = /^[ぁ-んァ-ヶー一-龥A-Za-z0-9]+$/;
-const supplierAllowedRe = /^[ぁ-んァ-ヶー一-龥A-Za-z0-9（）()・]+$/;
+
+/* 仕入先：追加で（）、()、・、半角/全角スペースを許可 */
+const supplierAllowedRe = /^[ぁ-んァ-ヶー一-龥A-Za-z0-9（）()・ 　]+$/u;
 
 let showErrors = false;
 
@@ -219,6 +223,24 @@ function validateTextField(el, label) {
   if (!allowedRe.test(v)) {
     return { ok:false, msg:`${label}は「ひらがな・カタカナ・漢字・アルファベット・数字」のみ入力できます（スペース/記号は不可）` };
   }
+  return { ok:true, msg:'' };
+}
+
+function validateSupplierField(el, label) {
+  const raw = el.value ?? '';
+  const v = raw.trim();
+
+  if (v.length === 0) {
+    return { ok:false, msg:`${label}を入力してください` };
+  }
+
+  if (!supplierAllowedRe.test(raw)) {
+    return {
+      ok:false,
+      msg:`${label}は「ひらがな・カタカナ・漢字・アルファベット・数字・（ ）・()・中点・半角スペース・全角スペース」のみ入力できます`
+    };
+  }
+
   return { ok:true, msg:'' };
 }
 
@@ -246,7 +268,7 @@ function refreshFormValidation() {
   const r2 = validateTextField(unit, '単位');
   if (!r2.ok) messages.push(r2.msg);
 
-  const r3 = validateTextField(supplier, '仕入先');
+  const r3 = validateSupplierField(supplier, '仕入先');
   if (!r3.ok) messages.push(r3.msg);
 
   const janOk = /^\d{13}$/.test(janInput.value) && isValidJan13(janInput.value);
