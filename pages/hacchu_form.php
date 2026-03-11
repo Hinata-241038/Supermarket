@@ -9,7 +9,7 @@ function h($s)
 }
 
 /* =========================
-   初期化（Undefined防止）
+   初期化
 ========================= */
 $notice = null;
 
@@ -30,7 +30,7 @@ $prefillJan = $_GET['jan'] ?? '';
 $prefillJan = preg_replace('/\D/', '', $prefillJan);
 
 /* =========================
-   商品取得（is_limited含む）
+   商品取得
 ========================= */
 $item = null;
 
@@ -44,7 +44,7 @@ if ($prefillJan !== '') {
       i.price,
       i.supplier,
       i.category_id,
-      i.is_limited
+      COALESCE(i.is_limited, 0) AS is_limited
     FROM items i
     WHERE i.jan_code = :jan
     LIMIT 1
@@ -78,7 +78,7 @@ $today = date('Y-m-d');
 <head>
   <meta charset="UTF-8">
   <title>発注</title>
-  <link rel="stylesheet" href="../assets/css/hacchu.css?v=6">
+  <link rel="stylesheet" href="../assets/css/hacchu.css?v=7">
 </head>
 
 <body class="hacchu-form-page">
@@ -115,8 +115,8 @@ $today = date('Y-m-d');
         </div>
       <?php endif; ?>
 
-      <form class="order-form" method="post" action="hacchu.php">
-        <input type="hidden" name="item_id" value="<?= $itemId ?>">
+      <form class="order-form" method="post" action="hacchu.php" id="orderForm">
+        <input type="hidden" name="item_id" value="<?= $itemId ?>" id="item_id">
 
         <div class="form-row">
           <label for="jan">JAN</label>
@@ -125,7 +125,10 @@ $today = date('Y-m-d');
             name="jan"
             type="text"
             inputmode="numeric"
+            maxlength="13"
             value="<?= h($jan) ?>"
+            placeholder="JANコードを入力"
+            autocomplete="off"
           >
         </div>
 
@@ -174,13 +177,13 @@ $today = date('Y-m-d');
         </div>
 
         <div class="form-row">
-          <label>個数（点）</label>
+          <label for="order_quantity">個数（点）</label>
           <input
             id="order_quantity"
             name="order_quantity"
             type="number"
             min="1"
-            value="0"
+            value="1"
           >
         </div>
 
@@ -194,7 +197,6 @@ $today = date('Y-m-d');
           <input id="total" type="number" value="0" readonly>
         </div>
 
-        <!-- 期間限定（自動制御・任意削除） -->
         <div class="form-row form-row--limited">
           <label>期間限定</label>
           <div class="limited-inline">
@@ -218,6 +220,7 @@ $today = date('Y-m-d');
 
   <script>
     (function () {
+      const janEl = document.getElementById('jan');
       const priceEl = document.getElementById('price');
       const qtyEl = document.getElementById('order_quantity');
       const totalEl = document.getElementById('total');
@@ -228,7 +231,49 @@ $today = date('Y-m-d');
         totalEl.value = price * qty;
       }
 
+      function sanitizeJan(value) {
+        return String(value || '').replace(/\D/g, '');
+      }
+
+      function searchByJan() {
+        const jan = sanitizeJan(janEl.value);
+        janEl.value = jan;
+
+        // 空なら検索解除
+        if (jan.length === 0) {
+          window.location.href = 'hacchu_form.php';
+          return;
+        }
+
+        // 13桁そろったときだけ検索
+        if (jan.length === 13) {
+          const current = new URL(window.location.href);
+          const currentJan = sanitizeJan(current.searchParams.get('jan') || '');
+
+          if (currentJan !== jan) {
+            window.location.href = 'hacchu_form.php?jan=' + encodeURIComponent(jan);
+          }
+        }
+      }
+
+      janEl.addEventListener('input', function () {
+        janEl.value = sanitizeJan(janEl.value);
+      });
+
+      janEl.addEventListener('change', searchByJan);
+      janEl.addEventListener('blur', searchByJan);
+
+      janEl.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          searchByJan();
+        }
+      });
+
       qtyEl.addEventListener('input', recalc);
+
+      // 初期表示時にも合計を再計算
+      recalc();
     })();
   </script>
 

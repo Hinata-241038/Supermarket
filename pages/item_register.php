@@ -209,6 +209,7 @@ const unit       = document.getElementById('unit');
 const supplier   = document.getElementById('supplier');
 const formErrors = document.getElementById('form_errors');
 const allowedRe = /^[ぁ-んァ-ヶー一-龥A-Za-z0-9]+$/;
+const supplierAllowedRe = /^[ぁ-んァ-ヶー一-龥A-Za-z0-9（）()・]+$/;
 
 let showErrors = false;
 
