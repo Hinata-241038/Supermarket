@@ -9,7 +9,6 @@ if (!isset($_POST['login_id'])) {
 
 $login_id = $_POST['login_id'];
 
-
 /* ユーザー情報取得 */
 $stmt = $pdo->prepare(
     'SELECT login_id, role FROM users WHERE login_id = ?'
@@ -17,7 +16,14 @@ $stmt = $pdo->prepare(
 $stmt->execute([$login_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-
+/* ★ mngは変更不可 */
+if ($user && $user['role'] === 'mng') {
+    echo "<script>
+            alert('管理者のパスワードは変更できません');
+            location.href='logu.php';
+          </script>";
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
