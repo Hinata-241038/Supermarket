@@ -17,7 +17,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$user) {
     header("Location: user_management.php");
     exit;
-}
+} 
 ?>
 
 <!DOCTYPE html>
@@ -54,6 +54,30 @@ if (!$user) {
                 <option value="fte" <?= $user['role'] === 'fte' ? 'selected' : '' ?>>正社員</option>
                 <option value="ptj" <?= $user['role'] === 'ptj' ? 'selected' : '' ?>>アルバイト兼パート</option>
             </select>
+        </div>
+
+        <div class="form-row">
+            <label>権限</label>
+            <input type="text"
+                   value="<?= htmlspecialchars($user['role']) ?>"
+                   readonly>
+        </div>
+
+        <div class="form-row">
+            <label>ユーザーID</label>
+            <input type="text"
+                   value="<?= htmlspecialchars($user['login_id']) ?>"
+                   readonly>
+        </div>
+
+        <div class="form-row">
+            <label>パスワード</label>
+            <input type="password" name="password" required>
+        </div>
+
+        <div class="form-row">
+            <label>パスワード確認用</label>
+            <input type="password" name="password_confirm" required>
         </div>
 
         <div class="btn-area">

@@ -1,25 +1,9 @@
-<?php
-session_start();
-require_once __DIR__ . '/../dbconnect.php';
-
-/* ユーザー情報取得 */
-$stmt = $pdo->prepare(
-    'SELECT login_id, role FROM users WHERE login_id = ?'
-);
-$stmt->execute([$login_id]);
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-/* ★ ログインユーザーの権限 */
-$my_role = $_SESSION['role'];
-
-/* ★ fte・ptjはmngを変更できない */
-if (($my_role === 'fte' || $my_role === 'ptj') && $user['role'] === 'mng') {
-    echo "<script>
-            alert('管理者のパスワードは変更できません');
-            location.href='logu.php';
-          </script>";
-    exit;
-}
+<?php require_once __DIR__ . '/../dbconnect.php'; 
+if (!isset($_POST['login_id'])) { echo "IDが送信されていません"; exit; } 
+$login_id = $_POST['login_id']; /* ユーザー情報取得 */ 
+$stmt = $pdo->prepare( 'SELECT login_id, role FROM users WHERE login_id = ?' ); 
+$stmt->execute([$login_id]); 
+$user = $stmt->fetch(PDO::FETCH_ASSOC); 
 ?>
 
 <!DOCTYPE html>

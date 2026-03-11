@@ -38,7 +38,6 @@ $role = $_SESSION['role'];
             <a href="user_management.php" class="menu-button">ユーザー管理</a>
         <?php endif; ?>
 
-        <a href="password_reset.php" class="menu-button">再設定</a>
 
     </div>
 
