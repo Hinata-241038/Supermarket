@@ -57,26 +57,12 @@ if (!$user) {
         </div>
 
         <div class="form-row">
-            <label>権限</label>
-            <input type="text"
-                   value="<?= htmlspecialchars($user['role']) ?>"
-                   readonly>
-        </div>
-
-        <div class="form-row">
-            <label>ユーザーID</label>
-            <input type="text"
-                   value="<?= htmlspecialchars($user['login_id']) ?>"
-                   readonly>
-        </div>
-
-        <div class="form-row">
             <label>パスワード</label>
             <input type="password" name="password" required>
         </div>
 
         <div class="form-row">
-            <label>パスワード確認用</label>
+            <label>パスワード確認</label>
             <input type="password" name="password_confirm" required>
         </div>
 
