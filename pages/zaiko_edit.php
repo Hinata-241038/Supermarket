@@ -113,7 +113,7 @@ $isLimited   = $hasLimited ? (int)($r['is_limited'] ?? 0) : 0;
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>在庫情報編集</title>
+<title>商品情報編集</title>
 <link rel="stylesheet" href="../assets/css/zaiko_edit.css">
 </head>
 <body>
