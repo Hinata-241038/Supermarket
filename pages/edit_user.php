@@ -24,7 +24,7 @@ if (!$user) {
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>ユーザーID/権限変更</title>
+    <title>ユーザー情報編集変更</title>
     <link rel="stylesheet" href="../assets/css/edit_user.css">
 </head>
 <body>
